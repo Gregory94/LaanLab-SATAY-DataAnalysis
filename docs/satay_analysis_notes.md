@@ -148,7 +148,7 @@ et.al. this can have 3 main reasons.
     starvation of the cells.
 
 It might happen that essential genes are partly tolerant to transposons.
-This is shown by Michel et.al. to be caused that some regions (that code
+This is shown by Michel et. al. to be caused that some regions (that code
 for specific subdomains of the proteins) of the essential genes are
 dispensable. The transposons in these essential genes are clearly
 located at a specific region in the gene, the one that codes for the
@@ -156,7 +156,7 @@ non-essential subdomain. However, this is not always possible, as in
 some cases deletion of non-essential subdomains of essential genes
 create unstable, unexpressed or toxin proteins. The difference in
 essentiality between subdomains in a single protein only happens in
-essential genes, not in non-essential genes. Michel et.al. devised an
+essential genes, not in non-essential genes. Michel et. al. devised an
 algorithm to estimate the likelihood *L* of an essential gene having an
 essential sub domain and a non-essential subdomain:
 
@@ -169,48 +169,22 @@ the CDS. Additionally, it must hold that $0.1 l_{cds} \leq d \leq 0.9 l_{cds}$
 
 # Methods and File types
 
-The essential genes in wild type cells are already known and published.
-We want to verify the SATAY results on wild type cells from Benoit et. al. (see also <https://sites.google.com/site/satayusers/>).
-using the known essential genes. Once this is verified, we want to
-compare the differences in essentiality of genes in wild type with
-different mutants (e.g. dBem1, dBem2, dBem3 and dNrp1). For this we need
-to have a list of essential genes in the different backgrounds. If this
-is not published already, we can obtain this by performing SATAY
-experiments in the lab with these backgrounds. For this a tool needs to
-be developed that automatically converts the raw sequencing and SATAY
-data and outputs a list of genes, together with some of their properties
-(e.g. essentiality, GO-terms, interactions etc.) and show this in a
-convenient overview for further processing and visualization.
+The essential genes in wild type cells are already known and published. We want to verify the SATAY results on wild type cells from Benoit et. al. (see also <https://sites.google.com/site/satayusers/>). using the known essential genes. Once this is verified, we want to compare the differences in essentiality of genes in wild type with different mutants (e.g. dBem1, dBem2, dBem3 and dNrp1). For this we need to have a list of essential genes in the different backgrounds. If this is not published already, we can obtain this by performing SATAY experiments in the lab with these backgrounds. For this a tool needs to be developed that automatically converts the raw sequencing and SATAY data and outputs a list of genes, together with some of their properties (e.g. essentiality, GO-terms, interactions etc.) and show this in a convenient overview for further processing and visualization.
 
 ## Experimental methods
 
-The process of SATAY starts with inserting a plasmid in the cells that
-contains a transposase (TPase) and the transposon (MiniDs) flanked on
-both sides by adenine (ADE). The transposon has a specific, known,
-sequence that codes for the transposase that cuts the transposon from
-the plasmid (or DNA) to (another part of) the DNA.
+The process of SATAY starts with inserting a plasmid in the cells that contains a transposase (TPase) and the transposon (MiniDs) flanked on both sides by adenine (ADE). The transposon has a specific, known, sequence that codes for the transposase that cuts the transposon from the plasmid (or DNA) to (another part of) the DNA.
 
 ![Simplified example for the transposon insertion plasmid.](./media/Plasmid_transposon.png)
 
-(See next figure for the following section). The MiniDs transposon is
-cut loose from the plasmid and randomly inserted in the DNA of the host
-cell. If the transposon is inserted in a gene, the gene can still be
-transcribed by the ribosomes, but typically cannot be (properly)
-translated. The genomic DNA (with the transposon) is cut in pieces for
-sequencing using enzymes, for example DpnII. This cuts the DNA in many
-small pieces (e.g. each approximately 200bp long) and it always cuts the
-transposon in two parts (i.e. digestion of the DNA). Each of the two
-halves of the cut transposon, together with the part of the gene where
-the transposon is inserted in is ligated, meaning that it is folded in a
-circle. A part of the circle is then the half transposon and the rest of
-the circle is a part of the gene where the transposon is inserted in.
-Using PCR and primers, this can then be unfolded by cutting the circle
-at the halved transposon. The part of the gene is then between the
-transposon quarters. Since the sequence of the transposon is known, the part of the gene can be extracted. This is repeated for the other half of the transposon that includes the other part of the gene.
-When both
-parts of the gene are known, the sequence from the original gene can be determined.
+The MiniDs transposon (688_minidsSEQ_1210, tttaccgaccgttaccgaccgttttcatcccta) is cut loose from the plasmid and randomly inserted in the DNA of the host cell. If the transposon is inserted in a gene, the gene can still be transcribed by the ribosomes, but typically cannot be (properly) translated. The genomic DNA (with the transposon) is cut in fragments for sequencing using enzymes, for example DpnII. This cuts the DNA in many small pieces (e.g. each 200bp long) and it always cuts the transposon in two parts (i.e. digestion of the DNA). Each of the two halves of the cut transposon, together with the part of the gene where the transposon is inserted, is folded in a circle by ligating the two ends of the fragment. A part of the circle is then the half transposon and the rest of the circle is a part of the gene where the transposon is inserted in. Using PCR and primers, this can then be unfolded by cutting the circle at the halved transposon. The part of the gene is then between the transposon quarters. Since the sequence of the transposon is known, the part of the gene can be extracted. This is repeated for the other half of the transposon that includes the other part of the gene. When both parts of the gene are known, the sequence from the original gene can be determined.
 
 ![Schematic overview of transposon insertion experiments.](./media/satay_experiment_overview.png)
+
+For sequencing, a number of things need to be considered before choosing a sequencing method. One of the considerations is the read length. The length of reads is for example depended on the size of the PCR fragments (amplicons), since the read length should not be longer than the length of the DNA fragments. Long read length has the advantage that it is easier to align during the postprocessing and allows for resolving large repeated DNA sequences which typically harder, or not even possible, with short reads. Long reads, however, typically has a higher error rate compared with short reads because the read quality typically drops as the reads become longer. Therefore short reads are better for variant calling. Short reads are cheaper to produce and can be generated in larger quanities.
+In case of SATAY, the DNA fragments are PCR amplified and therefore the read length should not exceed the amplicon length. Based on the methods used of similar researches, a read length of about 75 bp is initially recommended [Michel et. al. 2017] [Haribowo et. al. 2019].
+
+For amplicon sequencing, typically three methods are commonly used: Illumina, Ion Torrent and SOLID. Of these, Illumina is the recommended one based on online reviews and other researches using SATAY analysis. There are two techniques that can be used: Illumina MiSeq (as used in [Michel et. al. 2017] and [Haribowo et. al. 2019]) or the Illumina NextSeq 500 (as used in [Segal et. al. 2018]).
 
 ## Sequence alignment
 
@@ -1067,3 +1041,5 @@ Usaj, M., Tan, Y., Wang, W., VanderSluis, B., Zou, A., Myers, C. L., ...
 & Boone, C. (2017). TheCellMap. org: A web-accessible database for
 visualizing and mining the global yeast genetic interaction network. G3:
 Genes, Genomes, Genetics, 7(5), 1539-1549
+
+Haribowo, A. G., Hannich, J. T., Michel, A. H., Megyeri, M., Schuldiner, M., Kornmann, B., & Riezman, H. (2019). Cytotoxicity of 1-deoxysphingolipid unraveled by genome-wide genetic screens and lipidomics in Saccharomyces cerevisiae. Molecular biology of the cell, 30(22), 2814-2826.
