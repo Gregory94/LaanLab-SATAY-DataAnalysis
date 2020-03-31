@@ -704,11 +704,11 @@ The reads from sequencing are aligned to a reference genome. The alignment can b
 Before use, the reference sequence should be indexed so that the program knows where to find potential alignment sites. This only has to be done once for each reference genome. It is recommended to copy the reference genome and remove the ‘write’ permission using the command line
 `chmod –w /path/to/backup/reference/sequence`.
 After this, index the reference genome using the command
-`BWA index /path/to/reference/sequence/file.fasta`
+`bwa index /path/to/reference/sequence/file.fasta`
 This creates 5 more files in the same folder as the reference genome that BWA uses to speed up the process of alignment.
 
 The sequencing command should be given as
-`BWA mem [options] /path/to/reference/sequence/file.fasta /path/to/data/file.fastq > /path/to/output/file.sam`
+`bwa mem [options] /path/to/reference/sequence/file.fasta /path/to/data/file.fastq > /path/to/output/file.sam`
 
 Where `[options]` can be different statements as given in the
 documentation. Most importantly are:
@@ -781,9 +781,9 @@ SAMtools allows for different additional processing of the data. For an overview
   - quickcheck : Checks if a .bam or .sam file is ok. If there is no output, the file is good. If and only if there are warnings, an output is generated. If an output is wanted anyways, use the command `samtools quickcheck –v [input.bam] &&echo ‘All ok’ || echo ‘File failed check’`
 
 Create a .bam file using the command `samtools view –b <InputFile.sam> <OutputFile.bam>`. Check if everything is ok with the .bam file using
-samtools quickcheck `<InputFile.bam>`. If no output is generated, the
+`samtools quickcheck <InputFile.bam>`. If no output is generated, the
 file is good. If desired, more information can be obtained using
-samtools flagstat `<InputFile.bam>` or samtools stats `<InputFile.bam>`.
+`samtools flagstat <InputFile.bam>` or `samtools stats <InputFile.bam>`.
 
 For many downstream tools, the .bam file needs to be sorted. This can be
 done using SAMtools, but this might give problems. A faster and more

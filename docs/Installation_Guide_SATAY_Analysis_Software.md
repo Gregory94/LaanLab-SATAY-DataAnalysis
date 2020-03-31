@@ -34,7 +34,7 @@ To run a program in the command line, you need to specify the entire path to the
 An easier way is to add the program to the windows path. This can be done with the command
 `setx PATH '/path/to/program'`.
 To check if the program is added to the path, use
-`echo %PATH%`.
+`echo $PATH$`.
 
 Some programs requires java to be installed. To check if java is installed, run the command 'java -version' in the command line.
 If it is not installed, download and install it from [<https://www.java.com/nl/download/>](url)
@@ -63,8 +63,8 @@ If a folder is already shared and a new folder is wanted to be shared as well, p
 
 10. Open the terminal app
 11. Enter `'sudo apt update'`
-12. Enter `'sudo apt upgrade'` and restart the system
-13. Enter `'sudo apt install build-essential dkms linux-headers -$(uname -r)'`
+12. Enter `'sudo apt upgrade'`. Type 'Y' if the terminal asks if software needs to be installed. Restart the system
+13. Enter `'sudo apt install build-essential dkms linux-headers-$(uname -r)'`
 14. Click  the 'devices' tab in the top of the window. Click 'Insert Guest Additions CD Image' and run the installer. Power off the VM when done.
 15. In VB click 'settings' (yellow gear symbol) and go to the 'General' tab; 'Advanced'. Set both 'shared clipboard' and 'drag n drop' to bidirectional and click 'ok'
 16. In VB click 'settings' again (yellow gear symbol) and go to the 'Shared Folders'. Add path to a folder that is going to be used as shared folder. Set 'Auto Mount' and click 'Ok'
