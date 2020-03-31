@@ -18,7 +18,7 @@ secPrefix:
   - "Section"
   - "Sections"
 fontsize: 11pt
-geometry: margin=2.5cm
+geometry: margin=0.5in
 autoEqnLabels: true
 cref: true
 crossref: true
