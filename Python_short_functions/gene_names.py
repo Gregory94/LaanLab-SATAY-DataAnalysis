@@ -34,5 +34,48 @@ def list_gene_names(gene_information_file = None):
     print('Number of genes found in file = ',gene_counter)
     return(gene_name_list)
 
+
+
+
+
+
+
+
+
+def list_gene_aliases(gene_information_file = None):
+
+    if gene_information_file == None:
+        gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
+
+
+    gene_aliases_dict = {}
+    
+    
+    with open(gene_information_file) as f:
+        lines = f.readlines()
+        
+        for i in range(58,len(lines)-6):    #THE GENES START AT LINE 58 AND STOP 6 LINES BEFORE THE END OF THE FILE.
+            aliases_for_current_gene_list = []
+            l = lines[i]
+            l_list = l.split()
+            
+             
+            alias_counter = 0
+            gene_designation_list = []
+            for names in l_list:
+                if names.endswith(';'):
+                    gene_designation_list.append(names.strip(';'))
+                    alias_counter += 1
+            gene_designation_list.append(names[alias_counter])
+            aliases_for_current_gene_list.append(gene_names_list)
+            
+            
+            sgd_name = l_list[alias_counter+4]
+            aliases_for_current_gene_list.append(sgd_name)
+
+
+            gene_aliases_dict[alias_counter+1] = aliases_for_current_gene_list
+
+
 if __name__ == '__main__':
     list_gene_names()
