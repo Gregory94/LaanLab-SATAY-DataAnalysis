@@ -1,6 +1,6 @@
 '''This module includes two functions, 'chromosome_position' and 'gene_position'.
 Both do not require an input with the full path to the file 'Saccharomyces_cerevisiae.R64-1-1.99.gff3' (which can be downloaded from https://www.ensembl.org/Saccharomyces_cerevisiae/Info/Index).
-If no input is given, the program automatically searches for the file at r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3'.
+If no input is given, the program automatically searches for the file at in the current directory.
 '''
 def chromosome_position(gff_file = None):
     '''Get the start and end position of each chromosome and determine their respective length.
@@ -12,7 +12,8 @@ def chromosome_position(gff_file = None):
     'c' = chromosome end position
     '''
     if gff_file == None:
-        gff_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3'
+        gff_file = r'Saccharomyces_cerevisiae.R64-1-1.99.gff3'
+        #gff_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3'
 
     #CONVERT ROMAN NUMERALS TO ARABIC NUMERALS
     roman_to_arabic_dict = {}
@@ -62,7 +63,8 @@ def gene_position(gff_file = None):
     '''
 
     if gff_file == None:
-        gff_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3'
+        gff_file = r'Saccharomyces_cerevisiae.R64-1-1.99.gff3'
+        #gff_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3'
 
     gene_pos_dict = {}
     with open(gff_file) as f:

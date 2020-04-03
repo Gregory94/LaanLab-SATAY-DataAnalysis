@@ -18,8 +18,10 @@ def list_known_essentials(input_files = None, headerlines=3):
     '''
     
     if input_files == None:
-        essential_genes_files = [r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt',
-                                 r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt']
+        essential_genes_files = [r'Cervisiae_EssentialGenes_List_1.txt',
+                                 r'Cervisiae_EssentialGenes_List_2.txt']
+        #essential_genes_files = [r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt',
+        #                        r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt']
     else:
         essential_genes_files = input_files
 
