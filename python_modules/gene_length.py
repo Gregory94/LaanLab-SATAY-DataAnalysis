@@ -8,7 +8,8 @@ def gene_length_bp(gene_information_file = None):
     '''
 
     if gene_information_file == None:
-        gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
+        gene_information_file = r'Yeast_Protein_Names.txt'
+        #gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
 
     gene_length_dict = {}
     with open(gene_information_file) as f:
@@ -40,7 +41,8 @@ def gene_length_aa(gene_information_file = None):
     '''
 
     if gene_information_file == None:
-        gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\EssentialGenes_Database\Yeast_Protein_Names.txt'
+        gene_information_file = r'Yeast_Protein_Names.txt'
+        #gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
 
     gene_length_dict = {}
     with open(gene_information_file) as f:
