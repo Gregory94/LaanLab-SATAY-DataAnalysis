@@ -112,7 +112,7 @@ print('Number of essential genes found = ',essential_counter)
 
 df_transposon_fitness_filtered_renamed = df_transposon_fitness_filtered.rename(columns={'essential-by-benoit': 'annotated-essentials'})
 df_transposon_fitness_filtered_ordered = df_transposon_fitness_filtered_renamed.sort_values(by=['annotated-essentials'], ascending=True)
-sns.scatterplot(x='transposon-density' ,y='fitness-SGA',hue='annotated-essentials', data=df_transposon_fitness_filtered_ordered,palette=['green','red'])
+sns.scatterplot(x='transposon-density' ,y='fitness-SGA',hue='annotated-essentials', data=df_transposon_fitness_filtered_ordered,palette=['green','red'],alpha=0.6, linewidth=0)
 #plt.savefig('transposon-density-vs-fitness-NxN-scatter.png',dpi=300,format='png',transparent=False)
 #sns.jointplot("transposon-density", "fitness-SGA", data=df_transposon_fitness_filtered, height=6, ratio=3, color='essential-by-benoit', xlim=[0,0.5],ylim=[0,1.0],kind='scatter',alpha=0.3)
 
