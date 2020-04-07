@@ -5,10 +5,9 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_modules')
+sys.path.insert(1,r'python_modules')
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic
 
-#wig_file = r"C:\Users\gregoryvanbeek\Desktop\E-MTAB-4885.WT1.bam.wig"
 
 def transposon_profile(chrom='I',bar_width=1000,binsize=1000,wig_file = None):
     '''This function creates a bar plot along a specified chromosome for the number of transposons.
@@ -92,4 +91,4 @@ def transposon_profile(chrom='I',bar_width=1000,binsize=1000,wig_file = None):
     
 
 if __name__ == '__main__':
-    transposon_profile('XVI',1000,1000,r"C:\Users\gregoryvanbeek\Desktop\E-MTAB-4885.WT1.bam.wig")
+    transposon_profile('XVI',1000,1000,r"E-MTAB-4885.WT1.bam.wig")
