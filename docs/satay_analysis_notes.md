@@ -70,9 +70,9 @@ protein). When a transposon is randomly inserted in the DNA, the growth
 of the cells is checked. If the cell cannot produce offspring, the
 transposon is inserted in an essential gene. By means of sequencing the
 location of the transposon insertion can be checked and related to a
-specific gene. The genes of all cells (called the library) is saturated
+specific gene. The genome of all cells (called the library) is saturated
 when all possible insertion sites have at least one insertion of a
-transposon. In this case all genes are checked for their essentiality.
+transposon. In this case all regions of the DNA are checked for their essentiality.
 
 ## Essentiality
 
@@ -115,7 +115,21 @@ interaction network between the proteins. With this we aim to eventually
 be able to predict the synthetic lethality of multiple mutations based
 on the interaction maps of the individual mutations.
 
-## Transposon counts
+## Transposon Counts & Reads
+
+Once cells have a transposon inserted somewhere in the DNA, the cells are let to grow.
+A cell with a tranposon inserted in an essential part of its DNA grows very slowly or might not grow at all.
+After insrtion of the transposon, the cells are grown to a few generations.
+Since the sequencing starts only at the location of a transposon insertion (see experimental methods section), it can be concluded that roughly each read from the sequencing corresponds with a transposon insertion.
+Cells with a transposon inserted in an essential genomic region, will not have divided and therefore will not have a contribution to the sequencing reads.
+When the reads are aligned to a reference sequence and the number of reads are mapped against the genome, empty regions indicate possible essential genes.
+Negative selection can thus be found by looking for empty regions in the reads mapping.
+When a transposon is inserted in a non-essential genomic region, these cells can still divide and give rise to offspring.
+When the DNA of all cells are sequenced, the non-essential regions will be represented by relatively many reads.
+Reads per gene, instead of transposons per gene, might therefore a good measure for positive selection.
+Reads per gene is more sensitive (bigger difference in number of reads between essential and non-essential genes), but tends to be nosier.
+Transposons per gene is less noisy, but is also less sensitive since the number of transposons inserted in a gene does not change in subsequent generations of a cell.
+Therefore it is hard to tell the fitness of cells when a transposon is inserted a non-essential region based on the number of transposon insertions.
 
 Ideally transposons are only found in the non-essential genes and the
 essential genes do not have any insertions of transposons (since these
@@ -198,7 +212,7 @@ cell. If the transposon is inserted in a gene, the gene can still be
 transcribed by the ribosomes, but typically cannot be (properly)
 translated. The genomic DNA (with the transposon) is cut in pieces for
 sequencing using enzymes, for example DpnII. This cuts the DNA in many
-small pieces (e.g. each approximately 200bp long) and it always cuts the
+small pieces (e.g. each approximately 75bp long) and it always cuts the
 transposon in two parts (i.e. digestion of the DNA). Each of the two
 halves of the cut transposon, together with the part of the gene where
 the transposon is inserted in is ligated, meaning that it is folded in a
@@ -207,8 +221,7 @@ the circle is a part of the gene where the transposon is inserted in.
 Using PCR and primers, this can then be unfolded by cutting the circle
 at the halved transposon. The part of the gene is then between the
 transposon quarters. Since the sequence of the transposon is known, the part of the gene can be extracted. This is repeated for the other half of the transposon that includes the other part of the gene.
-When both
-parts of the gene are known, the sequence from the original gene can be determined.
+When both parts of the gene are known, the sequence from the original gene can be determined.
 
 ![Schematic overview of transposon insertion experiments.](./media/satay_experiment_overview.png)
 
@@ -1011,7 +1024,7 @@ the .mat file loads all the variables.
 Next a number of files are generated (.bed, .txt and .wig).
 
 [line238-256] A .bed file is generated that can be used for
-visualization of the transposon counts per insertion site. This contains
+visualization of the read counts per insertion site. This contains
 the information stored in the ‘tncoordinates’ variable. This includes
 the chromosome number and the start position of the reads. The end
 position of the reads is taken as the start position +1 (The end
@@ -1048,9 +1061,9 @@ the reads).
 insertion sites (in terms of basepairs, starting counting from 1 for
 each new chromosome). The file consists of two columns. The first column
 represent the insertion site for each transposons and the second column
-is the number of transposons inserted in total at that location. The
+is the number of reads in total at that location. The
 information is similar to that found in the .bed file, but here the
-transposon count is the actual count (and thus not used the equation
+read count is the actual count (and thus not used the equation
 100+transposon_count*20 as is done in the .bed file).
 
 # Bibliography

@@ -55,6 +55,34 @@ def chromosome_position(gff_file = None):
 
 
 
+
+
+
+def chromosomename_roman_to_arabic():
+    '''This creates two dictionaries for translating the chromosome names from roman to arabic numerals or vice versa.
+    The call is like this: arabic_to_roman_dict, roman_to_arabic_dict = chromosomename_roman_to_arabic()
+    '''
+    num_arabic = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+    num_roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
+    
+    arabic_to_roman_dict = {}
+    index_counter = 0
+    for arab in num_arabic:
+        arabic_to_roman_dict[arab] = num_roman[index_counter]
+        index_counter += 1
+    
+    roman_to_arabic_dict = {}
+    index_counter = 0
+    for rom in num_roman:
+        roman_to_arabic_dict[rom] = num_arabic[index_counter]
+        index_counter += 1
+    
+    return(arabic_to_roman_dict,roman_to_arabic_dict)
+
+
+
+
+
 def gene_position(gff_file = None):
     '''Get the start and end position of each gene and determine their respective length.
     Input is a .gff file downloaded from https://www.ensembl.org/Saccharomyces_cerevisiae/Info/Index
@@ -85,4 +113,4 @@ def gene_position(gff_file = None):
     return(gene_pos_dict)
 
 if __name__ == '__main__':
-    chromosome_position()
+    chromosomename_roman_to_arabic()
