@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+"""The module includes two functions that have the same purpose, to make a profile plot for a specified chromosome.
+The transposon_profile function plots a bar plot for the number of transposons in the chromosome.
+The read_profile function plots a bar plot for the number of reads in the chromosome.
+The background of the barplots are color coded. A red area indicates a gene that is not annotated as being essential (in a WT background). A green area indicates an annotated essential gene.
+Both functions require the modules chromosome_and_gene_positions.py, essential_genes_names.py and gene_names.py including the required files for the functions (see the help in these functions).
 """
-"""
-#VISUALIZE THE ESSENTIAL GENES IN THE PLOTS
 
 import sys
 import numpy as np
@@ -13,7 +16,13 @@ from gene_names import gene_aliases
 
 
 def transposon_profile(chrom='I',bar_width=None,bed_file = None):
-    '''
+    '''This function creates a bar plot along a specified chromosome for the number of transposons.
+    The height of each bar represents the number of transposons at the genomic position indicated on the x-axis.
+    The input is as follows: which chromosome (indicated by roman numeral), bar_width, bed_file.
+    The bar_width determines how many basepairs are put in one bin. Little basepairs per bin may be slow. Too many basepairs in one bin and possible low transposon areas might be obscured.
+    The bed_file is one of the files created by the Matlab code from the kornmann-lab.
+    The background of the graph is color coded to indicate areas that code for genes.
+    For this a list for essential genes is needed (used in 'list_known_essentials' function) and a .gff file is required (for the functions in 'chromosome_and_gene_positions.py') and a list for gene aliases (used in the function 'gene_aliases')
     '''
     #bed_file = r'X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed'
     
@@ -144,10 +153,11 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
 def read_profile(chrom='I',bar_width=None,wig_file = None):
     '''This function creates a bar plot along a specified chromosome for the number of reads.
     The height of each bar represents the number of reads at the genomic position indicated on the x-axis.
-    The input is as follows: which chromosome (indicated by roman numeral), bar_width, binsize, wig_file.
-    The bar_width determines how many basepairs are put in one bin. little basepairs per bin may be slow. Too many basepairs in one bin and possible low transposon areas might be obscured.
-    The binsize  is only for visualization, choose a value such that the plot has a high constrast in transposon rich areas and transposon poor areas.
+    The input is as follows: which chromosome (indicated by roman numeral), bar_width, wig_file.
+    The bar_width determines how many basepairs are put in one bin. Little basepairs per bin may be slow. Too many basepairs in one bin and possible low transposon areas might be obscured.
     The wig_file is one of the files created by the Matlab code from the kornmann-lab.
+    The background of the graph is color coded to indicate areas that code for genes.
+    For this a list for essential genes is needed (used in 'list_known_essentials' function) and a .gff file is required (for the functions in 'chromosome_and_gene_positions.py') and a list for gene aliases (used in the function 'gene_aliases')
     '''
     #GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3")
@@ -242,7 +252,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     ax.set_axisbelow(True)
     ax.grid(True)
     ax.set_xlabel('Basepair position on chromosome '+chrom)
-    ax.set_ylabel('Absolute read count')
+    ax.set_ylabel('Read count (log_10)')
 #    ax.set_title('Read profile for chromosome '+chrom)
     plt.show()
     
