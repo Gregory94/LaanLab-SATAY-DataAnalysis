@@ -5,7 +5,7 @@ The read_profile function plots a bar plot for the number of reads in the chromo
 The background of the barplots are color coded. A red area indicates a gene that is not annotated as being essential (in a WT background). A green area indicates an annotated essential gene.
 Both functions require the modules chromosome_and_gene_positions.py, essential_genes_names.py and gene_names.py including the required files for the functions (see the help in these functions).
 """
-
+#%%
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,7 +13,7 @@ sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataA
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from essential_genes_names import list_known_essentials
 from gene_names import gene_aliases
-
+#%%
 
 def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     '''This function creates a bar plot along a specified chromosome for the number of transposons.
@@ -136,8 +136,8 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
 #    ax.set_yscale('log')
     ax.set_axisbelow(True)
     ax.grid(True)
-    ax.set_xlabel('Basepair position on chromosome '+chrom)
-    ax.set_ylabel('Tranposon count')
+    ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=12)
+    ax.set_ylabel('Tranposon count', fontsize=12)
 #    ax.set_title('Transposon profile for chromosome '+chrom)
     plt.show()
 
@@ -149,7 +149,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
 
 
 
-
+#%%
 def read_profile(chrom='I',bar_width=None,wig_file = None):
     '''This function creates a bar plot along a specified chromosome for the number of reads.
     The height of each bar represents the number of reads at the genomic position indicated on the x-axis.
@@ -159,6 +159,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     The background of the graph is color coded to indicate areas that code for genes.
     For this a list for essential genes is needed (used in 'list_known_essentials' function) and a .gff file is required (for the functions in 'chromosome_and_gene_positions.py') and a list for gene aliases (used in the function 'gene_aliases')
     '''
+#%%
     #GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3")
     
@@ -168,14 +169,14 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     chromosomenames_list = []
     for roman in roman_to_arabic_dict:
         chromosomenames_list.append(roman)
-    
-    
+        
+#%%
 #    for chrom in chromosomenames_list:
     chrom_index = chromosomenames_list.index(chrom)
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
         bar_width = int(chr_length_dict.get(chrom)/1000)
-    
+#%%
     
     #GET ALL GENES IN CURRENT CHROMOSOME
     gene_pos_dict = gene_position(r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3')
@@ -184,21 +185,35 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     gene_alias_list = gene_aliases()[0]
     with open(wig_file) as f:
         lines = f.readlines()
-    
-        
-    
-    #GET ALL LINES WITH THE readS FOR THE CURRENT CHROMOSOME
+
+
+#%% GET THE NAMES OF THE CHROMOSOMES AS USED IN THE WIG FILE.
+    chrom_names_dict = {}
+    chrom_names_counter = 0
+    for line in lines:
+        line.strip('\n')
+        chrom_line = 'variableStep'
+        line_split = line.split(' ')
+        if line_split[0] == chrom_line:
+            chromosome_name_wigfile = line_split[1].replace('chrom=chr','').strip('\n')
+            chrom_names_dict[chromosomenames_list[chrom_names_counter]] = chromosome_name_wigfile
+            print('Chromosome ',chromosomenames_list[chrom_names_counter], 'is ',chromosome_name_wigfile)
+            
+            chrom_names_counter += 1
+            
+
+#%% GET ALL LINES WITH THE readS FOR THE CURRENT CHROMOSOME
     line_counter = 0
     for line in lines:
         line = line.strip('\n')
-        if line.endswith('chrom=chr'+chromosomenames_list[chrom_index]):
+        if line.endswith('chrom=chr'+chrom_names_dict.get(chromosomenames_list[chrom_index])):
             wigfile_start_index = line_counter + 1
-        elif chromosomenames_list[chrom_index] == chromosomenames_list[-1]: #CHECK IF THE LAST CHROMOSOME IS REACHED, SINCE THEN THE NEXT CHROMOSOME DOES NOT NEED TO BE SEARCHED AS THIS WON'T EXISTS
+        elif chrom_names_dict.get(chrom) == chrom_names_dict.get('XVI'): #CHECK IF THE LAST CHROMOSOME IS REACHED, SINCE THEN THE NEXT CHROMOSOME DOES NOT NEED TO BE SEARCHED AS THIS WON'T EXISTS
             wigfile_end_index = len(lines)-1 #GET INDEX LAST ELEMENT
-        elif line.endswith('chrom=chr'+chromosomenames_list[chrom_index+1]):
+        elif line.endswith('chrom=chr'+chrom_names_dict.get(chromosomenames_list[chrom_index+1])):
             wigfile_end_index = line_counter
         line_counter += 1
-    
+#%%    
 
 
 
@@ -209,7 +224,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
         line = line.strip(' \n').split()
         allreadscounts_list[int(line[0])] = int(line[1])
     
-    
+#%%    
     
     
     #THE LIST WITH ALL THE TRANPOSONS FOR THE CURRENT CHROMOSOME IS TYPICALLY REALLY LARGE.
@@ -233,8 +248,17 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
             val_counter += 1
             
         allinsertionsites_list = np.linspace(0,chr_length_dict.get(chrom),int(chr_length_dict.get(chrom)/bar_width)+1)
-    
-    
+
+#%%
+# =============================================================================
+#USE alltransposoncounts_binnedlist FOR NORMALIZING allreadscounts_binnedlist WITH THE AMOUNT OF TRANSPOSONS IN EACH BIN.
+#     allreadscounts_binnedlist_np = np.array(allreadscounts_binnedlist, dtype=np.float)
+#     alltransposoncounts_binnedlist_np = np.array(alltransposoncounts_binnedlist, dtype=np.float)
+#     allreadscounts_binnedlist_np_norm = list(allreadscounts_binnedlist_np/alltransposoncounts_binnedlist_np)
+#     allreadscounts_binnedlist_np_norm = np.where(allreadscounts_binnedlist_np_norm==np.inf,0,allreadscounts_binnedlist_np_norm)
+# =============================================================================
+#%%
+
     print('Plotting chromosome ', chrom, '...')
     print('bar width for plotting is ',bar_width)
     binsize = bar_width
@@ -251,12 +275,22 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     ax.set_yscale('log')
     ax.set_axisbelow(True)
     ax.grid(True)
-    ax.set_xlabel('Basepair position on chromosome '+chrom)
-    ax.set_ylabel('Read count (log_10)')
+    ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=12)
+    ax.set_ylabel('Read count (log_10)', fontsize=12)
 #    ax.set_title('Read profile for chromosome '+chrom)
     plt.show()
-    
 
+
+
+#%%    
+
+
+
+
+
+#%%
 if __name__ == '__main__':
-#    read_profile(chrom='I',wig_file=r"C:\Users\gregoryvanbeek\Documents\E-MTAB-4885.WT1.bam.wig")
-    transposon_profile(chrom='I',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed")
+#    read_profile(chrom='XVI',wig_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.wig")
+#    transposon_profile(chrom='VI',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed")
+    read_profile(chrom='XVI',wig_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig")
+#    transposon_profile(chrom='VI',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
