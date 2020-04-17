@@ -13,6 +13,7 @@ sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataA
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from essential_genes_names import list_known_essentials
 from gene_names import gene_aliases
+
 #%%
 
 def transposon_profile(chrom='I',bar_width=None,bed_file = None):
@@ -25,9 +26,14 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     For this a list for essential genes is needed (used in 'list_known_essentials' function) and a .gff file is required (for the functions in 'chromosome_and_gene_positions.py') and a list for gene aliases (used in the function 'gene_aliases')
     '''
     #bed_file = r'X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed'
-    
+#%% USED FILES
+    gff_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3"
+    essential_genes_files = [r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt',
+                            r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt']
+    gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
+#%%
     #GET CHROMOSOME LENGTHS AND POSITIONS
-    chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3")
+    chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
     
     
     #CREATE LIST OF ALL CHROMOSOMES IN ROMAN NUMERALS
@@ -45,10 +51,10 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     
     
     #GET ALL GENES IN CURRENT CHROMOSOME
-    gene_pos_dict = gene_position(r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items() if chrom in v]
-    genes_essential_list = list_known_essentials()
-    gene_alias_list = gene_aliases()[0]
+    genes_essential_list = list_known_essentials(essential_genes_files)
+    gene_alias_list = gene_aliases(gene_information_file)[0]
     
     
     with open(bed_file) as f:
@@ -159,9 +165,15 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     The background of the graph is color coded to indicate areas that code for genes.
     For this a list for essential genes is needed (used in 'list_known_essentials' function) and a .gff file is required (for the functions in 'chromosome_and_gene_positions.py') and a list for gene aliases (used in the function 'gene_aliases')
     '''
+
+#%% USED FILES
+    gff_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3"
+    essential_genes_files = [r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt',
+                            r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt']
+    gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
 #%%
     #GET CHROMOSOME LENGTHS AND POSITIONS
-    chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3")
+    chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
     
     
     #CREATE LIST OF ALL CHROMOSOMES IN ROMAN NUMERALS
@@ -176,13 +188,11 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
         bar_width = int(chr_length_dict.get(chrom)/1000)
-#%%
-    
-    #GET ALL GENES IN CURRENT CHROMOSOME
-    gene_pos_dict = gene_position(r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+#%% GET ALL GENES IN CURRENT CHROMOSOME
+    gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items() if chrom in v]
-    genes_essential_list = list_known_essentials()
-    gene_alias_list = gene_aliases()[0]
+    genes_essential_list = list_known_essentials(essential_genes_files)
+    gene_alias_list = gene_aliases(gene_information_file)[0]
     with open(wig_file) as f:
         lines = f.readlines()
 
@@ -200,7 +210,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
             print('Chromosome ',chromosomenames_list[chrom_names_counter], 'is ',chromosome_name_wigfile)
             
             chrom_names_counter += 1
-            
+
 
 #%% GET ALL LINES WITH THE readS FOR THE CURRENT CHROMOSOME
     line_counter = 0
