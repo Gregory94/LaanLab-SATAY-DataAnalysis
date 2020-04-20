@@ -10,8 +10,12 @@ import pandas as pd
 def stats_pergene(normalize,filepath, filename):
 
     #GET ALL KNOWN ESSENTIAL GENES FROM TWO DIFFERENT FILES AND COMBINE THEM IN ONE LIST
-    essential_genes_files = ['/Users/gregory/Documents/LaanLab/EssentialGenes_Database/Cervisiae_EssentialGenes_List_1.txt',
-                            '/Users/gregory/Documents/LaanLab/EssentialGenes_Database/Cervisiae_EssentialGenes_List_2.txt']
+    essential_genes_files = [r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt",
+                            r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt"]
+    gene_information_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt"
+
+
+
     known_essential_gene_list = []
 
     for files in essential_genes_files:
@@ -25,7 +29,6 @@ def stats_pergene(normalize,filepath, filename):
 
 
     #CREATE A DICTIONARY WITH ALL GENES (BOTH THE COMMON NAME AND THEIR SYSTEMATIC NAME) AND SAVE THEM WITH THEIR RESPECTIVE LENGHTS (IN TERMS OF BP WHICH IS DEFINED AS bp=aa*3)
-    gene_information_file = '/Users/gregory/Documents/LaanLab/EssentialGenes_Database/Yeast_Protein_Names.txt'
     gene_length_dict = {}
     with open(gene_information_file) as f:
         lines = f.readlines()
@@ -228,4 +231,4 @@ def stats_pergene(normalize,filepath, filename):
 
 
 if __name__ == '__main__':
-    stats_pergene('True','/Users/gregory/Documents/LaanLab/LaanLab_Data/Michel2017_WT1/','E-MTAB-4885.WT1.bam_pergene.txt')#'Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam_pergene.txt')#
+    stats_pergene('True',r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit","E-MTAB-4885.WT1.bam_pergene.txt")#'Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam_pergene.txt')#

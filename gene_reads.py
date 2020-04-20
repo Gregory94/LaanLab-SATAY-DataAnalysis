@@ -173,17 +173,19 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
     else:
         print('Plotting reads in range ', gene_start, '..', gene_end, 'in chromosome ', gene_chr, '...')
     fig,ax = plt.subplots()
-    ax.bar(roi_list,reads_roi_list,width=10)#, color=rvb(roi_list/len(roi_list)))
+    ax.bar(roi_list,reads_roi_list,width=15,color='k')#, color=rvb(roi_list/len(roi_list)))
     ax.set_axisbelow(True)
     ax.grid(True)
     if gene_name != None:
-        ax.set_title(gene_name)
-    ax.set_xlabel('Basepair position in chromosome '+ gene_chr, fontsize=12)        
-    ax.set_ylabel('Read count per transposon', fontsize=12)
+        ax.set_title(gene_name, fontweight='bold')
+    elif region == ['IV',46271,48031]:
+        ax.set_title('HO-locus', fontweight='bold')
+    ax.set_xlabel('Basepair position in chromosome '+ gene_chr)        
+    ax.set_ylabel('Read/tn')
     ax.set_xlim(gene_start,gene_end)
     plt.show()
 
 #%%
 if __name__ == '__main__':
-#    gene_reads(region=['I',1,4000],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
-    gene_reads(gene_name='bem3',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+    gene_reads(region=['IV',46271,48031],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+#    gene_reads(gene_name='bem3',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
