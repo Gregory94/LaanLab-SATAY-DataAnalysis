@@ -106,7 +106,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
         line_list = line.strip('\n').split()
         if gene_start <= int(line_list[1]) <= gene_end:
             insertion_list.append(int(line_list[1]))
-            
+
             read_value = (int(line_list[4])-100)/20
             read_list.append(read_value)
 
@@ -114,37 +114,37 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
 #see chromosome I, bp 3891
     unique_insertion_list = []
     duplicate_insertion_list = []
-    for ins in insertion_list: #FIND ALL DUPLICATED TRANSPOSON INSERTION SITES
+    for ins in insertion_list: #FIND THE CHROMOSOME POSITION OF ALL DUPLICATED TRANSPOSON INSERTION SITES
         if ins not in unique_insertion_list:
             unique_insertion_list.append(ins)
         else:
             duplicate_insertion_list.append(ins)
-    duplicate_insertion_list = np.unique(duplicate_insertion_list)
-    
+    duplicate_insertion_list = np.unique(duplicate_insertion_list) #ACCOUNT FOR THE SITUATION WHERE THERE ARE MORE THAN TWO INSERTIONS AT THE SAME LOCATION
+
     duplicate_index_list = []
     for dup in duplicate_insertion_list:
         insertion_arr = np.asarray(insertion_list)
-        duplicate_index_list.append(np.where(insertion_arr == dup))
-    
+        duplicate_index_list.append(np.where(insertion_arr == dup)) #GET ALL INDICES OF THE LIST OF TRANSPOSON INSERTIONS WHERE THE DUPLICATES ARE PRESENT. EACH INSERTION LOCATION GETS ITS OWN NUMPY ARRAY WITHIN THIS LIST
+
     if len(duplicate_index_list) > 0:
         number_of_duplicates_list = [1]*len(insertion_list) #MAKE LIST OF ONES WITH SAME LENGTH AS INSERTION_LIST FOR STORING NUMBER OF DUPLICATES
         delete_index = []
-        for ind_arr in duplicate_index_list:#LOOP OVER ALL INDICES OF DUPLICATES
+        for ind_arr in duplicate_index_list: #LOOP OVER ALL INDICES OF DUPLICATES
             ind_list = ind_arr[0]
-            ind_list_max = max(ind_list)#GET THE LAST INDEX OF THE DUPLICATES
+            ind_list_max = max(ind_list) #GET THE LAST INDEX OF THE DUPLICATES
             print('Mulitple transposons found at ',ind_list)
             for ind in ind_list:
                 if not ind == ind_list_max:
-                    read_list[ind_list_max] += read_list[ind]#ADD UP THE READS TO THE LAST DUPLICATE
+                    read_list[ind_list_max] += read_list[ind] #ADD UP THE READS TO THE LAST DUPLICATE
                     number_of_duplicates_list[ind_list_max] = len(ind_list) #UPDATE NUMBER OF DUPLICATES
                     delete_index.append(ind)
-        
+
         #REVERSE LOOP OVER LIST FOR DELETING
         for del_ind in reversed(delete_index):
             del read_list[del_ind] #DELETES THE INDEX WHICH IS NOW ADDED UP TO THE LAST INDEX
             del insertion_list[del_ind] #DELETES THE SAME INDICES IN THE INSERTION LISTS.
             del number_of_duplicates_list[del_ind]
-        
+
         readspertransposon_list = [x/y for x, y in zip(read_list, number_of_duplicates_list)] #DIVIDE THE NUMBER OF READS BY THE NUMBER OF TRANSPOSONS
     else:
         readspertransposon_list = read_list
@@ -162,7 +162,36 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
         reads_roi_list[roi_index] = float(readspertransposon_list[read_index])
 #        color_bars_roi_list[roi_index] = float(number_of_duplicates_list[read_index])
         read_index += 1
+
+
+#%% CALCULATE SOME STATISTICAL VALUES FOR THE SELECTED REGION
+#roi_list := list of all potential insertion sites in the region
+#reads_roi_list := number of reads in the selected region.
+    number_tn_insertions = sum(x > 0 for x in reads_roi_list)
+    print('Percentage of coverage is ',number_tn_insertions/len(roi_list)*100)
     
+    index_tn_insertions_list = []
+    index_tn_insertions_counter = 0
+    for tn in reads_roi_list:
+        if tn > 0:
+            index_tn_insertions_list.append(index_tn_insertions_counter)
+        index_tn_insertions_counter += 1
+    index_tn_insertions_list.sort()
+    bp_between_tn_insertions = [abs(y-x) for x, y in zip(index_tn_insertions_list[:-1], index_tn_insertions_list[1:])]
+    tn_insertion_meanfrequency = np.nanmean(bp_between_tn_insertions)
+    tn_insertion_medianfrequency = np.nanmedian(bp_between_tn_insertions)
+    print('Mean transposon insertion frequency is ', tn_insertion_meanfrequency)
+    print('Median transposon insertion frequency is ',tn_insertion_medianfrequency)
+
+
+    bp_between_tn_insertions.insert(0,index_tn_insertions_list[0])
+    bp_between_tn_insertions.append(index_tn_insertions_list[-1])
+    if bp_between_tn_insertions == []:
+        bp_between_tn_insertions_max = gene_length
+    else:
+        bp_between_tn_insertions_max = max(bp_between_tn_insertions)
+    print('Largest area devoid of transposon insertions is %.0f bp' % bp_between_tn_insertions_max)
+
 #%% MAKE BAR PLOT FOR READS IN CHROMOSOME
 
 #    clist = [(1, "green"), (max(color_bars_roi_list), "red")]
@@ -181,11 +210,21 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
     elif region == ['IV',46271,48031]:
         ax.set_title('HO-locus', fontweight='bold')
     ax.set_xlabel('Basepair position in chromosome '+ gene_chr)        
-    ax.set_ylabel('Read/tn')
+    ax.set_ylabel('Read/Tn')
     ax.set_xlim(gene_start,gene_end)
+
+    textstr = '\n'.join((r'Transposon coverage = %.2f percent' % (number_tn_insertions/len(roi_list)*100),
+                        r'Mean insertion frequency is once every %.2f bp' % tn_insertion_meanfrequency,
+                        r'Median insertion frequency is once every %.2f bp' % tn_insertion_medianfrequency,
+                        'Largest area devoid of transposon insertions is %.0f bp' % bp_between_tn_insertions_max
+                        ))
+    props = dict(boxstyle='round', facecolor='grey', alpha=0.3)
+    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14,
+        verticalalignment='top', bbox=props)
+    
     plt.show()
 
 #%%
 if __name__ == '__main__':
-    gene_reads(region=['IV',46271,48031],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
-#    gene_reads(gene_name='bem3',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+#    gene_reads(region=['I',1,4000],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+    gene_reads(gene_name='bem1',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
