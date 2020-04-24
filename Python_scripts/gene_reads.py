@@ -62,7 +62,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
     else:
         print('Selected region starts at basepair ',gene_start, ' and ends at basepair ',gene_end, ' in chromosome',gene_chr)
 
-#%% READ THE WIG FILE
+#%% READ THE BED FILE
     with open(bed_file) as f:
         lines = f.readlines()
 
@@ -112,7 +112,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
             read_value = (int(line_list[4])-100)/20
             read_list.append(read_value)
 
-#%% ACCOUNT FOR DOUBLE INSERTIONS
+#%% ACCOUNT FOR DOUBLE INSERTIONS FOR PLOTTING
 #see chromosome I, bp 3891
     unique_insertion_list = []
     duplicate_insertion_list = []
@@ -169,30 +169,51 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
 #%% CALCULATE SOME STATISTICAL VALUES FOR THE SELECTED REGION
 #roi_list := list of all potential insertion sites in the region
 #reads_roi_list := number of reads in the selected region.
-    number_tn_insertions = sum(x > 0 for x in reads_roi_list)
-    print('Percentage of coverage is ',number_tn_insertions/len(roi_list)*100)
-    
-    index_tn_insertions_list = []
-    index_tn_insertions_counter = 0
-    for tn in reads_roi_list:
-        if tn > 0:
-            index_tn_insertions_list.append(index_tn_insertions_counter)
-        index_tn_insertions_counter += 1
-    index_tn_insertions_list.sort()
-    bp_between_tn_insertions = [abs(y-x) for x, y in zip(index_tn_insertions_list[:-1], index_tn_insertions_list[1:])]
-    bp_between_tn_insertions.insert(0,index_tn_insertions_list[0])
-    bp_between_tn_insertions.append(len(reads_roi_list) - index_tn_insertions_list[-1])
-    tn_insertion_meanfrequency = np.nanmean(bp_between_tn_insertions)
-    tn_insertion_medianfrequency = np.nanmedian(bp_between_tn_insertions)
-    print('Mean transposon insertion frequency is ', tn_insertion_meanfrequency)
-    print('Median transposon insertion frequency is ',tn_insertion_medianfrequency)
 
+    coverage_percentage = (len(read_list)/len(roi_list)*100)
+    print('Percentage of coverage is ',coverage_percentage)
+#    number_tn_insertions = sum(x > 0 for x in reads_roi_list)
+#    print('Percentage of coverage is ',number_tn_insertions/len(roi_list)*100)
 
-    if bp_between_tn_insertions == []:
-        bp_between_tn_insertions_max = gene_length
+    if insertion_list != []:
+        bp_between_tn_insertions = [abs(y-x) for x, y in zip(insertion_list[:-1], insertion_list[1:])]
+        bp_between_tn_insertions.insert(0,insertion_list[0] - gene_start) #ADD START OF GENE (bp=0)
+        bp_between_tn_insertions.append(gene_end - insertion_list[-1]) #ADD END OF GENE (bp=INDEX LAST TN - GENE LENGTH)
+
+        max_empty_region = max(bp_between_tn_insertions)
+        
+        insertion_avgperiodicity = np.nanmean(bp_between_tn_insertions)
+        insertion_medperiodicity = np.nanmedian(bp_between_tn_insertions)
     else:
-        bp_between_tn_insertions_max = max(bp_between_tn_insertions)
-    print('Largest area devoid of transposon insertions is %.0f bp' % bp_between_tn_insertions_max)
+        max_empty_region = gene_length
+        bp_between_tn_insertions = [abs(y-x) for x, y in zip(insertion_list[:-1], insertion_list[1:])]
+        insertion_avgperiodicity = 0
+        insertion_medperiodicity = 0
+
+    print('Mean transposon insertion frequency is ', insertion_avgperiodicity)
+    print('Median transposon insertion frequency is ',insertion_medperiodicity)
+
+#    index_tn_insertions_list = []
+#    index_tn_insertions_counter = 0
+#    for tn in reads_roi_list:
+#        if tn > 0:
+#            index_tn_insertions_list.append(index_tn_insertions_counter)
+#        index_tn_insertions_counter += 1
+#    index_tn_insertions_list.sort()
+#    bp_between_tn_insertions = [abs(y-x) for x, y in zip(index_tn_insertions_list[:-1], index_tn_insertions_list[1:])]
+#    bp_between_tn_insertions.insert(0,index_tn_insertions_list[0]) #ADD START OF GENE (bp=0)
+#    bp_between_tn_insertions.append(len(reads_roi_list) - index_tn_insertions_list[-1]) #ADD END OF GENE (bp=INDEX LAST TN - GENE LENGTH)
+#    tn_insertion_meanfrequency = np.nanmean(bp_between_tn_insertions)
+#    tn_insertion_medianfrequency = np.nanmedian(bp_between_tn_insertions)
+#    print('Mean transposon insertion frequency is ', tn_insertion_meanfrequency)
+#    print('Median transposon insertion frequency is ',tn_insertion_medianfrequency)
+#
+#
+#    if bp_between_tn_insertions == []:
+#        bp_between_tn_insertions_max = gene_length
+#    else:
+#        bp_between_tn_insertions_max = max(bp_between_tn_insertions)
+#    print('Largest area devoid of transposon insertions is %.0f bp' % bp_between_tn_insertions_max)
 
 #%% MAKE BAR PLOT FOR READS IN CHROMOSOME
 
@@ -217,16 +238,16 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
 
     if gene_name != None:
         textstr = '\n'.join((r'Reading orientation of gene: ' + gene_orien,
-                            r'Transposon coverage = %.2f percent' % (number_tn_insertions/len(roi_list)*100),
-                            r'Mean insertion frequency is once every %.2f bp' % tn_insertion_meanfrequency,
-                            r'Median insertion frequency is once every %.2f bp' % tn_insertion_medianfrequency,
-                            'Largest area devoid of transposon insertions is %.0f bp' % bp_between_tn_insertions_max
+                            r'Transposon coverage = %.2f percent' % (coverage_percentage),
+                            r'Mean insertion frequency is once every %.2f bp' % insertion_avgperiodicity,
+                            r'Median insertion frequency is once every %.2f bp' % insertion_medperiodicity,
+                            'Largest area devoid of transposon insertions is %.0f bp' % max_empty_region
                             ))
     else:
-        textstr = '\n'.join((r'Transposon coverage = %.2f percent' % (number_tn_insertions/len(roi_list)*100),
-                            r'Mean insertion frequency is once every %.2f bp' % tn_insertion_meanfrequency,
-                            r'Median insertion frequency is once every %.2f bp' % tn_insertion_medianfrequency,
-                            'Largest area devoid of transposon insertions is %.0f bp' % bp_between_tn_insertions_max
+        textstr = '\n'.join((r'Transposon coverage = %.2f percent' % (coverage_percentage),
+                            r'Mean insertion frequency is once every %.2f bp' % insertion_avgperiodicity,
+                            r'Median insertion frequency is once every %.2f bp' % insertion_medperiodicity,
+                            'Largest area devoid of transposon insertions is %.0f bp' % max_empty_region
                             ))
     props = dict(boxstyle='round', facecolor='grey', alpha=0.3)
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14,
@@ -236,5 +257,5 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
 
 #%%
 if __name__ == '__main__':
-    gene_reads(region=['I',1,4000],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+    gene_reads(region=['I',1,230218],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
 #    gene_reads(gene_name='bem1',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
