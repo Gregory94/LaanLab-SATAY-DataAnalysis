@@ -103,7 +103,8 @@ def gene_position(gff_file = None):
                     gene_chr = line_list[0]
                     gene_start = line_list[3]
                     gene_end = line_list[4]
-                    gene_position = [gene_chr,gene_start,gene_end]
+                    gene_orien = line_list[6]
+                    gene_position = [gene_chr,gene_start,gene_end,gene_orien]
                     
                     gene_name_string = line_list[8].split(';')[0]
                     gene_name = gene_name_string.split(':')[1]
@@ -112,5 +113,6 @@ def gene_position(gff_file = None):
 
     return(gene_pos_dict)
 
+
 if __name__ == '__main__':
-    chromosomename_roman_to_arabic()
+    gene_position()

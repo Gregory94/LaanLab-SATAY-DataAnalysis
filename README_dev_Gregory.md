@@ -28,9 +28,9 @@ The following files are present:
 1. chromosome_and_gene_positions.py: This contains the functions `chromosome_positions` and `gene_positions` which outputs information about the location and lengths of the chromosomes and genes. Input is the gff file 'Saccharomyces_cerevisiae.R64-1-1.99.gff3'.
 2. essential_genes_names.py: This contains the function `list_known_essentials`. It combines and outputs the essential genes from the files 'Cervisiae_EssentialGenes_List_1.txt' and 'Cervisiae_EssentialGenes_List_2.txt' in one list.
 3. gene_length.py: This contains the functions `gene_length_bp` and `gene_length_aa`, both which requires the file 'Yeast_Protein_Names.txt'. It extracts the gene length in terms of basepairs and amino-acids, respectively.
-4. gene_names.py: This contains the functions `list_gene_names` and `gene_aliases` and both require the file 'Yeast_Protein_Names.txt' as input. The function 'list_gene_names' creates a list of all gene names, including aliases and different naming conventions. The function 'gene_aliases' creates dictionaries with keys the gene names according to the systematic naming convention (oln) and values are the names according to the standard naming conventions (including all potential aliases of the genes), the gene_id for SGD and the gene_id for swiss-prot.
+4. gene_names.py: This contains the functions `list_gene_names` and `gene_aliases` and both require the file 'Yeast_Protein_Names.txt' as input. The function 'list_gene_names' creates a list of all gene names, including aliases and different naming conventions. The function 'gene_aliases' creates dictionaries with keys the gene names according to the systematic naming convention (oln) and values are the names according to the standard naming conventions (including all potential aliases of the genes), the gene_id for SGD and the gene_id for swiss-prot. Input is the gff file 'Saccharomyces_cerevisiae.R64-1-1.99.gff3'.
 
 ## Other files
 Other files are python files for coding that are not yet suitable for the master branch.
 
-*Last updated: April 03, 2020*
+*Last updated: April 17, 2020*
