@@ -14,7 +14,7 @@ sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataA
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic
 
 #%%
-def chromosome_insertion_periodicity(chromosome=None,bed_file=None):
+def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=False):
     '''
     '''
 
@@ -72,24 +72,32 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None):
         chrom_loop = chrom_names_dict
 
     bp_between_tn_insertions_dict = {}
+    reads_per_tn_dict = {}
     for chrom in chrom_loop:
         tn_insertion_position_list = []
+        reads_per_tn_list = []
         for line in lines[chrom_start_index_dict.get(chrom):chrom_end_index_dict.get(chrom)+1]:
             line = line.strip('\n').split()
             tn_insertion_position_list.append(int(line[1]))
+            reads_per_tn_list.append((int(line[4])-100)/20)
         bp_between_tn_insertions = [abs(y-x) for x, y in zip(tn_insertion_position_list[:-1], tn_insertion_position_list[1:])]
         bp_between_tn_insertions.insert(0,tn_insertion_position_list[0]) #ADD START OF GENE (bp=0)
         bp_between_tn_insertions.append(chr_length_dict.get(chrom) - tn_insertion_position_list[-1]) #ADD END OF GENE (bp=INDEX LAST TN - GENE LENGTH)
         bp_between_tn_insertions_dict[chrom] = bp_between_tn_insertions
+        reads_per_tn_dict[chrom] = reads_per_tn_list
 
-        print('')
-        print('For chromosome ',chrom,':')
-        print('Coverage is %.2f percent' % (len(tn_insertion_position_list)/chr_length_dict.get(chrom)*100))
         tn_insertion_meanfrequency = np.nanmean(bp_between_tn_insertions)
         tn_insertion_medianfrequency = np.nanmedian(bp_between_tn_insertions)
-        print('Mean transposon insertion periodicity is once every %.2f bp' % tn_insertion_meanfrequency)
-        print('Median transposon insertion periodicity is once every %.2f bp' % tn_insertion_medianfrequency)
-        print('')
+        if printing != False:
+            print('')
+            print('For chromosome ',chrom,' with length ',chr_length_dict.get(chrom) ,':')
+            print('Coverage is %.2f percent' % (len(tn_insertion_position_list)/chr_length_dict.get(chrom)*100))
+            print('Mean transposon insertion periodicity is once every %.2f bp' % tn_insertion_meanfrequency)
+            print('Median transposon insertion periodicity is once every %.2f bp' % tn_insertion_medianfrequency)
+            print('Largest area devoid of transposons is %.2f' % max(bp_between_tn_insertions))
+            print('Mean number of reads per transposon is %.2f' % np.nanmean(reads_per_tn_list))
+            print('Median number of reads per transposon is %.2f' % np.nanmedian(reads_per_tn_list))
+            print('')
 
 #%% APPLY AUTOCORRELATION FOR CHECKING THE PERIODICITY
 
@@ -112,6 +120,7 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None):
     if chromosome == None:
         bp_between_tn_insertions_genome = []
         number_tn_insertions_list = []
+        reads_per_tn_genome = []
         for chrom in chrom_loop:
             #the next line includes the distance between the start of each chromosome and the first insertion and the distance between the last insertion and the end of the chromosome.
             #This might not be accurate. Please check!
@@ -119,34 +128,45 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None):
                 bp_between_tn_insertions_genome.append(bp_between)
             number_tn_insertions_list.append(len(bp_between_tn_insertions_dict.get(chrom)))
 #            number_tn_insertions_list.append(sum(x > 0 for x in alltransposoncounts_dict.get(chrom)))
-            
-        print('')
-        print('For the entire genome:')
-        print('Coverage is %.2f percent' % (sum(number_tn_insertions_list)/sum(chr_length_dict.values())*100))
-        print('Mean transposon insertion periodicity for the entire genome is %.2f' % np.nanmean(bp_between_tn_insertions_genome))
-        print('Median transposon insertion periodicity for the entire genome is %.2f' % np.nanmedian(bp_between_tn_insertions_genome))
 
+            for reads_tn in reads_per_tn_dict.get(chrom):
+                reads_per_tn_genome.append(reads_tn)
+
+        if printing != False:
+            print('')
+            print('For the entire genome:')
+            print('Coverage is %.2f percent' % (sum(number_tn_insertions_list)/sum(chr_length_dict.values())*100))
+            print('Mean transposon insertion periodicity for the entire genome is %.2f' % np.nanmean(bp_between_tn_insertions_genome))
+            print('Median transposon insertion periodicity for the entire genome is %.2f' % np.nanmedian(bp_between_tn_insertions_genome))
+            print('Mean number of reads per transposon for the entire genome is %.2f' % np.nanmean(reads_per_tn_genome))
+            print('Median number of reads per transposon for the entire genome is %.2f' % np.nanmedian(reads_per_tn_genome))
 #%% DETERMINE THE DISTRIBUTION OF THE NUMBER OF BP BETWEEN SUBSEQUENT TRANSPOSON INSERTIONS
 
-    if chromosome != None:
-        df = pd.DataFrame(data=bp_between_tn_insertions_dict)
-        df.columns = [chromosome]
-        df_melt = df.melt(var_name='chromosomes',value_name='bp between insertions')
-    elif chromosome == None:
-        df = pd.DataFrame(data=bp_between_tn_insertions_dict.get('I'))
-        for chrom in chrom_loop:
-            if chrom != 'I':
-                df_temp = pd.DataFrame(data=bp_between_tn_insertions_dict.get(chrom))
-                df = pd.concat([df,df_temp], axis=1)
-        df.columns = chromosome_romannames_list
-        df_melt = df.melt(var_name='chromosomes',value_name='bp between insertions')
-    
-    sb.violinplot(x='chromosomes',y='bp between insertions',data=df_melt,inner='box',gridsize=1000, cut=0)
-#    v.set_yscale('log')
+    if printing != False:
+        if chromosome != None:
+            bp_between_tn_insertions_norm_list = [x/chr_length_dict.get(chromosome) for x in bp_between_tn_insertions_dict.get(chromosome)]
+#            df = pd.DataFrame(data=bp_between_tn_insertions_dict.get(chromosome))
+            df = pd.DataFrame(data=bp_between_tn_insertions_norm_list)
+            df.columns = [chromosome]
+            df_melt = df.melt(var_name='chromosomes',value_name='bp between insertions')
+        elif chromosome == None:
+            bp_between_tn_insertions_norm_list = [x/chr_length_dict.get('I') for x in bp_between_tn_insertions_dict.get('I')]
+            df = pd.DataFrame(data=bp_between_tn_insertions_norm_list)
+            for chrom in chrom_loop:
+                if chrom != 'I':
+                    bp_between_tn_insertions_norm_list = [x/chr_length_dict.get(chrom) for x in bp_between_tn_insertions_dict.get(chrom)]
+                    df_temp = pd.DataFrame(data=bp_between_tn_insertions_norm_list)
+                    df = pd.concat([df,df_temp], axis=1)
+            df.columns = chromosome_romannames_list
+            df_melt = df.melt(var_name='chromosomes',value_name='bp between insertions')
+        
+        v = sb.violinplot(x='chromosomes',y='bp between insertions',data=df_melt,inner='quartile',gridsize=3000, cut=0)
+        v.set_yscale('log')
 
 #%%
     return(tn_insertion_meanfrequency,bp_between_tn_insertions_dict)
 
 #%%
 if __name__ == '__main__':
-    chromosome_insertion_periodicity(chromosome='I',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+#    chromosome_insertion_periodicity(bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed",plot=True)
+    chromosome_insertion_periodicity(chromosome='VIII',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed",printing=True)
