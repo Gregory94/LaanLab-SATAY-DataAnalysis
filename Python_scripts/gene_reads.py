@@ -8,10 +8,14 @@ Created on Wed Apr 15 14:10:52 2020
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sb
 #import matplotlib.colors as mcolors
 sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_modules')
 from chromosome_and_gene_positions import chromosomename_roman_to_arabic, gene_position
 from gene_names import gene_aliases
+sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_scripts')
+import statistics_perchromosome
 
 #%%
 
@@ -62,6 +66,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
     else:
         print('Selected region starts at basepair ',gene_start, ' and ends at basepair ',gene_end, ' in chromosome',gene_chr)
 
+    tn_insertion_meanfrequency = statistics_perchromosome.chromosome_insertion_periodicity(gene_chr,bed_file)[0]
 #%% READ THE BED FILE
     with open(bed_file) as f:
         lines = f.readlines()
@@ -87,7 +92,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
             if chrom_name_current != chrom_name_in_bed:
                 chrom_names_dict[chromosome_romannames_list[chr_counter]] = chrom_name_current
                 chrom_name_in_bed = chrom_name_current
-                print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chrom_name_current)
+#                print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chrom_name_current)
                 
                 chrom_start_line_dict[chromosome_romannames_list[chr_counter]] = line_counter #GET START INDEX IN THE BED FILE OF THE CURENT CHROMOSOME
                 if chr_counter != 0:
@@ -134,7 +139,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
         for ind_arr in duplicate_index_list: #LOOP OVER ALL INDICES OF DUPLICATES
             ind_list = ind_arr[0]
             ind_list_max = max(ind_list) #GET THE LAST INDEX OF THE DUPLICATES
-            print('Mulitple transposons found at ',ind_list)
+#            print('Mulitple transposons found at ',ind_list)
             for ind in ind_list:
                 if not ind == ind_list_max:
                     read_list[ind_list_max] += read_list[ind] #ADD UP THE READS TO THE LAST DUPLICATE
@@ -165,15 +170,12 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
 #        color_bars_roi_list[roi_index] = float(number_of_duplicates_list[read_index])
         read_index += 1
 
-
 #%% CALCULATE SOME STATISTICAL VALUES FOR THE SELECTED REGION
 #roi_list := list of all potential insertion sites in the region
 #reads_roi_list := number of reads in the selected region.
 
     coverage_percentage = (len(read_list)/len(roi_list)*100)
-    print('Percentage of coverage is ',coverage_percentage)
-#    number_tn_insertions = sum(x > 0 for x in reads_roi_list)
-#    print('Percentage of coverage is ',number_tn_insertions/len(roi_list)*100)
+    print('Percentage of coverage is %.2f' % coverage_percentage)
 
     if insertion_list != []:
         bp_between_tn_insertions = [abs(y-x) for x, y in zip(insertion_list[:-1], insertion_list[1:])]
@@ -190,72 +192,92 @@ def gene_reads(gene_name=None,region=None,bed_file=None):
         insertion_avgperiodicity = 0
         insertion_medperiodicity = 0
 
-    print('Mean transposon insertion frequency is ', insertion_avgperiodicity)
-    print('Median transposon insertion frequency is ',insertion_medperiodicity)
+    print('Mean transposon insertion frequency is %.2f' % insertion_avgperiodicity)
+    print('Median transposon insertion frequency is %.2f' % insertion_medperiodicity)
 
-#    index_tn_insertions_list = []
-#    index_tn_insertions_counter = 0
-#    for tn in reads_roi_list:
-#        if tn > 0:
-#            index_tn_insertions_list.append(index_tn_insertions_counter)
-#        index_tn_insertions_counter += 1
-#    index_tn_insertions_list.sort()
-#    bp_between_tn_insertions = [abs(y-x) for x, y in zip(index_tn_insertions_list[:-1], index_tn_insertions_list[1:])]
-#    bp_between_tn_insertions.insert(0,index_tn_insertions_list[0]) #ADD START OF GENE (bp=0)
-#    bp_between_tn_insertions.append(len(reads_roi_list) - index_tn_insertions_list[-1]) #ADD END OF GENE (bp=INDEX LAST TN - GENE LENGTH)
-#    tn_insertion_meanfrequency = np.nanmean(bp_between_tn_insertions)
-#    tn_insertion_medianfrequency = np.nanmedian(bp_between_tn_insertions)
-#    print('Mean transposon insertion frequency is ', tn_insertion_meanfrequency)
-#    print('Median transposon insertion frequency is ',tn_insertion_medianfrequency)
-#
-#
-#    if bp_between_tn_insertions == []:
-#        bp_between_tn_insertions_max = gene_length
-#    else:
-#        bp_between_tn_insertions_max = max(bp_between_tn_insertions)
-#    print('Largest area devoid of transposon insertions is %.0f bp' % bp_between_tn_insertions_max)
+#%% BINNING OF THE READS_ROI_LIST
+    #DETERMINE VARIABLE BIN WIDTH SUCHT THAT EACH BIN HAS 8 TN IN THEM. BAR PLOT ACCEPTS LIST OR ARRAY OF BIN WIDTHS.
+    bin_width = int(tn_insertion_meanfrequency*8)
+    reads_roi_binnedlist = []
+    val_counter = 0
+    sum_values = 0
+    for n in range(len(reads_roi_list)):
+        if val_counter % bin_width != 0:
+            sum_values += reads_roi_list[n]
+        elif val_counter % bin_width == 0:
+            reads_roi_binnedlist.append(sum_values)
+            sum_values = 0
+        val_counter += 1
 
+    roi_binnedlist = np.linspace(gene_start,gene_end,int(gene_length/bin_width)+1)
 #%% MAKE BAR PLOT FOR READS IN CHROMOSOME
-
-#    clist = [(1, "green"), (max(color_bars_roi_list), "red")]
-#    rvb = mcolors.LinearSegmentedColormap.from_list("", clist)
 
     if gene_name != None:
         print('Plotting reads for gene ', gene_name, '...')
     else:
         print('Plotting reads in range ', gene_start, '..', gene_end, 'in chromosome ', gene_chr, '...')
-    fig,ax = plt.subplots()
-    ax.bar(roi_list,reads_roi_list,width=15,color='k')#, color=rvb(roi_list/len(roi_list)))
+
+    text_size = 12
+    print('Bin width = %.2f' % bin_width)
+
+
+    plt.figure(figsize=(19,9))
+    grid = plt.GridSpec(1, 3, wspace=0.4, hspace=0.3)
+    
+    ax = plt.subplot(grid[0,:2])
+    ax.bar(roi_binnedlist,reads_roi_binnedlist,width=bin_width,facecolor='k',edgecolor='w')#, color=rvb(roi_list/len(roi_list)))
     ax.set_axisbelow(True)
     ax.grid(True)
     if gene_name != None:
-        ax.set_title(gene_name, fontweight='bold')
+        ax.set_title(gene_name, fontweight='bold', fontsize=text_size)
     elif region == ['IV',46271,48031]:
-        ax.set_title('HO-locus', fontweight='bold')
-    ax.set_xlabel('Basepair position in chromosome '+ gene_chr)        
-    ax.set_ylabel('Read/Tn')
+        ax.set_title('HO-locus', fontweight='bold', fontsize=text_size)
+    ax.set_xlabel('Basepair position in chromosome '+ gene_chr, fontsize=text_size) 
+    ax.set_ylabel('Read/Tn', fontsize=text_size)
     ax.set_xlim(gene_start,gene_end)
 
     if gene_name != None:
         textstr = '\n'.join((r'Reading orientation of gene: ' + gene_orien,
                             r'Transposon coverage = %.2f percent' % (coverage_percentage),
                             r'Mean insertion frequency is once every %.2f bp' % insertion_avgperiodicity,
-                            r'Median insertion frequency is once every %.2f bp' % insertion_medperiodicity,
-                            'Largest area devoid of transposon insertions is %.0f bp' % max_empty_region
                             ))
     else:
         textstr = '\n'.join((r'Transposon coverage = %.2f percent' % (coverage_percentage),
                             r'Mean insertion frequency is once every %.2f bp' % insertion_avgperiodicity,
-                            r'Median insertion frequency is once every %.2f bp' % insertion_medperiodicity,
-                            'Largest area devoid of transposon insertions is %.0f bp' % max_empty_region
                             ))
-    props = dict(boxstyle='round', facecolor='grey', alpha=0.3)
-    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14,
-        verticalalignment='top', bbox=props)
+    props = dict(boxstyle='round', facecolor='grey', alpha=0.8)
+    ax.text(0.05,0.9, textstr, transform=ax.transAxes, fontsize=text_size,
+        verticalalignment='top',horizontalalignment='left', bbox=props)
+
+
+
+# COMPARE DISTRIBUTION OF BASEPAIRS BETWEEN INSERTIONS FOR THE CHROMOSOME AND THE GENE
+    plt.subplot(grid[0,2])
+    
+    bp_between_tn_insertions_chr_dict = statistics_perchromosome.chromosome_insertion_periodicity(gene_chr,bed_file)[1]
+    bp_between_tn_insertions_dict = {}
+    bp_between_tn_insertions_dict[gene_chr] = bp_between_tn_insertions
+    
+#    bp_between_tn_insertions_dictlist = [bp_between_tn_insertions_chr_dict,bp_between_tn_insertions_dict]
+    df_chr = pd.DataFrame(bp_between_tn_insertions_chr_dict)
+    df = pd.DataFrame(bp_between_tn_insertions_dict)
+    df_concat = pd.concat([df,df_chr], axis=0, ignore_index=True)
+    names_list = ['gene']*len(bp_between_tn_insertions) + ['chromosome']*len(bp_between_tn_insertions_chr_dict.get(gene_chr))
+    df_concat['label'] = names_list
+    df_concat[gene_name] = ''
+    df_concat.columns = ['bp between tn','label',gene_name]
+    
+    sb.set(style="whitegrid", palette="pastel", color_codes=True)
+    sb.violinplot(data=df_concat,x=gene_name, y='bp between tn', hue='label', inner='quartile', scale='width', gridsize=5000, split=True, cut=0, palette={"gene": "y", "chromosome": "b"})
+    
+    plt.ylim(0,max_empty_region+10)
     
     plt.show()
+#    plt.savefig(r'X:\tnw\BN\LL\Shared\Gregory\Python\Python Figures\gene_reads_figures\ ' + gene_name + '_TnInsertions.png', dpi=300)
+
 
 #%%
 if __name__ == '__main__':
-    gene_reads(region=['I',1,230218],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
-#    gene_reads(gene_name='bem1',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+#    gene_reads(region=['I',1,4000],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+#    gene_reads(region=['IV',46271,48031],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+    gene_reads(gene_name='cla4',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
