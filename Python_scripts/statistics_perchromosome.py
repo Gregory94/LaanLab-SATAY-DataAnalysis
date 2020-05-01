@@ -87,12 +87,14 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=Fals
         reads_per_tn_dict[chrom] = reads_per_tn_list
 
         tn_insertion_meanfrequency = np.nanmean(bp_between_tn_insertions)
+        tn_insertion_stdfrequency = np.nanstd(bp_between_tn_insertions)
         tn_insertion_medianfrequency = np.nanmedian(bp_between_tn_insertions)
         if printing != False:
             print('')
             print('For chromosome ',chrom,' with length ',chr_length_dict.get(chrom) ,':')
             print('Coverage is %.2f percent' % (len(tn_insertion_position_list)/chr_length_dict.get(chrom)*100))
             print('Mean transposon insertion periodicity is once every %.2f bp' % tn_insertion_meanfrequency)
+            print('Standard deviation in transposon insertion periodicity is %.2f' % tn_insertion_stdfrequency)
             print('Median transposon insertion periodicity is once every %.2f bp' % tn_insertion_medianfrequency)
             print('Largest area devoid of transposons is %.2f' % max(bp_between_tn_insertions))
             print('Mean number of reads per transposon is %.2f' % np.nanmean(reads_per_tn_list))
@@ -164,7 +166,7 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=Fals
         v.set_yscale('log')
 
 #%%
-    return(tn_insertion_meanfrequency,bp_between_tn_insertions_dict)
+    return(bp_between_tn_insertions_dict)
 
 #%%
 if __name__ == '__main__':
