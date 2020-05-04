@@ -31,8 +31,12 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
 #%%SAVE FILES
     save_figure_path = r'X:\tnw\BN\LL\Shared\Gregory\Python\Python Figures\gene_reads_figures'
 #%% GET START AND END POSITION OF GENE
-    if gene_name != None:
-        gene_pos_dict = gene_position(gff_file)
+    if gene_name.upper() == 'HOLOCUS' or gene_name == 'HO-LOCUS':
+        gene_pos = ['IV',46271,48031]
+        gene_name = 'HOlocus'
+
+    elif gene_name != None:
+        gene_pos_dict = gene_position(gff_file) #GET POSITION INFORMATION OF ALL GENES
         
         gene_name = gene_name.upper() #CAPITALIZE GENE NAME
         if gene_pos_dict.get(gene_name) == None: #CHECK IF GENE_NAME EXISTS IN GENE_POS_DICT. IF NOT, CHECK IF ANY OF THE ALIASES EXISTS
@@ -53,7 +57,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
             gene_pos = gene_pos_dict.get(gene_name)
 
         gene_orien = gene_pos[3]
-        
+
     elif region != None:
         gene_pos = region
         
@@ -243,7 +247,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
         if reads_roi_list[ins] > 0:
             reads_currentbin += 1
 
-        if reads_currentbin == 8:
+        if reads_currentbin == 8: #STOP IF THERE ARE 8 INSERTIONS FOUND
             reads_roi_binnedlist.append(sum(currentbin_reads_list))
             bin_width.append(max(currentbin_insertion_list) - min(currentbin_insertion_list))
             insertion_roi_binnedlist.append(insertion_roi_list[ins]-bin_width[-1]/2)
@@ -252,8 +256,8 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
             currentbin_insertion_list = []
             reads_currentbin = 0
             insertion_counter = 0
-            
-        elif insertion_counter == int(insertion_chromosome_avgperiodicity*8):
+
+        elif insertion_counter == int(insertion_chromosome_avgperiodicity*8): #STOP IF THE LENGTH OF THE CURRENTBIN EXCEEDS AVERAGE PERIODICITY OF THE CHROMOSOME * 8
             reads_roi_binnedlist.append(sum(currentbin_reads_list))
             bin_width.append(max(currentbin_insertion_list) - min(currentbin_insertion_list))
             insertion_roi_binnedlist.append(insertion_roi_list[ins]-bin_width[-1]/2)
@@ -262,7 +266,12 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
             currentbin_insertion_list = []
             reads_currentbin = 0
             insertion_counter = 0
-        
+
+        elif gene_start+ins == gene_end: #ACCOUNT FOR THE FINAL BIN IN THE GENE.
+            reads_roi_binnedlist.append(sum(currentbin_reads_list))
+            bin_width.append(max(currentbin_insertion_list) - min(currentbin_insertion_list))
+            insertion_roi_binnedlist.append(insertion_roi_list[ins]-bin_width[-1]/2)
+
         insertion_counter += 1
 
 #%% MAKE BAR PLOT FOR READS IN CHROMOSOME
@@ -291,7 +300,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
     ax.set_ylabel('Read/Tn', fontsize=text_size)
     ax.set_xlim(gene_start,gene_end)
 
-    if gene_name != None:
+    if gene_name != None and gene_name != 'HOlocus':
         if insertion_list != []:
             textstr = '\n'.join((r'Reading orientation of gene: ' + gene_orien,
                                 r'Transposon coverage = %.2f percent' % (coverage_percentage),
@@ -349,10 +358,10 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
     plt.show()
     if savefigure == True:
         plt.savefig(os.path.join(save_figure_path, gene_name+'_TnInsertions.png'), dpi=300)
-
+        print('Figure saved at ', save_figure_path)
 
 #%%
 if __name__ == '__main__':
 #    gene_reads(region=['I',1,4000],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
 #    gene_reads(region=['IV',46271,48031],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed", savefigure=True)
-    gene_reads(gene_name='cdc42',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed", savefigure=False)
+    gene_reads(gene_name='holocus',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed", savefigure=True)

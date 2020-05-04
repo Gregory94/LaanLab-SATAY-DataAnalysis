@@ -92,6 +92,7 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=Fals
         if printing != False:
             print('')
             print('For chromosome ',chrom,' with length ',chr_length_dict.get(chrom) ,':')
+            print('Number of transposon insertions is ', len(reads_per_tn_list))
             print('Coverage is %.2f percent' % (len(tn_insertion_position_list)/chr_length_dict.get(chrom)*100))
             print('Mean transposon insertion periodicity is once every %.2f bp' % tn_insertion_meanfrequency)
             print('Standard deviation in transposon insertion periodicity is %.2f' % tn_insertion_stdfrequency)
