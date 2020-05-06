@@ -14,7 +14,6 @@ sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataA
 from chromosome_and_gene_positions import gene_position
 from gene_names import gene_aliases
 from chromosome_names_in_files import chromosome_props_bedfile
-sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_scripts')
 import statistics_perchromosome
 
 #%%
@@ -136,7 +135,6 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
     print('Length of region of interest is ',gene_length)
     insertion_roi_list = list(range(gene_start,gene_end+1))
     reads_roi_list = list(np.zeros(gene_length+1))
-#    color_bars_roi_list = list(np.zeros(gene_length+1))
     
     read_index = 0
     for position in insertion_list:
