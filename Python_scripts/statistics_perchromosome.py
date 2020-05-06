@@ -66,6 +66,7 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=Fals
 
 #%% DETERMINE STATISTICS FOR INDIVIDUAL CHROMOSOMES AND PUT THE RESULTS IN A DICT
     if chromosome != None:
+        chromosome = chromosome.upper()
         chrom_loop = {}
         chrom_loop[chromosome] = chrom_names_dict.get(chromosome)
     else:
@@ -172,4 +173,4 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=Fals
 #%%
 if __name__ == '__main__':
 #    chromosome_insertion_periodicity(bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed",plot=True)
-    chromosome_insertion_periodicity(chromosome='VIII',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed",printing=True)
+    chromosome_insertion_periodicity(chromosome='xvi',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed",printing=True)

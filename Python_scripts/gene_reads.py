@@ -11,8 +11,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sb
 sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_modules')
-from chromosome_and_gene_positions import chromosomename_roman_to_arabic, gene_position
+from chromosome_and_gene_positions import gene_position
 from gene_names import gene_aliases
+from chromosome_names_in_files import chromosome_props_bedfile
 sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_scripts')
 import statistics_perchromosome
 
@@ -29,7 +30,8 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
     gff_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3"
     gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
 #%%SAVE FILES
-    save_figure_path = r'X:\tnw\BN\LL\Shared\Gregory\Python\Python Figures\gene_reads_figures'
+    if savefigure == True:
+        save_figure_path = r'X:\tnw\BN\LL\Shared\Gregory\Python\Python Figures\gene_reads_figures'
 #%% GET START AND END POSITION OF GENE
     if gene_name.upper() == 'HOLOCUS' or gene_name == 'HO-LOCUS':
         gene_pos = ['IV',46271,48031]
@@ -75,40 +77,9 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
     with open(bed_file) as f:
         lines = f.readlines()
 
-#%% CREATE LIST OF CROMOSOME NUMBERS IN ROMAN NUMERALS
-    arabic_to_roman_dict, roman_to_arabic_dict = chromosomename_roman_to_arabic()    
-    chromosome_romannames_list = []
-    for roman in roman_to_arabic_dict:
-        chromosome_romannames_list.append(roman)
+#%% GET POSITION FOR THE CHROMOSOMES IN THE BED FILE
 
-#%% GET NAMES FOR THE CHROMOSOMES IN THE BED FILE
-    chrom_names_dict = {}
-    chrom_start_line_dict = {}
-    chrom_end_line_dict = {}
-    chrom_name_in_bed = ''
-    chr_counter = 0
-    line_counter = 0
-    stop_loop = False
-    while stop_loop is False:
-        line = lines[line_counter]
-        chrom_name_current = line.split(' ')[0].replace('chr','')
-        if not chrom_name_current.startswith('track') and not chrom_name_current.startswith('M'): #SKIP HEADER AND MITOCHRONDRIAL CHROMOSOMES
-            if chrom_name_current != chrom_name_in_bed:
-                chrom_names_dict[chromosome_romannames_list[chr_counter]] = chrom_name_current
-                chrom_name_in_bed = chrom_name_current
-#                print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chrom_name_current)
-                
-                chrom_start_line_dict[chromosome_romannames_list[chr_counter]] = line_counter #GET START INDEX IN THE BED FILE OF THE CURENT CHROMOSOME
-                if chr_counter != 0:
-                    chrom_end_line_dict[chromosome_romannames_list[chr_counter-1]] = line_counter-1 #GET THE END INDEX IN THE BED OF THE PREVIOUS CHROMOSOME (SKIP FOR THE FIRST CHROMOSOME)
-
-                chr_counter += 1
-
-        elif chrom_name_current.startswith('M'):
-            chrom_end_line_dict[chromosome_romannames_list[-1]] = line_counter-1 #GET THE END INDEX IN THE BED FILE FOR THE FINAL CHROMOSOME
-            stop_loop = True
-                
-        line_counter += 1
+    chrom_start_line_dict, chrom_end_line_dict= chromosome_props_bedfile(lines)[1:3]
 
 #%% GET ALL READS WITHIN THE GENE
     insertion_list = []
@@ -364,4 +335,4 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
 if __name__ == '__main__':
 #    gene_reads(region=['I',1,4000],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
 #    gene_reads(region=['IV',46271,48031],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed", savefigure=True)
-    gene_reads(gene_name='holocus',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed", savefigure=True)
+    gene_reads(gene_name='bem1',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed", savefigure=False)
