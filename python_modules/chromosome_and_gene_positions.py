@@ -1,6 +1,7 @@
-'''This module includes two functions, 'chromosome_position' and 'gene_position'.
-Both do not require an input with the full path to the file 'Saccharomyces_cerevisiae.R64-1-1.99.gff3' (which can be downloaded from https://www.ensembl.org/Saccharomyces_cerevisiae/Info/Index).
+'''This module includes three functions, 'chromosome_position', 'chromosomename_roman_to_arabic' and 'gene_position'.
+Except for 'chromosomename_roman_to_arabic', the functions require an input with the full path to the file 'Saccharomyces_cerevisiae.R64-1-1.99.gff3' (which can be downloaded from https://www.ensembl.org/Saccharomyces_cerevisiae/Info/Index).
 If no input is given, the program automatically searches for the file at in the current directory.
+The function 'chromosomename_roman_to_arabic' does not take any input. It returns two conversion lists for numbers 1 to 16 to get from arabic to roman numerals or vice versa, respectively.
 '''
 def chromosome_position(gff_file = None):
     '''Get the start and end position of each chromosome and determine their respective length.
@@ -86,8 +87,9 @@ def chromosomename_roman_to_arabic():
 def gene_position(gff_file = None):
     '''Get the start and end position of each gene and determine their respective length.
     Input is a .gff file downloaded from https://www.ensembl.org/Saccharomyces_cerevisiae/Info/Index
-    Output is a dictionary that includes all gene names as keys. The values are lists with two numbers.
-    The first is the chromosome number the gene belong to, the second is the start position, the third is the end position of the gene in terms of basepairs.
+    Output is a dictionary that includes all gene names as keys. The values are lists with four inputs.
+    The first is the chromosome number the gene belong to, the second is the start position, the third is the end position of the gene in terms of basepairs, the fourth is the reading orientation of the gene.
+    The reading orientation is indicated with a '+' (forward reading) or '-' (reverse reading).
     '''
 
     if gff_file == None:
