@@ -13,6 +13,7 @@ sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataA
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from essential_genes_names import list_known_essentials
 from gene_names import gene_aliases
+from chromosome_names_in_files import chromosome_props_bedfile
 
 #%%
 
@@ -31,12 +32,10 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     essential_genes_files = [r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt',
                             r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt']
     gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
-#%%
-    #GET CHROMOSOME LENGTHS AND POSITIONS
+#%% GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
     
-    
-    #CREATE LIST OF ALL CHROMOSOMES IN ROMAN NUMERALS
+#%% CREATE LIST OF ALL CHROMOSOMES IN ROMAN NUMERALS
     arabic_to_roman_dict, roman_to_arabic_dict = chromosomename_roman_to_arabic()    
     chromosome_romannames_list = []
     for roman in roman_to_arabic_dict:
@@ -47,53 +46,54 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
 #    chrom_index = chromosome_romannames_list.index(chrom)
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
-        bar_width = int(chr_length_dict.get(chrom)/1000)
+        bar_width = int(chr_length_dict.get(chrom)/500)
     
     
-    #GET ALL GENES IN CURRENT CHROMOSOME
+#%% GET ALL GENES IN CURRENT CHROMOSOME
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items() if chrom in v]
     genes_essential_list = list_known_essentials(essential_genes_files)
     gene_alias_list = gene_aliases(gene_information_file)[0]
     
-    
+#%% READ BED FILE
     with open(bed_file) as f:
         lines = f.readlines()
     
-    #GET NAMES FOR THE CHROMOSOMES IN THE BED FILE
-    chrom_names_dict = {}
-    chrom_start_index_dict = {}
-    chrom_end_index_dict = {}
-    chrom_name = ''
-    chr_counter = 0
-    line_counter = 0
-    stop_loop = False
-#    for line in lines:
-    while stop_loop is False:
-        line = lines[line_counter]
-        chrom_name_current = line.split(' ')[0]
-        if not chrom_name_current.startswith('track'): #SKIP HEADER
-            if not chrom_name_current.startswith('chrM'): #SKIP MITOCHRONDRIAL CHROMOSOMES
-                if chrom_name_current != chrom_name:
-                    chrom_names_dict[chromosome_romannames_list[chr_counter]] = chrom_name_current
-                    chrom_name = chrom_name_current
-                    print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chrom_name_current)
-                    
-                    chrom_start_index_dict[chromosome_romannames_list[chr_counter]] = line_counter #GET START INDEX IN THE BED FILE OF THE CURENT CHROMOSOME
-                    if chr_counter != 0:
-                        chrom_end_index_dict[chromosome_romannames_list[chr_counter-1]] = line_counter-1 #GET THE END INDEX IN THE BED OF THE PREVIOUS CHROMOSOME (SKIP FOR THE FIRST CHROMOSOME)
+#%% GET NAMES FOR THE CHROMOSOMES IN THE BED FILE
+#    chrom_names_dict = {}
+#    chrom_start_index_dict = {}
+#    chrom_end_index_dict = {}
+#    
+#    chrom_name = ''
+#    chr_counter = 0
+#    line_counter = 0
+#    stop_loop = False
+##    for line in lines:
+#    while stop_loop is False:
+#        line = lines[line_counter]
+#        chrom_name_current = line.split(' ')[0]
+#        if not chrom_name_current.startswith('track'): #SKIP HEADER
+#            if not chrom_name_current.startswith('chrM'): #SKIP MITOCHRONDRIAL CHROMOSOMES
+#                if chrom_name_current != chrom_name:
+#                    chrom_names_dict[chromosome_romannames_list[chr_counter]] = chrom_name_current
+#                    chrom_name = chrom_name_current
+#                    print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chrom_name_current)
+#                    
+#                    chrom_start_index_dict[chromosome_romannames_list[chr_counter]] = line_counter #GET START INDEX IN THE BED FILE OF THE CURENT CHROMOSOME
+#                    if chr_counter != 0:
+#                        chrom_end_index_dict[chromosome_romannames_list[chr_counter-1]] = line_counter-1 #GET THE END INDEX IN THE BED OF THE PREVIOUS CHROMOSOME (SKIP FOR THE FIRST CHROMOSOME)
+#
+#                    chr_counter += 1
+#
+#            elif chrom_name_current.startswith('chrM'):
+#                chrom_end_index_dict[chromosome_romannames_list[-1]] = line_counter-1 #GET THE END INDEX IN THE BED FILE FOR THE FINAL CHROMOSOME
+#                stop_loop = True
+#                
+#        line_counter += 1
 
-                    chr_counter += 1
+    chrom_start_index_dict, chrom_end_index_dict= chromosome_props_bedfile(lines)[1:3]
 
-            elif chrom_name_current.startswith('chrM'):
-                chrom_end_index_dict[chromosome_romannames_list[-1]] = line_counter-1 #GET THE END INDEX IN THE BED FILE FOR THE FINAL CHROMOSOME
-                stop_loop = True
-                
-        line_counter += 1
-
-
-
-    #GET ALL TRANSPOSON COUNTS
+#%% GET ALL TRANSPOSON COUNTS
 #    allinsertionsites_list = list(range(0,chr_length_dict.get(chrom)))
     alltransposoncounts_list = np.zeros(chr_length_dict.get(chrom))
     for line in lines[chrom_start_index_dict.get(chrom):chrom_end_index_dict.get(chrom)+1]:
@@ -102,7 +102,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     
     
     
-    
+#%% BINNING OF THE READS
     #THE LIST WITH ALL THE TRANPOSONS FOR THE CURRENT CHROMOSOME IS TYPICALLY REALLY LARGE.
     #TO COMPRESS THIS LIST, THE BASEPAIR POSITIONS ARE GROUPED IN GROUPS WITH SIZE DEFINED BY 'BAR_WIDTH'
     #IN EACH GROUP THE NUMBER OF readS ARE SUMMED UP.
@@ -125,7 +125,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
         allinsertionsites_list = np.linspace(0,chr_length_dict.get(chrom),int(chr_length_dict.get(chrom)/bar_width)+1)
     
     
-    
+#%% PLOTTING
     print('Plotting chromosome ', chrom, '...')
     print('bar width for plotting is ',bar_width)
     binsize = bar_width
