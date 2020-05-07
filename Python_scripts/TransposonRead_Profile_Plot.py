@@ -13,7 +13,7 @@ sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataA
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from essential_genes_names import list_known_essentials
 from gene_names import gene_aliases
-from chromosome_names_in_files import chromosome_props_bedfile, chromosome_props_wigfile
+from chromosome_names_in_files import chromosome_name_bedfile, chromosome_name_wigfile
 
 #%%
 
@@ -91,7 +91,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
 #                
 #        line_counter += 1
 
-    chrom_start_index_dict, chrom_end_index_dict= chromosome_props_bedfile(lines)[1:3]
+    chrom_start_index_dict, chrom_end_index_dict= chromosome_name_bedfile(lines)[1:3]
 
 #%% GET ALL TRANSPOSON COUNTS
 #    allinsertionsites_list = list(range(0,chr_length_dict.get(chrom)))
@@ -187,15 +187,16 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     chrom_index = chromosomenames_list.index(chrom)
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
-        bar_width = int(chr_length_dict.get(chrom)/1000)
+        bar_width = int(chr_length_dict.get(chrom)/500)
 #%% GET ALL GENES IN CURRENT CHROMOSOME
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items() if chrom in v]
     genes_essential_list = list_known_essentials(essential_genes_files)
     gene_alias_list = gene_aliases(gene_information_file)[0]
+
+#%%
     with open(wig_file) as f:
         lines = f.readlines()
-
 
 #%% GET THE NAMES OF THE CHROMOSOMES AS USED IN THE WIG FILE.
 #    chrom_names_dict = {}
@@ -211,19 +212,23 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 #            
 #            chrom_names_counter += 1
 
-    chrom_names_dict = chromosome_props_wigfile(lines)[0]
+    chrom_names_dict, chrom_start_line_dict, chrom_end_line_dict = chromosome_name_wigfile(lines)
 
-#%% GET ALL LINES WITH THE readS FOR THE CURRENT CHROMOSOME
-    line_counter = 0
-    for line in lines:
-        line = line.strip('\n')
-        if line.endswith('chrom=chr'+chrom_names_dict.get(chromosomenames_list[chrom_index])):
-            wigfile_start_index = line_counter + 1
-        elif chrom_names_dict.get(chrom) == chrom_names_dict.get('XVI'): #CHECK IF THE LAST CHROMOSOME IS REACHED, SINCE THEN THE NEXT CHROMOSOME DOES NOT NEED TO BE SEARCHED AS THIS WON'T EXISTS
-            wigfile_end_index = len(lines)-1 #GET INDEX LAST ELEMENT
-        elif line.endswith('chrom=chr'+chrom_names_dict.get(chromosomenames_list[chrom_index+1])):
-            wigfile_end_index = line_counter
-        line_counter += 1
+#%% GET ALL LINES WITH THE READS FOR THE CURRENT CHROMOSOME
+#    line_counter = 0
+#    for line in lines:
+#        line = line.strip('\n')
+#        if line.endswith('chrom=chr'+chrom_names_dict.get(chromosomenames_list[chrom_index])):
+#            wigfile_start_index = line_counter + 1
+#        elif chrom_names_dict.get(chrom) == chrom_names_dict.get('XVI'): #CHECK IF THE LAST CHROMOSOME IS REACHED, SINCE THEN THE NEXT CHROMOSOME DOES NOT NEED TO BE SEARCHED AS THIS WON'T EXISTS
+#            wigfile_end_index = len(lines)-1 #GET INDEX LAST ELEMENT
+#        elif line.endswith('chrom=chr'+chrom_names_dict.get(chromosomenames_list[chrom_index+1])):
+#            wigfile_end_index = line_counter
+#        line_counter += 1
+
+    wigfile_start_index = chrom_start_line_dict.get(chrom)
+    wigfile_end_index = chrom_end_line_dict.get(chrom)
+
 #%%    
 
 

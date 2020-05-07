@@ -3,7 +3,7 @@
 """
 
 #%%
-def chromosome_props_bedfile(bed_file=None):
+def chromosome_name_bedfile(bed_file=None):
     '''This function returns some properties of the chromosomes in a bed file.
     Input can be either of two options:
         The full path to a bed file after which the program opens the bed file, or
@@ -76,7 +76,7 @@ def chromosome_props_bedfile(bed_file=None):
     return(chrom_names_dict, chrom_start_line_dict, chrom_end_line_dict)
 
 #%%
-def chromosome_props_wigfile(wig_file=None):
+def chromosome_name_wigfile(wig_file=None):
     if wig_file == None:
         wig_file = r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig"
 
@@ -120,9 +120,9 @@ def chromosome_props_wigfile(wig_file=None):
         chrom_line = 'variableStep'
         line_split = line.split(' ')
         if line_split[0] == chrom_line:
-            chromosome_name_wigfile = line_split[1].replace('chrom=chr','').strip('\n')
-            chrom_names_dict[chromosome_romannames_list[chr_counter]] = chromosome_name_wigfile
-            print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chromosome_name_wigfile)
+            chromosome_name = line_split[1].replace('chrom=chr','').strip('\n')
+            chrom_names_dict[chromosome_romannames_list[chr_counter]] = chromosome_name
+            print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chromosome_name)
             
             chrom_start_line_dict[chromosome_romannames_list[chr_counter]] = line_counter+2 #GET START INDEX IN THE BED FILE OF THE CURENT CHROMOSOME
             if chr_counter != 0:
