@@ -13,7 +13,7 @@ sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataA
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from essential_genes_names import list_known_essentials
 from gene_names import gene_aliases
-from chromosome_names_in_files import chromosome_props_bedfile
+from chromosome_names_in_files import chromosome_props_bedfile, chromosome_props_wigfile
 
 #%%
 
@@ -36,11 +36,11 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
     
 #%% CREATE LIST OF ALL CHROMOSOMES IN ROMAN NUMERALS
-    arabic_to_roman_dict, roman_to_arabic_dict = chromosomename_roman_to_arabic()    
-    chromosome_romannames_list = []
-    for roman in roman_to_arabic_dict:
-        chromosome_romannames_list.append(roman)
-    
+#    arabic_to_roman_dict, roman_to_arabic_dict = chromosomename_roman_to_arabic()    
+#    chromosome_romannames_list = []
+#    for roman in roman_to_arabic_dict:
+#        chromosome_romannames_list.append(roman)
+#    
     
 #    for chrom in chromosomenames_list:
 #    chrom_index = chromosome_romannames_list.index(chrom)
@@ -198,19 +198,20 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 
 
 #%% GET THE NAMES OF THE CHROMOSOMES AS USED IN THE WIG FILE.
-    chrom_names_dict = {}
-    chrom_names_counter = 0
-    for line in lines:
-        line.strip('\n')
-        chrom_line = 'variableStep'
-        line_split = line.split(' ')
-        if line_split[0] == chrom_line:
-            chromosome_name_wigfile = line_split[1].replace('chrom=chr','').strip('\n')
-            chrom_names_dict[chromosomenames_list[chrom_names_counter]] = chromosome_name_wigfile
-            print('Chromosome ',chromosomenames_list[chrom_names_counter], 'is ',chromosome_name_wigfile)
-            
-            chrom_names_counter += 1
+#    chrom_names_dict = {}
+#    chrom_names_counter = 0
+#    for line in lines:
+#        line.strip('\n')
+#        chrom_line = 'variableStep'
+#        line_split = line.split(' ')
+#        if line_split[0] == chrom_line:
+#            chromosome_name_wigfile = line_split[1].replace('chrom=chr','').strip('\n')
+#            chrom_names_dict[chromosomenames_list[chrom_names_counter]] = chromosome_name_wigfile
+#            print('Chromosome ',chromosomenames_list[chrom_names_counter], 'is ',chromosome_name_wigfile)
+#            
+#            chrom_names_counter += 1
 
+    chrom_names_dict = chromosome_props_wigfile(lines)[0]
 
 #%% GET ALL LINES WITH THE readS FOR THE CURRENT CHROMOSOME
     line_counter = 0
@@ -302,5 +303,5 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 if __name__ == '__main__':
 #    read_profile(chrom='XVI',wig_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.wig")
 #    transposon_profile(chrom='VI',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed")
-#    read_profile(chrom='VI',wig_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig")
-    transposon_profile(chrom='VI',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+    read_profile(chrom='VI',wig_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig")
+#    transposon_profile(chrom='VI',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
