@@ -23,7 +23,7 @@ Currently the following Matlab codes and data files are present:
 3. yeastGFF.mat: Matlab data file with information about the genes. This file is required for running the matlab code 1.
 
 ## Python_modules
-This folder contains codes for extracting information about genes from online data files. All required text files are present in the docs folder on this branch.
+This folder contains codes for extracting information about genes from online data files. All required text files are present in the Data_Files folder on this branch.
 The following files are present:
 
 1. chromosome_and_gene_positions.py: This contains the functions `chromosome_positions` and `gene_positions` which outputs information about the location and lengths of the chromosomes and genes. Input is the gff file 'Saccharomyces_cerevisiae.R64-1-1.99.gff3'. Also contains the function `chromosome_roman_to_arabic` which translates the roman numerals to arabic numerals or vice versa for the 16 chromosomes.
