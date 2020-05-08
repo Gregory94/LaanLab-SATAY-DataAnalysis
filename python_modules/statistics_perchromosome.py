@@ -15,7 +15,10 @@ from chromosome_and_gene_positions import chromosome_position, chromosomename_ro
 
 #%%
 def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=False):
-    '''
+    '''Determines statistical values for the transposon insertion per chromosome.
+    When the printing variable is set to True, it prints these values and creates a plot for showing the distribution of the distance between insertions in terms of basepairs.
+    The functions returns the distance between insertions in terms of basepairs for the chromosome given as a roman numeral.
+    When no chromosome is given, the return variable contains all chromosome with a list of distances between insertions in the form of a dictionary.
     '''
 
 #%% USED FILES

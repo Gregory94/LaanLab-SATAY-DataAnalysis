@@ -138,4 +138,4 @@ def chromosome_name_wigfile(wig_file=None):
 
 #%%
 if __name__ == '__main__':
-    chromosome_props_wigfile()
+    chromosome_name_wigfile()
