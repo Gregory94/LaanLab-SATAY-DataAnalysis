@@ -133,6 +133,11 @@ According to Michel et.al. this can have 3 main reasons.
  For example, genes that are involved in galactose metabolism are typically not essential, as inhibition of these genes block the cell’s ability to digest galactose, but it can still survive on other nutrition’s.
  In lab conditions however, the cells are typically grown in galactose rich media, and inhibiting the genes for galactose metabolism cause starvation of the cells.
 
+4. A gene might not be essential, but its deletion might cripple the cell so that the growth rate decreases significantly.
+ When the cells are grown, the more healthy cells grow much faster and, after some time, occur more frequently in the population than these crippled cells and therefore these cells might not generate many reads or no reads at all.
+ In the processing, it might therefore look as if these genes are essential, but in fact they are not.
+ The cells just grow very slowly.
+ 
 The other way around might also occcur, where essential genes are partly tolerant to transposons.
 This is shown by Michel et.al. to be caused that some regions (that code for specific subdomains of the proteins) of the essential genes are dispensable.
 The transposons in these essential genes are clearly located at a specific region in the gene, the one that codes for a non-essential subdomain.
@@ -366,20 +371,19 @@ See for example [phred score conversion table](<https://drive5.com/usearch/manua
 ## Determine essentiality based on transposon counts
 Using the number of transposons and reads, it can be determined which genes are potentially essential and which are not.
 To check this method, the transposon count for wild type cells are determined.
-The essential genes for this strain are already known and can therefore be used as a check.
+Currently, genes that are taken as essential are the annotated essentials based on previous research (see files located in `X:\tnw\BN\LL\Shared\Gregory\Gene_Database\`).
 
 ### Distribution number of insertions and reads compared with essential and non-essential genes
+(*See `statistics_pergene.py`*)
 
-Ideally, the number of transposons of all essential genes are small and the number of transposons in non-essential genes are is large so that there is a clear distinction can be made.
+Ideally, the number of transposon insertions of all essential genes are small and the number of insertions in non-essential genes are is large so that there is a clear distinction can be made.
 However, this is not always so clear.
 For example, the distribution of transposons in WT cells in the data from Michel et. al. looks like this:
 
-![Reads and transposon density after processing as discussed in Michel et.al. 2017](./media/Tn_Reads_Pergene_BenoitAnalysis.png)
+![Reads and transposon density after processing as discussed in Michel et.al. 2017.](./media/Tn_Reads_Pergene_BenoitAnalysis.png)
 
-In this figure, both the reads and the transposon counts are normalized with respect to the length of each gene (hence the graph represents the
-read density and transposon density).
-High transposon counts only occurs for non-essential genes, and therefore when a high transposon count is
-seen, it can be assigned nonessential with reasonable certainty.
+In this figure, both the reads and the transposon counts are normalized with respect to the length of each gene (hence the graph represents the read density and transposon density).
+High transposon counts only occurs for non-essential genes, and therefore when a high transposon count is seen, it can be assigned nonessential with reasonable certainty.
 However, when the transposon count is low the there is a significant overlap between the two distribution and therefore there is no certainty whether this gene is essential or not (see also the section about 'Interpreting Transposon Counts & Reads').
 
 The data is also sensitive to postprocessing.
@@ -388,7 +392,41 @@ The graph below shows the same data as in the previous graph, but with different
 This has a significant influence on the results and as a consequence, no distinction can be made between essential and nonessential genes based on the transposon counts.
 Significant attention needs to be given to the postprocessing of the data.
 
-![Reads and transposon density after processing](./media/Tn_Reads_Pergene_MyAnalysis.png)
+![Reads and transposon density after processing.](./media/Tn_Reads_Pergene_MyAnalysis.png)
+
+### Profile plot for number of reads
+(*See `TransposonRead_Profile_Plot.py`*)
+
+To create a visual overview where the insertions are and how many reads there are for each insertion, a profile plot is created for each chromosome.
+
+![Read profile plot for chromosome XV (note the y-axis is logarithmic scale).](./media/Read_ProfilePlot_chrxv.png)
+
+The bars indicate the absolute number of reads for all insertions located in the bars (bar width is 545bp).
+The colored background indicate the location of genes, where green are the annotated essential genes and red the non-essential genes.
+In general, the essential genes have no or little reads whereas the non-essential genes have many reads.
+Note that at location 564476 the ADE2 gene is located that has significant more reads than any other location in the genome, which has to do the way the plasmid is designed (see Michel et.al. 2017).
+
+This figure gives a rough overview that allows for identifying how well the data fits the expectation.
+Also an alternative version of this plot is made (`TransposonRead_Profile_Compare.py`) that makes a similar plot for two datasets at the same time, allowing the comparison of the two datasets with each other and with the expectation.
+
+### Profile plot number of reads per individual genes
+(*See `gene_reads.py`*)
+
+Instead of plotting the number of reads for an entire chromosome, it is also useful to plot the read profile for individual genes to see how the insertion sites and reads are distributed within a gene.
+For this a bar plot is made where the number of reads per transposon are determined.
+This also shows the distribution of the distances between subsequent transposon insertions for both the gene and the chromosome the gene is located.
+It is expected that for essential genes, the median distance between subsequent insertions is larger compared to the distance in the entire chromosome (since important genes have few insertions and large parts will be free of insertions).
+For non-essential genes, the distribution for the distance between insertions is expected to follow the distribution of the chromomsome more closely.
+
+![Read per transposon insertion for BEM1. The violin plot gives the distribution for the distance between subsequent insertions for both BEM1 and chromosome II (where BEM1 is located). The small black bars indicate individual transposon insertions.](./media/Read_ProfilePlot_bem1.png)
+
+![Read per transposon insertion for the HO-locus. Note that the distribution for the distance between insertions follows the distribution for the chromosome more closely compared to BEM1.](./media/Read_ProfilePlot_ho.png)
+
+The minimum width of the bars are chosen such that each bar should contain 8 transposon insertions.
+The maximum width is set equal to the length such that the probabilty of finding at least one insertion is more than 99% in the whole chromosome.
+This is chosen because if now a bar is empty in a gene than this is not a coincidence, but this is an interesting region.
+
+These plots can be used for checking if a gene has transposon free regions which might indicate that this gene is essential.
 
 # Data analysis steps
 

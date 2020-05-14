@@ -183,11 +183,11 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
         chromosomenames_list.append(roman)
         
 #%%
-#    for chrom in chromosomenames_list:
-    chrom_index = chromosomenames_list.index(chrom)
+#    chrom_index = chromosomenames_list.index(chrom)
+    chrom = chrom.upper()
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
-        bar_width = int(chr_length_dict.get(chrom)/500)
+        bar_width = int(chr_length_dict.get(chrom)/2000)
 #%% GET ALL GENES IN CURRENT CHROMOSOME
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items() if chrom in v]
@@ -277,8 +277,12 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 
     print('Plotting chromosome ', chrom, '...')
     print('bar width for plotting is ',bar_width)
+
+    plt.figure(figsize=(19,9))
+    grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
+
     binsize = bar_width
-    fig,ax = plt.subplots()
+    ax = plt.subplot(grid[0,0])
     for gene in genes_currentchrom_pos_list:
         gene_start_pos = int(gene_pos_dict.get(gene)[1])
         gene_end_pos = int(gene_pos_dict.get(gene)[2])
@@ -291,10 +295,11 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     ax.set_yscale('log')
     ax.set_axisbelow(True)
     ax.grid(True)
+    ax.set_xlim(0,chr_length_dict.get(chrom))
     ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=12)
     ax.set_ylabel('Read count (log_10)', fontsize=12)
 #    ax.set_title('Read profile for chromosome '+chrom)
-    plt.show()
+    plt.tight_layout()
 
 
 
@@ -308,5 +313,5 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 if __name__ == '__main__':
 #    read_profile(chrom='XVI',wig_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.wig")
 #    transposon_profile(chrom='VI',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed")
-    read_profile(chrom='VI',wig_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig")
+    read_profile(chrom='xv',wig_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig")
 #    transposon_profile(chrom='VI',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
