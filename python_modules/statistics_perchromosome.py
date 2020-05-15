@@ -12,10 +12,14 @@ import pandas as pd
 import seaborn as sb
 sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_modules')
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic
+from chromosome_names_in_files import chromosome_name_bedfile
 
 #%%
 def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=False):
-    '''
+    '''Determines statistical values for the transposon insertion per chromosome.
+    When the printing variable is set to True, it prints these values and creates a plot for showing the distribution of the distance between insertions in terms of basepairs.
+    The functions returns the distance between insertions in terms of basepairs for the chromosome given as a roman numeral.
+    When no chromosome is given, the return variable contains all chromosome with a list of distances between insertions in the form of a dictionary.
     '''
 
 #%% USED FILES
@@ -35,34 +39,37 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=Fals
         lines = f.readlines()
 
 #%% GET NAMES FOR THE CHROMOSOMES IN THE BED FILE
-    chrom_names_dict = {}
-    chrom_start_index_dict = {}
-    chrom_end_index_dict = {}
-    chrom_name = ''
-    chr_counter = 0
-    line_counter = 0
-    stop_loop = False
-    while stop_loop is False:
-        line = lines[line_counter]
-        chrom_name_current = line.split(' ')[0].replace('chr','')
-        if not chrom_name_current.startswith('track'): #SKIP HEADER
-            if not chrom_name_current.startswith('M'): #SKIP MITOCHRONDRIAL CHROMOSOMES
-                if chrom_name_current != chrom_name:
-                    chrom_names_dict[chromosome_romannames_list[chr_counter]] = chrom_name_current
-                    chrom_name = chrom_name_current
-#                    print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chrom_name_current)
-                    
-                    chrom_start_index_dict[chromosome_romannames_list[chr_counter]] = line_counter #GET START INDEX IN THE BED FILE OF THE CURENT CHROMOSOME
-                    if chr_counter != 0:
-                        chrom_end_index_dict[chromosome_romannames_list[chr_counter-1]] = line_counter-1 #GET THE END INDEX IN THE BED OF THE PREVIOUS CHROMOSOME (SKIP FOR THE FIRST CHROMOSOME)
+#    chrom_names_dict = {}
+#    chrom_start_index_dict = {}
+#    chrom_end_index_dict = {}
+#    chrom_name = ''
+#    chr_counter = 0
+#    line_counter = 0
+#    stop_loop = False
+#    while stop_loop is False:
+#        line = lines[line_counter]
+#        chrom_name_current = line.split(' ')[0].replace('chr','')
+#        if not chrom_name_current.startswith('track'): #SKIP HEADER
+#            if not chrom_name_current.startswith('M'): #SKIP MITOCHRONDRIAL CHROMOSOMES
+#                if chrom_name_current != chrom_name:
+#                    chrom_names_dict[chromosome_romannames_list[chr_counter]] = chrom_name_current
+#                    chrom_name = chrom_name_current
+##                    print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chrom_name_current)
+#                    
+#                    chrom_start_index_dict[chromosome_romannames_list[chr_counter]] = line_counter #GET START INDEX IN THE BED FILE OF THE CURENT CHROMOSOME
+#                    if chr_counter != 0:
+#                        chrom_end_index_dict[chromosome_romannames_list[chr_counter-1]] = line_counter-1 #GET THE END INDEX IN THE BED OF THE PREVIOUS CHROMOSOME (SKIP FOR THE FIRST CHROMOSOME)
+#
+#                    chr_counter += 1
+#
+#            elif chrom_name_current.startswith('M'):
+#                chrom_end_index_dict[chromosome_romannames_list[-1]] = line_counter-1 #GET THE END INDEX IN THE BED FILE FOR THE FINAL CHROMOSOME
+#                stop_loop = True
+#                
+#        line_counter += 1
 
-                    chr_counter += 1
+    chrom_names_dict,chrom_start_index_dict, chrom_end_index_dict= chromosome_name_bedfile(lines)
 
-            elif chrom_name_current.startswith('M'):
-                chrom_end_index_dict[chromosome_romannames_list[-1]] = line_counter-1 #GET THE END INDEX IN THE BED FILE FOR THE FINAL CHROMOSOME
-                stop_loop = True
-                
-        line_counter += 1
 
 #%% DETERMINE STATISTICS FOR INDIVIDUAL CHROMOSOMES AND PUT THE RESULTS IN A DICT
     if chromosome != None:
