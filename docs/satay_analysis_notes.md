@@ -1,5 +1,5 @@
 ---
-title: "Notes and details for SATAY analysis workflow"
+title: "Notes and details for SATAY analysis"
 output: pdf_document
 documentclass: article
 classoption: onecolumn
@@ -64,6 +64,14 @@ In that case all regions of the DNA are checked for their essentiality.
 
 ## Essentiality
 
+Essentiality of genes are defined as its deletion is determental to cell in the form that either the cell cannot grow anymore and dies, or the cell cannot give rise to offspring.
+Essentiality can be grouped in two categories, namely type I and type II [Chen et.al. 2016].
+Type I essential genes are genes, when inhibited, show a loss-of-function that can only be rescued (or masked) when the lost function is recovered by a gain-of-function mechanism.
+Typically these genes are important for some indispensable core function in the cell (e.g. Cdc42 in *S. Cerevisiae* that is type I essential for cell polarity).
+Type II essential genes are the ones that look essential upon inhibition, but the effects of its inhibition can be rescued or masked by the deletion of (an)other gene(s).
+These genes are therefore not actually essential, but when inhibiting the genes some toxic side effects are provoked that are deleterious for the cells.
+
+The idea is that the essentiality of genes (both type I and type II), may change between different genetic backgrounds.
 For changes in essentiality four cases are considered:
 
 1. A gene is **essential** in WT and remains **essential** in the
@@ -95,7 +103,7 @@ The SATAY experiments will therefore show that these genes are intolerant for tr
 However, when the cells are grown in another growth condition where mainly other nutrients are present, the same genes might now not be essential and therefore also be more tolerent to transposon insertions in that region.
 It is suggested to compare the results of experiments with cells from the same genetic background grown in different conditions with each other to rule out conditions specific results.
 
-For wild-type (and mutated) yeast, the interaction network is already made based on previous research [thecellmap.org](<thecellmap.org>).
+For wild-type (and some mutated) yeast, the interaction network is already made based on previous research [thecellmap.org](<thecellmap.org>).
 We want to check the essentiality of all genes in different mutants and compare this with both wild type cells and with each other.
 The goal is to make an overview of the changes in the essentiality of the genes and the interaction network between the proteins.
 With this we aim to eventually be able to predict the synthetic lethality of multiple mutations based on the interaction maps of the individual mutations.
@@ -137,7 +145,7 @@ According to Michel et.al. this can have 3 main reasons.
  When the cells are grown, the more healthy cells grow much faster and, after some time, occur more frequently in the population than these crippled cells and therefore these cells might not generate many reads or no reads at all.
  In the processing, it might therefore look as if these genes are essential, but in fact they are not.
  The cells just grow very slowly.
- 
+
 The other way around might also occcur, where essential genes are partly tolerant to transposons.
 This is shown by Michel et.al. to be caused that some regions (that code for specific subdomains of the proteins) of the essential genes are dispensable.
 The transposons in these essential genes are clearly located at a specific region in the gene, the one that codes for a non-essential subdomain.
@@ -451,10 +459,8 @@ First, the main focus will be step 1 of the analysis (see next section).
 # Step 1 data analysis; From raw data to essential protein overview
 
 SATAY experiments need to be sequenced which results in a FASTQ file.
-The sequence reads from this file needs to be aligned to create a SAM
-file (and/or the compressed binary equivalent BAM file). Using the BAM
-file, the number of transposons can be determined for each insertion
-location.
+The sequence reads from this file needs to be aligned to create a SAM file (and/or the compressed binary equivalent BAM file).
+Using the BAM file, the number of transposons can be determined for each insertion location.
 
 For guides and manuals of the software discussed below, see the folder
 
@@ -465,171 +471,164 @@ Raw data (.FASTQ file) discussed in the paper of Michel et.al. 2017 can be found
 ## Workflow
 
 The results from the sequencing is typically represented in FASTA or FASTQ format.
-This needs to be aligned according to a reference sequence
-to create a SAM and BAM file. Before alignment, the data needs to be
-checked for quality and possibly trimmed to remove unwanted and
-unnecessary sequences.
-When the location of the reads relative to a
-reference sequence are known, the insertion sites of the transposons can be determined.
-With this, a visualization can be made that shows the
-number of transposon insertions per gene.
+This needs to be aligned according to a reference sequence to create a SAM and BAM file.
+Before alignment, the data needs to be checked for quality and possibly trimmed to remove unwanted and unnecessary sequences.
+When the location of the reads relative to a reference sequence are known, the insertion sites of the transposons can be determined.
+With this, a visualization can be made that shows the number of transposon insertions per gene.
 
 1. Checking the raw FASTA or FASTQ data can be done using the
-    ‘**FASTQC’** [<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>] software (Windows, Linux, Mac. Requires Java).
+    ([**FASTQC**](<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>)) software (Windows, Linux, Mac. Requires Java).
     This gives a quality report (see accompanying tutorial) for the sequence reads and can be run non-interactively using the command line.
 
-2. Based on the quality report, the data needs to be trimmed to
-    remove any unwanted sequences.
-    This can be done with for example ‘**FASTX’** software [<http://hannonlab.cshl.edu/fastx_toolkit/index.html>] (Linux,
-    Mac) or ‘**Trimmomatic’** [<http://www.usadellab.org/cms/?page=trimmomatic>] (Windows,requires Java).
-    An easy graphical user interface that combines the
-    FASTQC and Trimmomatic is ‘**123FASTQ’** [<https://sourceforge.net/projects/project-123ngs/>].
+2. Based on the quality report, the data needs to be trimmed to remove any unwanted sequences.
+    This can be done with for example ([**FASTX**](<http://hannonlab.cshl.edu/fastx_toolkit/index.html>)) (Linux, Mac) or ([**Trimmomatic**](<http://www.usadellab.org/cms/?page=trimmomatic>)) (Windows,requires Java).
+    An easy graphical user interface that combines the FASTQC and Trimmomatic is ([**123FASTQ**](<https://sourceforge.net/projects/project-123ngs/>)).
     Also **BBDuk** can be used for trimming (which belongs to BBMap).
 
 3. The trimmed sequence reads need to be aligned using a reference
-    sequence, for example the *S. Cerevisiae* S288C Ref64-2-1 reference sequence from SGD [<https://downloads.yeastgenome.org/sequence/S288C_reference/>].
-    Aligning can be done, for example, using ‘**SnapGene’**
-    [<https://www.snapgene.com/>] (Windows, Linux, Mac. This does not
+    sequence, for example the *S. Cerevisiae* [S288C Ref64-2-1 reference sequence](<https://downloads.yeastgenome.org/sequence/S288C_reference/>) or the [W303 strain sequence](<http://sgd-archive.yeastgenome.org/sequence/strains/W303/W303_SGD_2015_JRIU00000000/>) from SGD.
+    Aligning can be done, for example, using ([**SnapGene**](<https://www.snapgene.com/>)) (Windows, Linux, Mac. This does not
     import large files and is therefore not suitable for whole genome
-    sequencing), ‘**BBMap’** [<https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbmap-guide/>] (Linux, Mac, Windows (seems to give problems when installing on windows machines), might be possible to integrate it in Python, ‘**BWA’** [<http://bio-bwa.sourceforge.net/>] (Linux, Mac), ‘**Bowtie2**’ [<http://bowtie-bio.sourceforge.net/bowtie2/index.shtml>] (Linux, Mac) or ‘**ClustalOmega’** [<http://www.clustal.org/omega/>] (Windows, Linux, Mac).
-    This step might require defining scores for
-    matches, mismatches, gaps and insertions of nucleotides.
+    sequencing), ([**BBMap**](<https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbmap-guide/>)) (Linux, Mac, Windows (seems to give problems when installing on windows machines), might be possible to integrate it in Python, ([**BWA**](<http://bio-bwa.sourceforge.net/>)) (Linux, Mac), ([**Bowtie2**](<http://bowtie-bio.sourceforge.net/bowtie2/index.shtml>)) (Linux, Mac) or ([**ClustalOmega**](<http://www.clustal.org/omega/>)) (Windows, Linux, Mac).
+    This step might require defining scores for matches, mismatches, gaps and insertions of nucleotides.
 
-4. After aligning, the data needs to be converted to SAM and BAM
-    formats for easier processing hereafter.
-    This requires ‘**SAMtools’** [<http://www.htslib.org/>] (Linux, Mac) or ‘**GATK’** [<https://gatk.broadinstitute.org/hc/en-us>] (Linux, Mac).
-    Conversion from SAM to BAM can also be done in Matlab if
-    preferred using the ‘BioMap’ function.
+4. After aligning, the data needs to be converted to SAM and BAM formats for easier processing hereafter.
+    This requires ([**SAMtools**](<http://www.htslib.org/>)) (Linux, Mac) or ([**GATK**](<https://gatk.broadinstitute.org/hc/en-us>)) (Linux, Mac).
+    Conversion from SAM to BAM can also be done in Matlab if preferred using the ‘BioMap’ function.
 
-5. Using the BAM file with the aligned sequence reads, the transposon
-    insertion sites can be determined using the **Matlab** script given by Benoit Kornmann Lab [<https://sites.google.com/site/satayusers/>] (including the name.mat and yeastGFF.mat files).
+5. Using the BAM file with the aligned sequence reads, the transposon insertion sites can be determined using the [**Matlab** script given by Benoit Kornmann Lab](<https://sites.google.com/site/satayusers/>) (including the name.mat and yeastGFF.mat files).
     The results from this step are three files (a .txt file, a .bed file and a .wig file) that can be used for visualization.
 
-6. If more processing is required, ‘**Picard**‘[<https://broadinstitute.github.io/picard/>] (Linux, Mac) might be useful, as well as ‘**GATK**’ [<https://gatk.broadinstitute.org/hc/en-us>] (Linux, Mac).
-    Visualization of the genomic dataset can be done using ‘**IGV**’[<https://software.broadinstitute.org/software/igv/home>] (Windows, Linux, Mac) or SAMtools’ tview function.
-    Also **sambamba** [<https://lomereiter.github.io/sambamba/>] (Linux, Mac) can be used, especially for sorting and indexing the bam files.
+6. If more processing is required, ([**Picard**](<https://broadinstitute.github.io/picard/>)) (Linux, Mac) might be useful, as well as ([**GATK**](<https://gatk.broadinstitute.org/hc/en-us>)) (Linux, Mac).
+    Visualization of the genomic dataset can be done using ([**IGV**](<https://software.broadinstitute.org/software/igv/home>)) (Windows, Linux, Mac) or SAMtools’ tview function.
+    Also ([**sambamba**](<https://lomereiter.github.io/sambamba/>)) (Linux, Mac) can be used, especially for sorting and indexing the bam files.
 
 7. Creating transposon insertion maps for the genome (see <https://sites.google.com/site/satayusers/>) and comparison essential genes between different genetic backgrounds using Venn diagrams, customized software needs to be created.
 
+### 0. Initializing
+
+The next steps might help in organizing the data.
+
+1. Create an empty folder
+
+2. Add the .fastq file (and unzip if necessary).
+
+3. Add the following empty folders for the outcomes of the different processing steps:
+
+    A. filename_QC
+
+    B. filename_Trimmed
+
+    C. filename_Aligned
+
+4. Start the command line using GitBash.
+
+5. It might be handy to be able to define variables, for example for the paths to the difference programs and files.
+For this type the command `#!/bin/bash`.
+
+6. Define the following variables:
+
+    A. Path to the folder containing the .fastq file (`pathdata='/C/Users/gregoryvanbeek/Desktop/Cerevisiae_WT2_Seqdata_Michel2017/Cerevisiae_WT2_Seqdata_Michel2017_Aligned/'`).
+
+    B. Name of the .fastq file (`filename='Cerevisiae_WT2_Michel2017.fastq'`).
+
+    C. Path to the shared folder used for communicating with the virtual machine running Linux (`path_sharedfolder='/C/Users/gregoryvanbeek/Documents/VirtualBox VMs/VMSharedFolder_Ubuntu64_1'`).
+
+    D. Path to the location where the FASTQC software is located (`path_fastqc_software='/C/Users/gregoryvanbeek/Documents/Software/FastQC'`).
+
+    E. Path to the location where the Trimmomatic software is located (`path_trimm_software='/C/Users/gregoryvanbeek/Documents/Software/Trimmomatic-0.39'`).
+
+    F. Path to the outcome folder for the fastqc software (`path_fastqc_out= ${pathdata}'_Cerevisiae_WT2_Seqdata_Michel2017_QC'`).
+
+    G. Path to the outcome folder for the trimmomatic software (`path_trimm_out= ${pathdata}'_Cerevisiae_WT2_Seqdata_Michel2017_Trimmed'`).
+
+    H. Path to the outcome folder for the aligned software (`path_align_out= ${pathdata}'_Cerevisiae_WT2_Seqdata_Michel2017_Aligned'`).
+
+Some useful commands:
+
+1. `echo`: Print a variable name or some text.
+
+2. `gunzip`: Unzip a .gz file.
+
+3. `bunzip`: Unzip a .bz file.
+
+
+
 ### 1. Quality checking of the sequencing reads; FASTQC (0.11.9)
 
-FASTQC creates a report for the quality of sequencing data. The input
-should be a fastq (both zipped and unzipped), sam or bam file (it can
-handle multiple files at once). The program does not need to be
-installed, but after downloading only requires to be unzipped. FASTQC
-can be ran as an interactive program (i.e. using a GUI) or
-non-interactively using the command line options.
+FASTQC creates a report for the quality of sequencing data.
+The input should be a fastq (both zipped and unzipped), sam or bam file (it can handle multiple files at once).
+The program does not need to be installed, but after downloading only requires to be unzipped.
+FASTQC can be ran as an interactive program (i.e. using a GUI) or non-interactively using the command line options.
 
-If using interactively, open the ‘run\_fastqc.bat’ file in the FASTQC
-folder and load a file to be checked. Alternatively using the 123FASTQ
-(version 1.1) program, open this and use the ‘Quality Check’ menu on the
-right. The advantage of using 123FASTQ is that it can also do trimming
-(using Trimmomatic).
+If using interactively, open the ‘run\_fastqc.bat’ file in the FASTQC folder and load a file to be checked. Alternatively using the 123FASTQ (version 1.1) program, open this and use the ‘Quality Check’ menu on the right.
+The advantage of using 123FASTQ is that it can also do trimming (using Trimmomatic).
 
-If using the command line for checking a single file use the command:
-`/path/to/program/folder/fastqc --outdir /path/to/output/directory/path/to/input/directory/filename.fastq`
-(Note that the output directory should already exist, as the program
-does not create paths). In the output directory, a .html file and a
-folder is created, both with the same name as the input file.
+If using the command line for checking a single file use the command: `/path/to/program/folder/fastqc --outdir /path/to/output/directory/path/to/input/directory/filename.fastq` (Note that the output directory should already exist, as the program does not create paths).
+In the output directory, a .html file and a folder is created, both with the same name as the input file.
 The .html file can be used to quickly see the graphs.
 Also, a zipped folder is created where the raw data of the quality check is stored.
 For explanation about the different graphs, see the fastqc\_manual pdf or [<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3%20Analysis%20Modules/>] (or the paper ‘Preprocessing and Quality Control for Whole-Genome’ from Wright et.al. or the ‘Assessing Read Quality’ workshop from the Datacarpentry Genomics workshop).
 
-For more commands, type
-`/path/to/program/folder/fastqc --help`
-Note and some useful commands might be:
+For more commands, type `/path/to/program/folder/fastqc --help`.
+Some useful commands might be:
 
-- --contaminants Reads a file where sequences are stored of
-    (potential) contaminants.
+- --contaminants Reads a file where sequences are stored of (potential) contaminants.
     The (.txt) file should be created before running the software.
     Each contaminant is presented on a different line the text file and should have the form name 'tab' sequence.
 
-- --adapters Similar as the contaminants command, but specifically
-    for adapter sequences.
+- --adapters Similar as the contaminants command, but specifically for adapter sequences.
     Also here a text file should be created before running and this file should have the same layout as the contaminants file.
 
-- --min_length where a minimal sequence length can be set, so that
-    the statistics can be better compared between different reads of
-    different length (which for example might occur after trimming).
+- --min_length where a minimal sequence length can be set, so that the statistics can be better compared between different reads of different length (which for example might occur after trimming).
 
-- --threads Preferably leave this unchanged, especially when an error
-    is shown that there ‘could not reserve enough space for object heap’ after setting this command.
+- --threads Preferably leave this unchanged, especially when an error is shown that there ‘could not reserve enough space for object heap’ after setting this command.
 
 - --extract Set this command (without following of parameters) to extract the zipped folder from the results.
 
 The output of the FASTQC program is:
 
-- **Per base sequence quality**: Box and whisker plot for the quality
-    of a basepair position in all reads. The quality should be above
-    approximately 30 for most reads, but the quality typically drops
-    near the end of the sequences. If the ends of the reads are really
-    bad, consider trimming those in the next step.
+- **Per base sequence quality**: Box and whisker plot for the quality of a basepair position in all reads.
+The quality should be above approximately 30 for most reads, but the quality typically drops near the end of the sequences.
+If the ends of the reads are really bad, consider trimming those in the next step.
 
-- **Per tile sequence quality**: (Shows only when Illumina Library
-    which retains there sequence identifier). Shows a heat map of the
-    quality per tile of the sequence machines. Blueish colours indicate
-    that the quality score is about or better than average and reddish
-    colours indicates scores worse than average.
+- **Per tile sequence quality**: (Shows only when Illumina Library which retains there sequence identifier).
+Shows a heat map of the quality per tile of the sequence machines.
+Blueish colours indicate that the quality score is about or better than average and reddish colours indicates scores worse than average.
 
-- **Per sequence quality score**: Shows an accumulative distribution
-    to indicate which mean quality score per sequence occurs most often.
+- **Per sequence quality score**: Shows an accumulative distribution to indicate which mean quality score per sequence occurs most often.
 
-- **Per base sequence content**: Shows the percentage of nucleotide
-    appearance in all sequences. Assuming a perfectly random
-    distribution for all four nucleotides, each nucleotide should be
-    present about 25% over the entire sequence. In the beginning this
-    might be a bit off due to for example adapters present in the
-    sequences. If this is present, it might difficult/impossible to cut
-    these during the trimming part, but it should typically not
-    seriously affect further analysis.
+- **Per base sequence content**: Shows the percentage of nucleotide appearance in all sequences.
+Assuming a perfectly random distribution for all four nucleotides, each nucleotide should be present about 25% over the entire sequence. In the beginning this might be a bit off due to for example adapters present in the sequences.
+If this is present, it might difficult/impossible to cut these during the trimming part, but it should typically not seriously affect further analysis.
 
-- **Per sequence GC content**: Indicates the distribution of the G-C
-    nucleotides appearances in the genome. The ideal distribution that
-    is expected based on the data is shown as a blue curve. The red
-    curve should, ideally follow the blue curve. If the red curve is
-    more or less a normal distribution, but shifted from the blue curve,
-    is might indicate a systematic bias which might be caused by an
-    inaccurate estimation of the GC content in the blue curve. This does
-    not necessarily indicate bad data. When the red curve is not normal
-    or show irregularities (peaks or flat parts), this might indicate
-    contaminants in the sample or overrepresented sequences.
+- **Per sequence GC content**: Indicates the distribution of the G-C nucleotides appearances in the genome.
+The ideal distribution that is expected based on the data is shown as a blue curve.
+The red curve should, ideally follow the blue curve.
+If the red curve is more or less a normal distribution, but shifted from the blue curve, is might indicate a systematic bias which might be caused by an inaccurate estimation of the GC content in the blue curve.
+This does not necessarily indicate bad data.
+When the red curve is not normal or show irregularities (peaks or flat parts), this might indicate contaminants in the sample or overrepresented sequences.
 
-- **Per base N content**: Counts the number of N appearances in the
-    data for each basepair position of all reads. Every time a
-    nucleotide cannot be accurately determine during sequencing, it is
-    flagged with a N (No hit) in the sequence instead of one of the
-    nucleotides. Ideally this should never occur in the data and this
-    graph should be a flat line at zero over the entire length. Although
-    at the end of the sequences it might occur few times, but it should
-    not occur more than a few percent.
+- **Per base N content**: Counts the number of N appearances in the data for each basepair position of all reads.
+Every time a nucleotide cannot be accurately determine during sequencing, it is flagged with a N (No hit) in the sequence instead of one of the nucleotides.
+Ideally this should never occur in the data and this graph should be a flat line at zero over the entire length.
+Although at the end of the sequences it might occur few times, but it should not occur more than a few percent.
 
 - **Sequence length distribution**: Shows the length of all sequences.
-    Ideally all reads should have the same length, but this might
-    change, for example, after trimming.
+    Ideally all reads should have the same length, but this might change, for example, after trimming.
 
-- **Sequence duplication level**: Indicates how often some sequences
-    appear the data. Ideally, all reads occur only few times and a high
-    peak is expected near 1. If peaks are observed at higher numbers,
-    this might indicate enrichment bias during the sequencing
-    preparation (e.g. over amplification during PCR). Only the first 100
-    000 sequences are considered and when the length of the reads is
-    over 75bp, the reads are cut down to pieces of 50bp. Some
-    duplication might not be bad and therefore a warning or error here
-    does not need to concern.
+- **Sequence duplication level**: Indicates how often some sequences appear the data.
+Ideally, all reads occur only few times and a high peak is expected near 1.
+If peaks are observed at higher numbers, this might indicate enrichment bias during the sequencing preparation (e.g. over amplification during PCR).
+Only the first 100000 sequences are considered and when the length of the reads is over 75bp, the reads are cut down to pieces of 50bp. 
+Some duplication might not be bad and therefore a warning or error here does not need to concern.
 
-- **Overrepresented sequences**: List of sequences that appear in more
-    0.1% of the total (this is only considered for the first 100 000
-    sequences and reads over 75bp are truncated to 50bp pieces). The
-    program gives a warning (when sequences are found to be present
-    between 0.1% and 1% of the total amount of sequences) or an error
-    (when there are sequences occurring more 1% of all sequences), but
-    this does not always mean that the data is bad and might be ignored.
+- **Overrepresented sequences**: List of sequences that appear in more 0.1% of the total (this is only considered for the first 100000 sequences and reads over 75bp are truncated to 50bp pieces).
+The program gives a warning (when sequences are found to be present between 0.1% and 1% of the total amount of sequences) or an error (when there are sequences occurring more 1% of all sequences), but this does not always mean that the data is bad and might be ignored.
 
-- **Adapter (Kmers) content**: Shows an accumulative percentage plot
-    of adapter appearances in the data. Ideally this is a flat line at
-    zero (meaning that there are no adapter sequences present in the
-    data). If this is not a flat line at zero, it might be necessary to
-    cut the adapter during the trimming step.
+- **Adapter (Kmers) content**: Shows an accumulative percentage plot of adapter appearances in the data.
+Ideally this is a flat line at zero (meaning that there are no adapter sequences present in the data).
+If this is not a flat line at zero, it might be necessary to cut the adapter during the trimming step.
 
 ### 2. Trimming of the sequencing reads; Trimmomatic (0.39)
 
