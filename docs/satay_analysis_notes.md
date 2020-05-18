@@ -507,7 +507,8 @@ With this, a visualization can be made that shows the number of transposon inser
 
 ### 0. Initializing
 
-The next steps might help in organizing the data.
+The next steps are not obligatory, but might help in organizing the data.
+The bold printed commands are put so that they can be copied directly to the bash (note to modify the respective paths on your own machine).
 
 1. Create an empty folder
 
@@ -523,26 +524,28 @@ The next steps might help in organizing the data.
 
 4. Start the command line using GitBash.
 
-5. It might be handy to be able to define variables, for example for the paths to the difference programs and files.
-For this type the command `#!/bin/bash`.
+5. It might be handy to be able to define variables, for example for the paths to the difference programs and files so that these do not have te be entered each time.
+For this start with the command:
 
-6. Define the following variables:
+**`#!/bin/bash`**.
 
-    A. Path to the folder containing the .fastq file (`pathdata='/C/Users/gregoryvanbeek/Desktop/Cerevisiae_WT2_Seqdata_Michel2017/Cerevisiae_WT2_Seqdata_Michel2017_Aligned/'`).
+6. Define the following variables (when using git bash, copy and paste the commands using `shift+Ins`):
 
-    B. Name of the .fastq file (`filename='Cerevisiae_WT2_Michel2017.fastq'`).
+    A. Path to the folder containing the .fastq file(**`pathdata='/C/Users/gregoryvanbeek/Desktop/Cerevisiae_WT2_Seqdata_Michel2017/'`**).
 
-    C. Path to the shared folder used for communicating with the virtual machine running Linux (`path_sharedfolder='/C/Users/gregoryvanbeek/Documents/VirtualBox VMs/VMSharedFolder_Ubuntu64_1'`).
+    B. Name of the .fastq file (**`filename='Cerevisiae_WT2_Michel2017.fastq'`**).
 
-    D. Path to the location where the FASTQC software is located (`path_fastqc_software='/C/Users/gregoryvanbeek/Documents/Software/FastQC'`).
+    C. Path to the shared folder used for communicating with the virtual machine running Linux (**`path_sharedfolder='/C/Users/gregoryvanbeek/Documents/VirtualBox VMs/VMSharedFolder_Ubuntu64_1'`**).
 
-    E. Path to the location where the Trimmomatic software is located (`path_trimm_software='/C/Users/gregoryvanbeek/Documents/Software/Trimmomatic-0.39'`).
+    D. Path to the location where the FASTQC software is located (**`path_fastqc_software='/C/Users/gregoryvanbeek/Documents/Software/FastQC/'`**).
 
-    F. Path to the outcome folder for the fastqc software (`path_fastqc_out= ${pathdata}'_Cerevisiae_WT2_Seqdata_Michel2017_QC'`).
+    E. Path to the location where the Trimmomatic software is located (**`path_trimm_software='/C/Users/gregoryvanbeek/Documents/Software/Trimmomatic-0.39/'`**).
 
-    G. Path to the outcome folder for the trimmomatic software (`path_trimm_out= ${pathdata}'_Cerevisiae_WT2_Seqdata_Michel2017_Trimmed'`).
+    F. Path to the outcome folder for the fastqc software (**`path_fastqc_out=${pathdata}'Cerevisiae_WT2_Seqdata_Michel2017_QC/'`**).
 
-    H. Path to the outcome folder for the aligned software (`path_align_out= ${pathdata}'_Cerevisiae_WT2_Seqdata_Michel2017_Aligned'`).
+    G. Path to the outcome folder for the trimmomatic software (**`path_trimm_out=${pathdata}'Cerevisiae_WT2_Seqdata_Michel2017_Trimmed/'`**).
+
+    H. Path to the outcome folder for the aligned software (**`path_align_out=${pathdata}'Cerevisiae_WT2_Seqdata_Michel2017_Aligned'`**).
 
 Some useful commands:
 
@@ -551,8 +554,6 @@ Some useful commands:
 2. `gunzip`: Unzip a .gz file.
 
 3. `bunzip`: Unzip a .bz file.
-
-
 
 ### 1. Quality checking of the sequencing reads; FASTQC (0.11.9)
 
@@ -564,17 +565,21 @@ FASTQC can be ran as an interactive program (i.e. using a GUI) or non-interactiv
 If using interactively, open the ‘run\_fastqc.bat’ file in the FASTQC folder and load a file to be checked. Alternatively using the 123FASTQ (version 1.1) program, open this and use the ‘Quality Check’ menu on the right.
 The advantage of using 123FASTQ is that it can also do trimming (using Trimmomatic).
 
-If using the command line for checking a single file use the command: `/path/to/program/folder/fastqc --outdir /path/to/output/directory/path/to/input/directory/filename.fastq` (Note that the output directory should already exist, as the program does not create paths).
+If using the command line for checking a single file use the command:
+
+**`${path_fastqc_software}fastqc --outdir ${path_fastqc_out} ${pathdata}${filename}`**
+
+(Note that the output directory should already exist, as the program does not create paths).
 In the output directory, a .html file and a folder is created, both with the same name as the input file.
 The .html file can be used to quickly see the graphs.
 Also, a zipped folder is created where the raw data of the quality check is stored.
 For explanation about the different graphs, see the fastqc\_manual pdf or [<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3%20Analysis%20Modules/>] (or the paper ‘Preprocessing and Quality Control for Whole-Genome’ from Wright et.al. or the ‘Assessing Read Quality’ workshop from the Datacarpentry Genomics workshop).
 
-For more commands, type `/path/to/program/folder/fastqc --help`.
+For more commands, type `${path_fastqc_software} --help`.
 Some useful commands might be:
 
 - --contaminants Reads a file where sequences are stored of (potential) contaminants.
-    The (.txt) file should be created before running the software.
+    The .txt-file should be created before running the software.
     Each contaminant is presented on a different line the text file and should have the form name 'tab' sequence.
 
 - --adapters Similar as the contaminants command, but specifically for adapter sequences.
@@ -625,6 +630,7 @@ Some duplication might not be bad and therefore a warning or error here does not
 
 - **Overrepresented sequences**: List of sequences that appear in more 0.1% of the total (this is only considered for the first 100000 sequences and reads over 75bp are truncated to 50bp pieces).
 The program gives a warning (when sequences are found to be present between 0.1% and 1% of the total amount of sequences) or an error (when there are sequences occurring more 1% of all sequences), but this does not always mean that the data is bad and might be ignored.
+For Illumina sequencing for satay experiments, the sequences often start with either 'CATG' or 'GATC' which are the recognition sites for NlaIII and DpnII respectively.
 
 - **Adapter (Kmers) content**: Shows an accumulative percentage plot of adapter appearances in the data.
 Ideally this is a flat line at zero (meaning that there are no adapter sequences present in the data).
@@ -632,75 +638,86 @@ If this is not a flat line at zero, it might be necessary to cut the adapter dur
 
 ### 2. Trimming of the sequencing reads; Trimmomatic (0.39)
 
-Trimmomatic alters the sequencing result by trimming the reads from
-unwanted sequences, as is specified by the user. The program does not
-need to be installed, but after downloading only requires to be
-unzipped. Trimmomatic can be ran as an interactive program (for this
-123FASTQ needs to be used) or non-interactively using the command line
-options.
+Trimmomatic alters the sequencing result by trimming the reads from unwanted sequences, as is specified by the user. 
+The program does not need to be installed, but after downloading only requires to be unzipped.
+Trimmomatic can be ran as an interactive program (for this 123FASTQ needs to be used) or non-interactively using the command line options.
 
-If using interactively, use 123FASTQ (version 1.1) and run the
-‘Runner.bat’ file in the 123FASTQ folder. Use the ‘Trimmer’ in the
-‘Trim Factory’ menu on the right.
+If using interactively, use 123FASTQ (version 1.1) and run the ‘Runner.bat’ file in the 123FASTQ folder.
+Use the ‘Trimmer’ in the ‘Trim Factory’ menu on the right.
 
 If using non-interactively in the command line use the command:
 
-`java -jar /path/to/program/folder/Trimmomatic/trimmomatic-0.39.jar`
+`java -jar ${path_trimm_software}'trimmomatic-0.39.jar'`
 
-The following can be set to be set by typing the following fields after
-the above command (the fields must be in the given order, the optional
-fields can be ignored if not needed, see also
-<http://www.usadellab.org/cms/?page=trimmomatic>):
+Before running Trimmomatic, a .fasta file needs to be created that allows clipping unwanted sequences in the reads.
+For example, the 'overrepresented sequences' as found by Fastqc can be clipped by adding the sequences to the .fasta file.
+Easiest is to copy an existing .fasta file that comes with Trimmomatic and adding extra sequences that needs to be clipped.
+For MiSeq sequencing, it is advised to use the TruSeq3 adapter file that needs to be copied to the data folder (see below for detailed explanation).
+For this use the command:
+
+ **`cp ${path_trimm_software}'adapters/''TruSeq3-SE.fa' ${pathdata}`**
+
+Open the .fa file and copy any sequences in the file using a similar style as the sequences that are already present.
+Typically it is useful to clip overrepresented sequences that start with 'CATG' or 'GATC' which are the recognition sites for NlaIII and DpnII respectively.
+
+A typical command for trimmomatic looks like this:
+
+**`java -jar ${path_trimm_software}'trimmomatic-0.39.jar' SE -phred33 ${pathdata}${filename} ${path_trimm_out}${filename::-6}'_trimmed.fastq' ILLUMINACLIP:'TruSeq3-SE.fa':2:30:10 SLIDINGWINDOW:5:20 MINLEN:40`**
+
+Check the quality of the trimmed sequence using the command:
+
+**`${path_fastqc_software}fastqc --outdir ${path_fastqc_out} ${path_trimm_out}${filename::-6}'_trimmed.fastq'`**
+
+The following can be set to be set by typing the following fields after the above command (the fields must be in the given order, the optional fields can be ignored if not needed, see also <http://www.usadellab.org/cms/?page=trimmomatic>):
 
 - `SE` (Single End) or `PE` (Paired End) [required];
 
-- `-phred33` or `-phred64` sets which quality coding is used, if not
-    specified the program tries to determine this itself which might be less accurate [optional];
+- `-phred33` or `-phred64` sets which quality coding is used, if not specified the program tries to determine this itself which might be less accurate.
+usually the phred33 coding is used.
+If not sure, check if the .fastq file contains, for example, an exclamation mark (!), a dollar sign ($), an ampersand (&) or any number (0-9) since these symbols only occur in the phredd33 coding and not in the phred64 coding [optional];
 
-- `Input filename`. Both forward and reverse for paired end in case of
-    PE [required];
+- `Input filename`. Both forward and reverse for paired end in case of PE [required];
 
-- `Output filename`. Both paired and unpaired forward and paired and
-    unpaired reverse for paired end (thus 4 output in total) in case of PE.
-    In case of SE, a single output file needs to be specified.
-    Needs to have the same extension as the input file (e.g. .fastq)
-    [required];
+- `Output filename`. Both paired and unpaired forward and paired and unpaired reverse for paired end (thus 4 output in total) in case of PE.
+In case of SE, a single output file needs to be specified.
+Needs to have the same extension as the input file (e.g. .fastq) [required];
 
-- `ILLUMINACLIP:TruSeq3-SE.fa:2:15` or `ILLUMINACLIP:TruSeq3-PE.fa:2:30:10` This cuts the adapter and other Illumina specific sequences from the reads. The first parameter after `:` indicates a FASTA file (this should be located in the same folder as the sequencing data). A number of adapters are stored in the ‘adapters’ folder at the location where the trimmomatic program is saved. In case of MiSeq sequencing, the TruSeq3 adapter file is advised. The way the adapter sequences are aligned is by cutting the adapters (in the FASTA file) into 16bp pieces (called seeds) and these seeds are aligned to the reads. If there is a match, the entire alignment between the read and the complete adapter sequence is given a score. A perfect match gets a score of 0.6. Each mismatching base reduces the score by Q/10. When the score exceeds a threshold, the adapter is clipped from the read. The first number in the parameter gives the maximal number of mismatches allowed in the seeds (typically 2). The second value is the minimal score before the adapter is clipped (typically between 7 (requires $\frac{7}{0.6}=12$ perfect matches) and 15 (requires $\frac{15}{0.6}=25$ perfect matches)). High values for short reads (so many perfect matches are needed) allows for clipping adapters, but not for adapter contaminations. Note a bug in the software is that the FASTA file with the adapters need to be located in your current folder. A path to another folder with the adapter files yields an error. [optional] [<https://wiki.bits.vib.be/index.php/Parameters_of_Trimmomatic>];
+- `ILLUMINACLIP:TruSeq3-SE.fa:2:15` or `ILLUMINACLIP:TruSeq3-PE.fa:2:30:10` (for Single End reads or Paired End reads respectively). This cuts the adapter and other Illumina specific sequences from the reads.
+The first parameter after `:` indicates a FASTA file (this should be located in the same folder as the sequencing data).
+The second paramter indicates the Seed Mismatches which indicates the maximum mismatch count that still allows for a full match to be performed.
+The third parameter (for SE, fourth parameter for PE) is the Simple Clip Threshold which specifies how accurate the match between the adapter and the read.
+The third parameter for PE sets the Palindrome Clip Threshold specifies how accurate the match between the two 'adapter
+ligated' reads must be for PE palindrome read alignment.
 
-- `SLIDINGWINDOW` Sliding window trimming which cuts out sequences
-    within the window if the average quality score within the window is
-    lower than a certain threshold. Parameters should be given as :
-    `L_window:Q_min` where `L_window` is the window size (in terms of
-    basepairs) and `Q_min` the average threshold quality. [optional];
+A number of adapters are stored in the ‘adapters’ folder at the location where the trimmomatic program is saved.
+In case of MiSeq sequencing, the TruSeq3 adapter file is advised.
+The way the adapter sequences are aligned is by cutting the adapters (in the FASTA file) into 16bp pieces (called seeds) and these seeds are aligned to the reads.
+If there is a match, the entire alignment between the read and the complete adapter sequence is given a score.
+A perfect match gets a score of 0.6.
+Each mismatching base reduces the score by Q/10.
+When the score exceeds a threshold, the adapter is clipped from the read. The first number in the parameter gives the maximal number of mismatches allowed in the seeds (typically 2).
+The second value is the minimal score before the adapter is clipped (typically between 7 (requires $\frac{7}{0.6}=12$ perfect matches) and 15 (requires $\frac{15}{0.6}=25$ perfect matches)).
+High values for short reads (so many perfect matches are needed) allows for clipping adapters, but not for adapter contaminations.
+Note a bug in the software is that the FASTA file with the adapters need to be located in your current folder.
+A path to another folder with the adapter files yields an error. [optional] [<https://wiki.bits.vib.be/index.php/Parameters_of_Trimmomatic>];
 
-- `LEADING` Cut the bases at the start (5’ end) of a read if the quality
-    is below a certain threshold. Note that when, for example, the
-    parameter is set to 3, the quality score Q=0 to Q=2 will be removed.
-    All basepairs will be removed until the first basepair that has a
-    quality score above the given threshold. [optional];
+- `SLIDINGWINDOW` Sliding window trimming which cuts out sequences within the window if the average quality score within the window is lower than a certain threshold. Parameters should be given as : `L_window:Q_min` where `L_window` is the window size (in terms of basepairs) and `Q_min` the average threshold quality. [optional];
 
-- `TRAILING` Cut the bases at the end (3’ end) of a read if the quality
-    is below a certain threshold. Note that when, for example, the
-    parameter is set to 3, the quality score Q=0 to Q=2 will be removed.
-    All basepairs will be removed until the first basepair that has a
-    quality score above the given threshold. [optional];
+- `LEADING` Cut the bases at the start (5’ end) of a read if the quality is below a certain threshold. Note that when, for example, the parameter is set to 3, the quality score Q=0 to Q=2 will be removed.
+All basepairs will be removed until the first basepair that has a quality score above the given threshold. [optional];
 
-- `CROP` Cuts the read to a specific length by removing a specified
-    amount of nucleotides from the tail of the read (this does not
-    discriminate between quality scores). [optional];
+- `TRAILING` Cut the bases at the end (3’ end) of a read if the quality is below a certain threshold. Note that when, for example, the parameter is set to 3, the quality score Q=0 to Q=2 will be removed.
+All basepairs will be removed until the first basepair that has a quality score above the given threshold. [optional];
 
-- `HEADCROP` Cut a specified number of bases from the start of the reads
-    (this does not discriminate between quality scores). [optional];
+- `CROP` Cuts the read to a specific length by removing a specified amount of nucleotides from the tail of the read (this does not discriminate between quality scores). [optional];
 
-- `MINLEN` Drops a read if it has a length smaller than a specified
-    amount [optional];
+- `HEADCROP` Cut a specified number of bases from the start of the reads (this does not discriminate between quality scores). [optional];
 
-- `TOPHRED33` Converts the quality score to phred33 encoding
-    [optional];
+- `MINLEN` Drops a read if it has a length smaller than a specified amount [optional];
 
-- `TOPHRED64` Converts the quality score to phred64 encoding
-    [optional].
+- `TOPHRED33` Converts the quality score to phred33 encoding [optional];
+
+- `TOPHRED64` Converts the quality score to phred64 encoding [optional].
 
 Note that the input files can be either uncompressed FASTQ files or gzipped FASTQ (with an extension fastq.gz or fq.gz) and the output fields should ideally have the same extension as the input files (i.e. .fastq or .fq).
 The convention is using field:parameter, where ‘parameter’ is typically a number.
@@ -720,18 +737,30 @@ Where `xxx` should be replaced with the commands for trimmomatic.
 
 ### 3. Sequence alignment and Reference sequence indexing; BWA (0.7.17) (Linux)
 
-The reads from sequencing are aligned to a reference genome. The alignment can be completed using different algorithms within BWA, but the ‘Maximal Exact Matches’ (MEM) algorithm is the recommended one (which is claimed to be the most accurate and fastest algorithm and is compatible with many downstream analysis tools). For full documentation see [<http://bio-bwa.sourceforge.net/bwa.shtml>]. BWA uses a FM-index, which uses the Burrows Wheeler Transform (BWT), to exactly align all the reads to the reference genome at the same time. Each alignment is given a score, based on the number of matches, mismatches and potential gaps and insertions. The highest possible score is 60, meaning that the read aligns perfectly to the reference sequence (this score is saved in the SAM file as MAPQ). Besides the required 11 fields in the SAM file, BWA gives some optional fields to indicate various aspects of the mapping, for example the alignment score (for a complete overview and explanation, see the documentation). The generated SAM file also include headers where the names of all chromosomes are shown (lines starting with SQ). These names are used to indicate where each read is mapped to.
+The reads from sequencing are aligned to a reference genome.
+This is done in the Linux Virtual Machine, so the trimmed reads needs to be copied to the shared folder with the command (note the accolades for the path_sharedfolder since this path contains a space and otherwise it is not correctly implemented):
 
-Before use, the reference sequence should be indexed so that the program knows where to find potential alignment sites. This only has to be done once for each reference genome. It is recommended to copy the reference genome and remove the ‘write’ permission using the command line
-`chmod –w /path/to/backup/reference/sequence`.
-After this, index the reference genome using the command
-`bwa index /path/to/reference/sequence/file.fasta`
+**`cp ${path_trimm_out}${filename::-6}'_trimmed.fastq' "${path_sharedfolder}"`**
+
+The alignment can be completed using different algorithms within BWA, but the ‘Maximal Exact Matches’ (MEM) algorithm is the recommended one (which is claimed to be the most accurate and fastest algorithm and is compatible with many downstream analysis tools).
+For full documentation see [<http://bio-bwa.sourceforge.net/bwa.shtml>].
+BWA uses a FM-index, which uses the Burrows Wheeler Transform (BWT), to exactly align all the reads to the reference genome at the same time.
+Each alignment is given a score, based on the number of matches, mismatches and potential gaps and insertions.
+The highest possible score is 60, meaning that the read aligns perfectly to the reference sequence (this score is saved in the SAM file as MAPQ).
+Besides the required 11 fields in the SAM file, BWA gives some optional fields to indicate various aspects of the mapping, for example the alignment score (for a complete overview and explanation, see the documentation).
+The generated SAM file also include headers where the names of all chromosomes are shown (lines starting with SQ).
+These names are used to indicate where each read is mapped to.
+
+Before use, the reference sequence should be indexed so that the program knows where to find potential alignment sites. This only has to be done once for each reference genome.
+It is recommended to copy the reference genome and remove the ‘write’ permission using the command line `chmod –w /path/to/backup/reference/sequence`.
+After this, index the reference genome using the command `bwa index /path/to/reference/sequence/file.fasta`
 This creates 5 more files in the same folder as the reference genome that BWA uses to speed up the process of alignment.
 
-The sequencing command should be given as
+The alignment command should be given as
+
 `bwa mem [options] /path/to/reference/sequence/file.fasta /path/to/data/file.fastq > /path/to/output/file.sam`
 
-Where `[options]` can be different statements as given in the
+where `[options]` can be different statements as given in the
 documentation. Most importantly are:
 
 - `-A` Matching scores (default is 1)
@@ -742,8 +771,7 @@ documentation. Most importantly are:
 
 - `-E` Gap extension penalty (default is 1)
 
-- `-U` Penalty for unpaired reads (default is 9; only of use in case of
-    paired-end sequencing).
+- `-U` Penalty for unpaired reads (default is 9; only of use in case of paired-end sequencing).
 
 ### 4. Converting SAM file to BAM file; SAMtools (1.7) and sambamba (0.7.1) (Linux)
 
