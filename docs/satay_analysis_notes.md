@@ -735,30 +735,55 @@ done
 
 Where `xxx` should be replaced with the commands for trimmomatic.
 
-### 3. Sequence alignment and Reference sequence indexing; BWA (0.7.17) (Linux)
-
-The reads from sequencing are aligned to a reference genome.
-This is done in the Linux Virtual Machine, so the trimmed reads needs to be copied to the shared folder with the command (note the accolades for the path_sharedfolder since this path contains a space and otherwise it is not correctly implemented):
+Next the sequences alignment is performed which is done in the Linux Virtual Machine.
+Before starting the Linux Virtual Machine, the trimmed reads need to be copied to the shared folder with the command (note the accolades for the path_sharedfolder since this path contains a space and otherwise it is not correctly implemented):
 
 **`cp ${path_trimm_out}${filename::-6}'_trimmed.fastq' "${path_sharedfolder}"`**
 
-The alignment can be completed using different algorithms within BWA, but the ‘Maximal Exact Matches’ (MEM) algorithm is the recommended one (which is claimed to be the most accurate and fastest algorithm and is compatible with many downstream analysis tools).
-For full documentation see [<http://bio-bwa.sourceforge.net/bwa.shtml>].
+Now the protocol continues in the Linux Virtual Machine.
+
+### 3. Sequence alignment and Reference sequence indexing; BWA (0.7.17) (Linux)
+
+The reads from sequencing are aligned to a reference genome.
+This is done in the Linux Virtual Machine, so the previously defined variables do not work anymore in the Virtual Machine.
+If wanted, new variables can be defined within the Linux VM terminal.
+
+A. **`#!/bin/bash`**
+
+B. **`pathvm_sharedfolder='/media/sf_VMSharedFolder_Ubuntu64_1/'`**
+
+C. **`filenamevm='Cerevisiae_WT2_Michel2017.fastq'`**
+
+C. **`pathvm_refgenome=~/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa`**
+
+D. **`pathvm_data=~/Documents/satay_data/Michel_WT2/`**
+
+E. **`mkdir ${pathvm_data}`**
+
+F. **`mv ${pathvm_sharedfolder}${filenamevm} ${pathvm_data}`**
+
+(If the installation protocol is followed that is located in the same folder as this file [Installation_Guide_SATAY_Analysis_Software], then BWA, SAMTools and SAMBamba is already added to the system path in the Virtual Machine, so no paths need to be explicitely defined for this.
+If the software is not added to the system path of the Virtual Machine, variables can be defined as well that store the absolute paths of the software packages).
+
+The alignment can be completed using different algorithms within BWA, but the ‘Maximal Exact Matches’ (MEM) algorithm is the recommended one (which is claimed to be the most accurate and fastest algorithm and is compatible with many downstream analysis tools, see [documentation](<http://bio-bwa.sourceforge.net/bwa.shtml>) for more information).
 BWA uses a FM-index, which uses the Burrows Wheeler Transform (BWT), to exactly align all the reads to the reference genome at the same time.
 Each alignment is given a score, based on the number of matches, mismatches and potential gaps and insertions.
 The highest possible score is 60, meaning that the read aligns perfectly to the reference sequence (this score is saved in the SAM file as MAPQ).
-Besides the required 11 fields in the SAM file, BWA gives some optional fields to indicate various aspects of the mapping, for example the alignment score (for a complete overview and explanation, see the documentation).
+Besides the required 11 fields in the SAM file, BWA gives some optional fields to indicate various aspects of the mapping, for example the alignment score (for a complete overview and explanation, see the [documentation](<http://bio-bwa.sourceforge.net/bwa.shtml>)).
 The generated SAM file also include headers where the names of all chromosomes are shown (lines starting with SQ).
 These names are used to indicate where each read is mapped to.
 
-Before use, the reference sequence should be indexed so that the program knows where to find potential alignment sites. This only has to be done once for each reference genome.
-It is recommended to copy the reference genome and remove the ‘write’ permission using the command line `chmod –w /path/to/backup/reference/sequence`.
-After this, index the reference genome using the command `bwa index /path/to/reference/sequence/file.fasta`
+Before use, the reference sequence should be indexed so that the program knows where to find potential alignment sites.
+This only has to be done *once* for each reference genome.
+Index the reference genome using the command
+
+`bwa index /path/to/reference/sequence/file.fasta`
+
 This creates 5 more files in the same folder as the reference genome that BWA uses to speed up the process of alignment.
 
 The alignment command should be given as
 
-`bwa mem [options] /path/to/reference/sequence/file.fasta /path/to/data/file.fastq > /path/to/output/file.sam`
+**`bwa mem [options] ${pathvm_refgenome} ${pathvm_data}${filenamevm} > ${pathvm_data}${filenamevm}'.sam'`**
 
 where `[options]` can be different statements as given in the
 documentation. Most importantly are:
@@ -772,6 +797,9 @@ documentation. Most importantly are:
 - `-E` Gap extension penalty (default is 1)
 
 - `-U` Penalty for unpaired reads (default is 9; only of use in case of paired-end sequencing).
+
+Note that this process might take a while.
+After BWA is finished, a new .sam file is created in the same folder as the .fastq file.
 
 ### 4. Converting SAM file to BAM file; SAMtools (1.7) and sambamba (0.7.1) (Linux)
 
@@ -803,7 +831,9 @@ SAMtools allows for different additional processing of the data. For an overview
 
 - `stats` Generate statistics.
 
-- `tview` This function creates a text based Pileup file that is used to assess the data with respect to the reference genome. The output is represented as characters that indicate the relation between the aligned and the reference sequence. The meaning of the characters are:
+- `tview` This function creates a text based Pileup file that is used to assess the data with respect to the reference genome.
+The output is represented as characters that indicate the relation between the aligned and the reference sequence.
+The meaning of the characters are:
 
   - . :base match on the forward strand
 
@@ -827,30 +857,49 @@ SAMtools allows for different additional processing of the data. For an overview
   - \* : Placeholder for a deleted base in a multiple basepair
     deletion.
 
-  - quickcheck : Checks if a .bam or .sam file is ok. If there is no output, the file is good. If and only if there are warnings, an output is generated. If an output is wanted anyways, use the command `samtools quickcheck –v [input.bam] &&echo ‘All ok’ || echo ‘File failed check’`
+  - `quickcheck` Checks if a .bam or .sam file is ok. If there is no output, the file is good. If and only if there are warnings, an output is generated. If an output is wanted anyways, use the command `samtools quickcheck –v [input.bam] &&echo ‘All ok’ || echo ‘File failed check’`
 
-Create a .bam file using the command `samtools view –b <InputFile.sam> <OutputFile.bam>`. Check if everything is ok with the .bam file using
-`samtools quickcheck <InputFile.bam>`. If no output is generated, the
-file is good. If desired, more information can be obtained using
-`samtools flagstat <InputFile.bam>` or `samtools stats <InputFile.bam>`.
+Create a .bam file using the command
 
-For many downstream tools, the .bam file needs to be sorted. This can be
-done using SAMtools, but this might give problems. A faster and more
-reliable method is using the software sambamba using the command
-`sambamba-0.7.1 sort –m 500MB <InputFile.bam>` (where `–m` allows for
-specifying the memory usage which is 500MB in this example). This
-creates a file with the extension .sorted.bam, which is the sorted
-version of the original bam file. Also an index is created with the
-extenstion .bam.bai. If this latter file is not created, it can be made using the command `sambamba-0.7.1 index <InputFile.bam>`.
+**`samtools view –b ${pathvm_data}${filenamevm}'.sam' > ${pathvm_data}${filenamevm}'.bam'`.**
+
+Check if everything is ok with the .bam file using
+
+**`samtools quickcheck ${pathvm_data}${filenamevm}'.bam'`**.
+
+If no output is generated, the file is good.
+If desired, more information can be obtained using `samtools flagstat ${pathvm_data}${filenamevm}'.bam'` or `samtools stats ${pathvm_data}${filenamevm}'.bam'`.
+
+For many downstream tools, the .bam file needs to be sorted.
+This can be done using SAMtools, but this might give problems.
+A faster and more reliable method is using the software sambamba using the command
+
+**`sambamba-0.7.1-linux-static sort –m 500MB ${pathvm_data}${filenamevm}'.bam'`**
+
+(where `–m` allows for specifying the memory usage which is 500MB in this example).
+This creates a file with the extension .sorted.bam, which is the sorted version of the original bam file.
+Also an index is created with the extenstion .bam.bai.
+If this latter file is not created, it can be made using the command
+
+`sambamba-0.7.1-linux-static index  ${pathvm_data}${filenamevm}'.bam'`.
+
+Now the reads are aligned to the reference genome and sorted and indexed.
+Further analysis is done in windows, meaning that the sorted .bam files needs to be moved to the shared folder.
+
+**`mv ${pathvm_data}${filenamevm}'.'* ${pathvm_sharedfolder}`**
+
+Next, the data analysis is performed using custom made codes in Matlab.
 
 ### 5. Determining transposon insertions: Matlab (Code from Benoit [Michel et. al. 2017])
 
-This Matlab code is provided by Benoit and is based on the paper by
-Michel et. al. [<https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script>].
-Running the code requires the user to select a .bam file. In the same
-folder as the bam file the Matlab variables ‘yeastGFF.mat’ and
-‘names.mat’ should be present (which can be found on the website cited
-above). Line numbers correspond to the original, unaltered code.
+Before the data can be used as an input for the Matlab code provided by the Kornmann lab, it needs to be copied from the shared folder to the data folder using the command:
+
+**`mv "${path_sharedfolder}/"* ${path_align_out}`**
+
+The Matlab code is provided by Benoit (see the [website](https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script)) and is based on the [paper by Michel et. al.](<https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script>).
+Running the code requires the user to select a .bam file.
+In the same folder as the bam file the Matlab variables ‘yeastGFF.mat’ and ‘names.mat’ should be present (which can be found on the website cited above).
+Line numbers correspond to the original, unaltered code.
 
 [line1-13] After loading the .BAM file, the ‘baminfo’ command is used
 to collect the properties for the sequencing data. These include (among
