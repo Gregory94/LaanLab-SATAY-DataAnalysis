@@ -701,9 +701,10 @@ High values for short reads (so many perfect matches are needed) allows for clip
 Note a bug in the software is that the FASTA file with the adapters need to be located in your current folder.
 A path to another folder with the adapter files yields an error. [optional] [<https://wiki.bits.vib.be/index.php/Parameters_of_Trimmomatic>];
 
-- `SLIDINGWINDOW` Sliding window trimming which cuts out sequences within the window if the average quality score within the window is lower than a certain threshold. Parameters should be given as : `L_window:Q_min` where `L_window` is the window size (in terms of basepairs) and `Q_min` the average threshold quality. [optional];
+- `SLIDINGWINDOW` Sliding window trimming which cuts out sequences within the window if the average quality score within the window is lower than a certain threshold. Parameters should be given as `SLIDINGWINDOW:L_window:Q_min` where `L_window` is the window size (in terms of basepairs) and `Q_min` the average threshold quality. [optional];
 
 - `LEADING` Cut the bases at the start (5’ end) of a read if the quality is below a certain threshold. Note that when, for example, the parameter is set to 3, the quality score Q=0 to Q=2 will be removed.
+Parameters should be given as `LEADING:Q_min` where `Q_min` is the threshold quality score.
 All basepairs will be removed until the first basepair that has a quality score above the given threshold. [optional];
 
 - `TRAILING` Cut the bases at the end (3’ end) of a read if the quality is below a certain threshold. Note that when, for example, the parameter is set to 3, the quality score Q=0 to Q=2 will be removed.
@@ -896,9 +897,9 @@ Before the data can be used as an input for the Matlab code provided by the Korn
 
 **`mv "${path_sharedfolder}/"* ${path_align_out}`**
 
-The Matlab code is provided by Benoit (see the [website](https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script)) and is based on the [paper by Michel et. al.](<https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script>).
+The Matlab code is provided by Benoit (see the [website](https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script)) and is based on the [paper by Michel et. al.](<https://elifesciences.org/articles/23570>).
 Running the code requires the user to select a .bam file.
-In the same folder as the bam file the Matlab variables ‘yeastGFF.mat’ and ‘names.mat’ should be present (which can be found on the website cited above).
+In the same folder as the bam file the Matlab variables ‘yeastGFF.mat’ and ‘names.mat’ should be present (which can be found on the [website cited above](https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script)).
 Line numbers correspond to the original, unaltered code.
 
 [line1-13] After loading the .BAM file, the ‘baminfo’ command is used

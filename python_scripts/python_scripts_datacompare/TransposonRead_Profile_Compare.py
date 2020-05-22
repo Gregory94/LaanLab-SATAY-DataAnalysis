@@ -307,5 +307,5 @@ def read_profile(chrom='I',bar_width=None,wig_files = None):
 if __name__ == '__main__':
 #    read_profile(chrom='i',wig_files=[r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig",
 #                                      r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.wig"])
-    transposon_profile(chrom='i',bed_files=[r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed",
-                                      r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed"])
+    transposon_profile(chrom='i',bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_KornmannAlignment\E-MTAB-4885.WT2.bam.bed",
+                                      r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.sorted.bam.bed"])
