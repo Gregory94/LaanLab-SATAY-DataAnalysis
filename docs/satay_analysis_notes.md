@@ -509,6 +509,7 @@ With this, a visualization can be made that shows the number of transposon inser
 
 The next steps are not obligatory, but might help in organizing the data.
 The bold printed commands are put so that they can be copied directly to the bash (note to modify the respective paths on your own machine).
+If the paths below are correctly defined, the boldface commands defined in the different processing steps can be literally copied and pasted in the bash.
 
 1. Create an empty folder
 
@@ -529,7 +530,7 @@ For this start with the command:
 
 **`#!/bin/bash`**.
 
-6. Define the following variables (when using git bash, copy and paste the commands using `shift+Ins`):
+6. Define the following variables. (When using git bash, copy and paste the commands using `shift+Ins`. Remember to first alter the respective variables given below to the paths and filenames in your computer.):
 
     A. Path to the folder containing the .fastq file(**`pathdata='/C/Users/gregoryvanbeek/Desktop/Cerevisiae_WT2_Seqdata_Michel2017/'`**).
 
@@ -554,6 +555,8 @@ Some useful commands:
 2. `gunzip`: Unzip a .gz file.
 
 3. `bunzip`: Unzip a .bz file.
+
+4. `${}`: when using a variable, the name of the variable should be placed between curly brackets and should start with a dollar sign (`$`), otherwise the bash won't recognize the name as a variable.
 
 ### 1. Quality checking of the sequencing reads; FASTQC (0.11.9)
 
@@ -655,14 +658,16 @@ Easiest is to copy an existing .fasta file that comes with Trimmomatic and addin
 For MiSeq sequencing, it is advised to use the TruSeq3 adapter file that needs to be copied to the data folder (see below for detailed explanation).
 For this use the command:
 
- **`cp ${path_trimm_software}'adapters/''TruSeq3-SE.fa' ${pathdata}`**
+ `cp ${path_trimm_software}'adapters/''TruSeq3-SE.fa' ${pathdata}`
 
 Open the .fa file and copy any sequences in the file using a similar style as the sequences that are already present.
 Typically it is useful to clip overrepresented sequences that start with 'CATG' or 'GATC' which are the recognition sites for NlaIII and DpnII respectively.
+Note that the trimming is performed in the order in which the steps are given as input.
+Typically the adapter clipping is performed as one of the first steps and removing short sequences as one of the final steps.
 
 A typical command for trimmomatic looks like this:
 
-**`java -jar ${path_trimm_software}'trimmomatic-0.39.jar' SE -phred33 ${pathdata}${filename} ${path_trimm_out}${filename::-6}'_trimmed.fastq' ILLUMINACLIP:'TruSeq3-SE.fa':2:30:10 SLIDINGWINDOW:5:20 MINLEN:40`**
+**`java -jar ${path_trimm_software}'trimmomatic-0.39.jar' SE -phred33 ${pathdata}${filename} ${path_trimm_out}${filename::-6}'_trimmed.fastq' ILLUMINACLIP:'TruSeq3-SE.fa':2:30:10 LEADING:14 TRAILING:14 SLIDINGWINDOW:10:14 MINLEN:30`**
 
 Check the quality of the trimmed sequence using the command:
 
