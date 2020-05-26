@@ -1,5 +1,5 @@
 ---
-title: "Notes and details for SATAY analysis"
+title: "Notes and Workflow for SATAY analysis"
 output: pdf_document
 documentclass: article
 classoption: onecolumn
@@ -24,6 +24,16 @@ cref: true
 crossref: true
 colorlinks: true
 ---
+# Summary
+
+This file discusses the general outline of the experiments and interpretation of experiments using SAturated Transposon Analysis in Yeast (SATAY).
+The introduction explains the purpose of the experiments and what kind of results we expect and how to interpret these results.
+The Methods and File types section explains the different kind of files used during processing and analysis and how to read and use them.
+It also explains some custom made software for analyzing the data.
+This software is stored in the [Github page](<https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis>) of the this research.
+The steps needed for the processing and initial analysis of the data is explained in the Data Analysis section.
+This includes a detailed step-by-step tutorial on how to use the different software packages and what steps need to be taken for the processing to go from the raw sequencing reads to the location of all the transposon insertion and the number of reads at each location.
+
 # Introduction
 
 About 20% of the genes in wild type *Saccharomyces Cerevisiae* are essential, meaning that they cannot be deleted without crippling the cell to such an extent that it either cannot survive (lethality) or multiply
@@ -150,17 +160,16 @@ The other way around might also occcur, where essential genes are partly toleran
 This is shown by Michel et.al. to be caused that some regions (that code for specific subdomains of the proteins) of the essential genes are dispensable.
 The transposons in these essential genes are clearly located at a specific region in the gene, the one that codes for a non-essential subdomain.
 However, this is not always possible, as in some cases deletion of non-essential subdomains of essential genes create unstable, unexpressed or toxin proteins.
-The difference in essentiality between subdomains in a single protein only happens in essential genes, not in non-essential genes. 
+The difference in essentiality between subdomains in a single protein only happens in essential genes, not in non-essential genes.
 Michel et.al. devised an algorithm to estimate the likelihood $L$ of an essential gene having an essential sub domain and a non-essential subdomain:
 
 $$L = \frac{\text{d }N_{\text{cds}}}{l_{\text{cds}}}$$,
 
-Where $d$ is the longest interval (in terms of base pairs) between 5
-neighboring transposons in a Coding DNA Sequence (cds) ($\geq 300$ bp), $N_{cds}$ is the total number transposons mapping in the cds
-($\geq 20$) transposons) and $l_{cds}$ is the total length of
-the CDS. Additionally, it must hold that $0.1 l_{cds} \leq d \leq 0.9 l_{cds}$.
+Where $d$ is the longest interval (in terms of base pairs) between 5 neighboring transposons in a Coding DNA Sequence (cds) ($\geq 300$ bp), $N_{cds}$ is the total number transposons mapping in the cds ($\geq 20$) transposons) and $l_{cds}$ is the total length of the CDS.
+Additionally, it must hold that $0.1 l_{cds} \leq d \leq 0.9 l_{cds}$.
 
-Because of the reasons mentioned here, not a simple binary conclusion can be made solely based on the amount of transposon insertions or the number of reads.
+It is expected that only essential genes cary essential subdomains, and indeed what was found by Michel et.al. that the genes with the highest likelihood were mostly also genes previously annotated as essential by other studies.
+Because of the reasons mentioned before, not a simple binary conclusion can be made solely based on the amount of transposon insertions or the number of reads.
 Instead, a gene with little reads *might* be essential, but to be sure the results from other experiments need to be implemented as well, for example where the cells were grown in a different growth conditions.
 Therefore, SATAY analysis says something about the relative fitness of the cells in the current conditions.
 
@@ -392,7 +401,7 @@ For example, the distribution of transposons in WT cells in the data from Michel
 
 In this figure, both the reads and the transposon counts are normalized with respect to the length of each gene (hence the graph represents the read density and transposon density).
 High transposon counts only occurs for non-essential genes, and therefore when a high transposon count is seen, it can be assigned nonessential with reasonable certainty.
-However, when the transposon count is low the there is a significant overlap between the two distribution and therefore there is no certainty whether this gene is essential or not (see also the section about 'Interpreting Transposon Counts & Reads').
+However, when the transposon count is low the there is a significant overlap between the two distributions and therefore there is no certainty whether this gene is essential or not (see also the section about 'Interpreting Transposon Counts & Reads').
 
 The data is also sensitive to postprocessing.
 It is expected that the trimming of the sequences is an important step.
@@ -407,15 +416,19 @@ Significant attention needs to be given to the postprocessing of the data.
 
 To create a visual overview where the insertions are and how many reads there are for each insertion, a profile plot is created for each chromosome.
 
-![Read profile plot for chromosome XV (note the y-axis is logarithmic scale).](./media/Read_ProfilePlot_chrxv.png)
+![Read profile plot for chromosome XV (note the y-axis is in logarithmic scale).](./media/Read_ProfilePlot_chrxv.png)
 
 The bars indicate the absolute number of reads for all insertions located in the bars (bar width is 545bp).
 The colored background indicate the location of genes, where green are the annotated essential genes and red the non-essential genes.
 In general, the essential genes have no or little reads whereas the non-essential genes have many reads.
 Note that at location 564476 the ADE2 gene is located that has significant more reads than any other location in the genome, which has to do the way the plasmid is designed (see Michel et.al. 2017).
+The examples used here are from a dataset discussed in the paper by Michel et.al. 2017 which used centromeric plasmids where the transposons are excised from.
+The transposons tend to reinsert in the chromosome near the chromosomal pericentromeric region causing those regions to have about 20% more insertions compared to other chromosomal regions.
 
 This figure gives a rough overview that allows for identifying how well the data fits the expectation.
 Also an alternative version of this plot is made (`TransposonRead_Profile_Compare.py`) that makes a similar plot for two datasets at the same time, allowing the comparison of the two datasets with each other and with the expectation.
+
+![Comparison of the same datasets, but with different processing steps. Shown here is the transposon count for the two files including the absolute difference between the two datasets show in blue. Note also here that some regions has a higher likelihood of bearing transposons compared to the surrounding regions.](./media/Cerevisiae_Michel2017_WT2_Compare_chromIX.png)
 
 ### Profile plot number of reads per individual genes
 (*See `gene_reads.py`*)
@@ -476,6 +489,12 @@ Before alignment, the data needs to be checked for quality and possibly trimmed 
 When the location of the reads relative to a reference sequence are known, the insertion sites of the transposons can be determined.
 With this, a visualization can be made that shows the number of transposon insertions per gene.
 
+A short overview is given for different software tools that can be used for processing and analyzing the data.
+Next, a step-by-step tutorial is given as an example how to process the data.
+Most of this is done using command line based tools.
+
+An overview of the different steps including some software that can handle this is show here:
+
 1. Checking the raw FASTA or FASTQ data can be done using the
     ([**FASTQC**](<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>)) software (Windows, Linux, Mac. Requires Java).
     This gives a quality report (see accompanying tutorial) for the sequence reads and can be run non-interactively using the command line.
@@ -503,17 +522,18 @@ With this, a visualization can be made that shows the number of transposon inser
     Visualization of the genomic dataset can be done using ([**IGV**](<https://software.broadinstitute.org/software/igv/home>)) (Windows, Linux, Mac) or SAMtools’ tview function.
     Also ([**sambamba**](<https://lomereiter.github.io/sambamba/>)) (Linux, Mac) can be used, especially for sorting and indexing the bam files.
 
-7. Creating transposon insertion maps for the genome (see <https://sites.google.com/site/satayusers/>) and comparison essential genes between different genetic backgrounds using Venn diagrams, customized software needs to be created.
+7. Creating transposon insertion maps for the genome (see the [satay users website](<https://sites.google.com/site/satayusers/>)) and comparison essential genes between different genetic backgrounds using Venn diagrams, customized software needs to be created.
 
 ### 0. Initializing
 
 The next steps are not obligatory, but might help in organizing the data.
-The bold printed commands are put so that they can be copied directly to the bash (note to modify the respective paths on your own machine).
+The **bold** printed commands are put so that they can be copied directly to the bash.
+(Note to modify the respective paths on your own machine in this Initialization step).
 If the paths below are correctly defined, the boldface commands defined in the different processing steps can be literally copied and pasted in the bash.
 
-1. Create an empty folder
+1. Create an empty folder.
 
-2. Add the .fastq file (and unzip if necessary).
+2. Add the .fastq file to the folder (and unzip if necessary).
 
 3. Add the following empty folders for the outcomes of the different processing steps:
 
@@ -523,14 +543,14 @@ If the paths below are correctly defined, the boldface commands defined in the d
 
     C. filename_Aligned
 
-4. Start the command line using GitBash.
+4. Start the command line using GitBash (or whatever else you prefer).
 
-5. It might be handy to be able to define variables, for example for the paths to the difference programs and files so that these do not have te be entered each time.
+5. It might be handy to be able to define variables, for example for the paths to the difference programs and files so that these do not have te be entered every single time.
 For this start with the command:
 
 **`#!/bin/bash`**.
 
-6. Define the following variables. (When using git bash, copy and paste the commands using `shift+Ins`. Remember to first alter the respective variables given below to the paths and filenames in your computer.):
+6. Define the following variables. (When using git bash, copy and paste the commands using `shift+Ins`. Remember to first alter the respective variables given below to the paths and filenames in your computer):
 
     A. Path to the folder containing the .fastq file(**`pathdata='/C/Users/gregoryvanbeek/Desktop/Cerevisiae_WT2_Seqdata_Michel2017/'`**).
 
