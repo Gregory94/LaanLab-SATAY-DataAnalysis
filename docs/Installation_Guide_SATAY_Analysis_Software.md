@@ -83,7 +83,7 @@ It is java based and therefore does not need to be installed.
 To run interactively, click the 'run-fastqc' batch file.
 To run non-interactively, enter in 'fastqc' in the command line.
 
-## 2. Trimmomatic-0.39 (Windows)
+## 2a. Trimmomatic-0.39 (Windows)
 
 [[http://www.usadellab.org/cms/?page=trimmomatic](url)]
 
@@ -92,13 +92,24 @@ It is java based and therefore does not need to be installed.
 To run, enter 'trimmomatic-0.39' in the command line.
 The adapters folder contains some adapters that can be used during trimming if desired.
 
-## 2a. 123Fastq-v1.1 (Windows) (optional)
+### 123Fastq-v1.1 (Windows) (optional)
 
 [[https://sourceforge.net/projects/project-123ngs/](url)]
 
 123Fastq is Fastqc and Trimmomatic combined in one interactive program.
 It is java based and therefore does not need to be installed.
 Click the 123fastq executable jar file to run the program.
+
+## 2b. BBDuk-38.84 (Windows)
+
+[[https://jgi.doe.gov/data-and-tools/bbtools/](url)]
+
+BBDuk is an alternative for Trimmomatic for trimming of fastq files.
+It java based and therefore does not need to be installed.
+It is part of the bbtools packages (named the bbmap when downloaded).
+Once downloaded, unpack the .tar.gz package.
+Run the bbduk.sh executable in the bbmap directory.
+The adapter.fa file is included and located in the /resources directory.
 
 ## 3. BWA (Linux)
 

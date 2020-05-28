@@ -496,6 +496,10 @@ Since a virtual machine is used, both the computation power and the amount of st
 Sequence alignment can be done on Windows machines (e.g. using [BBmap](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbmap-guide/)), but this is not ideal as many software tools are designed for Unix based computer systems (i.e. Mac or Linux).
 Also, many tools related to sequence alignment (e.g. converting .sam files to .bam and sorting and indexing the bam files) are done with tools not designed to be used in windows, hence this is performed in Linux.
 
+An overview of the different processing steps are shown in the figure below.
+
+![Processing pipeline. Input is a file containing the raw reads from the sequencing saved in a .fastq file.](./media/processing_pipeline.png)
+
 A short overview is given for different software tools that can be used for processing and analyzing the data.
 Next, a step-by-step tutorial is given as an example how to process the data.
 Most of this is done using command line based tools.
@@ -790,8 +794,11 @@ For example, the 'overrepresented sequences' as found by Fastqc can be clipped b
 A .fasta file can be created by simply creating a text file and adding the sequences that need to be clipped, for example, in the form:
 
 > Sequence1
+
 CATG
+
 > Sequence2
+
 GATC
 
 Or a .fasta can be copied from either Trimmomatic software package or the BBDuk package, both which are provided with some standard adapter sequences.
@@ -820,7 +827,7 @@ Typically, the length k is chosen about the size of the smallest adapter sequenc
 For more details, see [the webpage](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/).
 
 A typical command for BBDuk looks like this:
-**`${path_bbduk_software}/bbduk.sh -Xmx1g in=${pathdata}${filename} out=${filename::-6}_trimmed.fastq ref=TruSeq3-SE.fa ktrim=r k=23 mink=10 hdist=1 tpe tbo qtrim=rl trimq=14 minlen=30`**
+**`${path_bbduk_software}/bbduk.sh -Xmx1g in=${pathdata}${filename} out=${filename::-6}_trimmed.fastq ref=TruSeq3-SE.fa ktrim=r k=23 mink=10 hdist=1 qtrim=r trimq=14 minlen=30`**
 
 1. `-Xmx1g`. This defines the memory usage of the computer, in this case 1Gb (`1g`).
 Setting this too low or too high can result in an error (e.g. 'Could not reserve enough space for object heap').
@@ -837,9 +844,30 @@ For example, when setting this option to `ktrim=r`, than when a sequence is foun
 5. `k`. This defines the number of kmers to be used. This should be not be longer than the smallest adapter sequences and should also not be too short as there might too much trimmed. Typically values around 20 works fine.
 6. `mink`. When the lenght of a read is not a perfect multiple of the value of `k`, then at the end of the read there is a sequence left that is smaller than length k. Setting `mink` allows the software to use smaller kmers as well.
 The sequence at the end of a read are matched with adapter sequences using kmers with lenght between mink and k.
-7. `hdist`. 
+7. `hdist`. This is the Hamming distance, which is the minimum number of substitutions needed to convert one string in another string.
+Basically this indicates how many errors are allowed between a read and and an adapter sequence to still count as an exact match.
+Typically does not need to be set any higher than 1, unless the reads are of very low quality.
+Note that high values of hdist also requires much more memory in the computer.
+8. `tpe` and `tbo`: This is only relevant for paired-end reads.
+`tpe` cuts both the forward and the reverse read to the same length and `tbo` trims the reads if they match any adapter sequence while considering the overlap between two paired reads.
 
-Check the quality of the trimmed sequence using the command:
+So far all the options were regarding the adapter trimming (more options are available as well, check out the [user guide](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/)).
+These options go before any other options, for example the following:
+
+9. `qtrim=rl`. This an option for quality trimming which indicates whether the reads should be trimmed on the right (`r`), the left (`l`)or both.
+10. `trimq`. This sets the minimum quality that is still allowed.
+In this case, all quality score below Q=14 ($P_{error} = 0.04$) are trimmed.
+11. `minlen`. This sets the minimum length that the reads need to have after all previous trimming steps.
+Reads short than the value given here are discarded completely.
+12. `mlf`. Alternatively to the `minlen` option, the Minimum Length Fraction can be used which determines the fraction of the length of the read before and after trimming and if this drops below a certain value (e.g 50%, so `mlf=50`), then this read is trimmed.
+13. `ftl` and `ftr`. This cuts a specified amount of basepairs at the beginning (`ftl`) or the last specified amount of basepairs (`ftr`).
+Note that this is zero based, for example `ftl=10` trims basepairs 0-9.
+14. `maq`. Discard reads that have an average quality below the specified Q-value.
+This can be useful after quality trimming to discard reads where the really poor quality basepairs are trimmed, but the rest of the basepairs are of poor quality as well.
+15. `ftm`. This force Trim Modulo option can sometimes be useful when an extra, unwanted and typically very poor quality, basepair is added at the end of a read.
+So when reads are expected to be all 75bp long, this will discard the last basepair in 76bp reads.
+
+Finally, to check the quality of the trimmed sequence using the command:
 
 **`${path_fastqc_software}fastqc --outdir ${path_fastqc_out} ${path_trimm_out}${filename::-6}'_trimmed.fastq'`**
 
@@ -986,7 +1014,7 @@ A faster and more reliable method is using the software sambamba using the comma
 
 (where `–m` allows for specifying the memory usage which is 500MB in this example).
 This creates a file with the extension .sorted.bam, which is the sorted version of the original bam file.
-Also an index is created with the extenstion .bam.bai.
+Also an index is created with the extension .bam.bai.
 If this latter file is not created, it can be made using the command
 
 `sambamba-0.7.1-linux-static index  ${pathvm_data}${filenamevm}'.bam'`.
