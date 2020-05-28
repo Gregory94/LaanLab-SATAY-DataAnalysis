@@ -17,17 +17,25 @@ from chromosome_names_in_files import chromosome_name_wigfile, chromosome_name_b
 
 #%%
 
-def transposon_profile(chrom_user_set=None, bar_width_user_set=None, bed_files=None, savefigure_path=None, savefigure_name=None):
+def transposon_profile(bed_files=None, chrom_user_set=None, bar_width_user_set=None, savefigure_path=None, savefigure_name=None):
     '''This function creates a bar plot along a specified chromosome for the number of transposons.
     The height of each bar represents the number of transposons at the genomic position indicated on the x-axis.
-    The input is as follows: which chromosome (indicated by roman numeral), bar_width, bed_file.
-    The bar_width determines how many basepairs are put in one bin. Little basepairs per bin may be slow. Too many basepairs in one bin and possible low transposon areas might be obscured.
+    The input is as follows:
+        -The bed-files ('bed_files', a list containing two paths, each refering to a bed-file [mandatory]),
+        -Which chromosome ('chrom_user_set', indicated by roman numeral or list of roman numerals [optional]),
+        -The width of the bars ('bar_width-user_set', indicated by an integer [optional]),
+        -Path to where to save the figures ('savefigure_path', string containing an existing path [optional]),
+        -Name of the figures ('savefigure_name', string containing a single name, the name will be automatically extended with the chromosomal number [optional]).
+    
     The bed_file is one of the files created by the Matlab code from the kornmann-lab.
+    The figure shows two graphs, the top one represents the first bed-file given in the list, the bottom plot the second bed-file in the list.
+    If the chromosome number is not set by the user, it automatically loops over all chromosomes and determines the figures for each of them.    
+    The bar_width determines how many basepairs are put in one bin. Little basepairs per bin may be slow. Too many basepairs in one bin and possible low transposon areas might be obscured.
+    When either the savefigure_path and/or the savefigure_name is left empty, the figure won't be saved.
+    If the both these variables are given, the figures are saved using the path/figurename_chromX where the _chromX extension is automatically added.
+    
     The background of the graph is color coded to indicate areas that code for genes.
-    For this a list for essential genes is needed (used in 'list_known_essentials' function) and a .gff file is required (for the functions in 'chromosome_and_gene_positions.py') and a list for gene aliases (used in the function 'gene_aliases')
-    When the chrom variable is not set or set to None, then for all chromosomes the bar plot is determined.
-    Set the savefigure_path and savefigure_name to automatically save the figures.
-    If either one of them are left empty or set to None, then the figures are not saved automatically.
+    For this a list for essential genes is needed (used in 'list_known_essentials' function) and a .gff file is required (for the functions in 'chromosome_and_gene_positions.py') and a list for gene aliases (used in the function 'gene_aliases').
     '''
     #bed_file = r'X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed'
 #%% USED FILES
@@ -44,14 +52,15 @@ def transposon_profile(chrom_user_set=None, bar_width_user_set=None, bed_files=N
     gene_alias_list = gene_aliases(gene_information_file)[0]
     
 #%% DETERMINE WHICH CHROMOSOME NEEDS TO BE ANALYZED AND LOOP OVER THE CHROMOSOMES
-    if chrom_user_set is None:
+    if type(chrom_user_set) is list:
+        chrom_list = chrom_user_set
+    elif type(chrom_user_set) is str:
+        chrom_list = [chrom_user_set.upper()]
+    else:
         chrom_list = []
         roman_to_arabic_numerals = chromosomename_roman_to_arabic()[1]
         for keys in roman_to_arabic_numerals:
             chrom_list.append(keys)
-    else:
-        chrom_list = [chrom_user_set.upper()]
-    
     
     for chrom in chrom_list:
         print('')
@@ -69,7 +78,7 @@ def transposon_profile(chrom_user_set=None, bar_width_user_set=None, bed_files=N
             chrom_start_index_dict, chrom_end_index_dict= chromosome_name_bedfile(lines)[1:3]
 
 #%% GET ALL TRANSPOSON COUNTS
-            alltransposoncounts_list = np.zeros(chr_length_dict.get(chrom)+1)
+            alltransposoncounts_list = np.zeros(chr_length_dict.get(chrom)+2)
             for line in lines[chrom_start_index_dict.get(chrom):chrom_end_index_dict.get(chrom)+1]:
                 line = line.strip('\n').split()
                 alltransposoncounts_list[int(line[1])] += 1
@@ -114,7 +123,7 @@ def transposon_profile(chrom_user_set=None, bar_width_user_set=None, bed_files=N
         print('Plotting chromosome ', chrom, '...')
         print('bar width for plotting is ',bar_width)
         binsize = bar_width
-        font_size = 18
+        font_size = 12
         max_ylim = max([item for sublist in alltransposoncounts_allfiles_binnedlist for item in sublist]) #GET MAXIMUM VALUE FOR SETTING THE Y AXIS LIMIT EQUAL FOR BOTH GRAPHS
         max_ylim = max_ylim + 0.1*max_ylim
         
@@ -331,8 +340,9 @@ def read_profile(chrom='I',bar_width=None,wig_files = None):
 if __name__ == '__main__':
 #    read_profile(chrom='i',wig_files=[r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig",
 #                                      r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.wig"])
-    transposon_profile(chrom_user_set='IX',
-                       bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_KornmannAlignment\E-MTAB-4885.WT2.bam.bed",
-                                      r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.sorted.bam.bed"],
-                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017",
-                        savefigure_name=r'Cerevisiae_Michel2017_WT2_Compare')
+    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_KornmannAlignment\E-MTAB-4885.WT2.bam.bed",
+                                    r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing1\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.bam.bed"],
+                        chrom_user_set=None,
+                        bar_width_user_set=None,
+                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing1",
+                        savefigure_name=r'Cerevisiae_Michel2017_WT2_Processing1_Compare')

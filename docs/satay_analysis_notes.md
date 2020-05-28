@@ -489,6 +489,13 @@ Before alignment, the data needs to be checked for quality and possibly trimmed 
 When the location of the reads relative to a reference sequence are known, the insertion sites of the transposons can be determined.
 With this, a visualization can be made that shows the number of transposon insertions per gene.
 
+In the description given in this document, it is chosen to do the quality checking and the trimming in windows and the alignment of the reads with a reference genome in a virtual machine running Linux.
+It is possible to do the quality checking and trimming in Linux as well or to do the whole process in windows.
+To do quality checking and/or trimming in Linux requires more memory of the Linux machine since both the raw sequencing data needs to be stored and the trimming needs to be stored (both which can be relatively large files).
+Since a virtual machine is used, both the computation power and the amount of storage is limited, and therefore it chosen to do the trimming on the main windows computer (this problem would not exists if a computer is used running on Linux, for example a computer with an alternative startup disc running Linux).
+Sequence alignment can be done on Windows machines (e.g. using [BBmap](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbmap-guide/)), but this is not ideal as many software tools are designed for Unix based computer systems (i.e. Mac or Linux).
+Also, many tools related to sequence alignment (e.g. converting .sam files to .bam and sorting and indexing the bam files) are done with tools not designed to be used in windows, hence this is performed in Linux.
+
 A short overview is given for different software tools that can be used for processing and analyzing the data.
 Next, a step-by-step tutorial is given as an example how to process the data.
 Most of this is done using command line based tools.
@@ -561,6 +568,8 @@ For this start with the command:
     D. Path to the location where the FASTQC software is located (**`path_fastqc_software='/C/Users/gregoryvanbeek/Documents/Software/FastQC/'`**).
 
     E. Path to the location where the Trimmomatic software is located (**`path_trimm_software='/C/Users/gregoryvanbeek/Documents/Software/Trimmomatic-0.39/'`**).
+
+    F. Path to the location where the BBDuk software is located (**`path_bbduk_software='/c/Users/gregoryvanbeek/Documents/Software/BBMap/bbmap/'`**)
 
     F. Path to the outcome folder for the fastqc software (**`path_fastqc_out=${pathdata}'Cerevisiae_WT2_Seqdata_Michel2017_QC/'`**).
 
@@ -659,9 +668,19 @@ For Illumina sequencing for satay experiments, the sequences often start with ei
 Ideally this is a flat line at zero (meaning that there are no adapter sequences present in the data).
 If this is not a flat line at zero, it might be necessary to cut the adapter during the trimming step.
 
-### 2. Trimming of the sequencing reads; Trimmomatic (0.39)
+### 2. Trimming of the sequencing reads
 
-Trimmomatic alters the sequencing result by trimming the reads from unwanted sequences, as is specified by the user. 
+Next is the trimming of the sequencing reads to cut out, for example, cut out adapter sequences and low quality reads.
+There are two software tools adviced, Trimmomatic and BBDuk.
+Trimmomatic is relative simple to use and can be used interactively together with FASTQC.
+However, the options can be limiting if you want more control over the trimming protocol.
+An alternative is BBDuk, which is part of the BBMap software package.
+This allows for more options, but can therefore also be more confusing to use initially.
+Both software packages are explained below, but only one needs to be used.
+
+#### 2a. Trimming of the sequencing reads; Trimmomatic (0.39)
+
+Trimmomatic alters the sequencing result by trimming the reads from unwanted sequences, as is specified by the user.
 The program does not need to be installed, but after downloading only requires to be unzipped.
 Trimmomatic can be ran as an interactive program (for this 123FASTQ needs to be used) or non-interactively using the command line options.
 
@@ -761,14 +780,77 @@ done
 
 Where `xxx` should be replaced with the commands for trimmomatic.
 
+#### 2b. Trimming of the sequencing reads; BBDuk (38.84)
+
+BBDuk is part of the BBMap package and alters the sequencing result by trimming the reads from unwanted sequences, as is specified by the user.
+The program does not need to be installed, but after downloading only requires to be unzipped.
+
+Before running BBDuk, a .fasta file can to be created that allows clipping unwanted sequences in the reads.
+For example, the 'overrepresented sequences' as found by Fastqc can be clipped by adding the sequences to the .fasta file.
+A .fasta file can be created by simply creating a text file and adding the sequences that need to be clipped, for example, in the form:
+
+> Sequence1
+CATG
+> Sequence2
+GATC
+
+Or a .fasta can be copied from either Trimmomatic software package or the BBDuk package, both which are provided with some standard adapter sequences.
+In the case of Trimmomatic it is advised to use the TruSeq3 adapter file when using MiSeq sequencing.
+To copy the .fasta file to the data folder (see below for detailed explanation) use the following command:
+
+ `cp ${path_trimm_software}'adapters/''TruSeq3-SE.fa' ${pathdata}`
+
+When using the adapter file that comes with BBMap, use the command:
+
+`cp ${path_bbduk_software}'resources/adapters.fa' ${pathdata}`
+
+The adapters.fa file from the BBDuk package includes many different adapter sequences, so it might be good to remove everything that is not relevant.
+Typically it is useful to clip overrepresented sequences that were found by FASTQC and sequences that start with 'CATG' or 'GATC' which are the recognition sites for NlaIII and DpnII respectively.
+Note that the trimming is performed in the order in which the steps are given as input.
+Typically the adapter clipping is performed as one of the first steps and removing short sequences as one of the final steps.
+
+BBDuk uses a kmers algorithm, which basically means it divides the reads in pieces of length k.
+(For example, the sequence abcd has the following 2mers: ab,bc,cd).
+For each of these pieces the software checks if it contains any sequences that are present in the adapter file.
+The kmers process divides both the reads and the adapters in pieces of length k and it then looks for an exact match.
+If an exact match is found between a read and an adapter, then that read is trimmed.
+If the length k is chosen to be bigger than the length of the smallest adapter, then there will never be an exact match between any of the reads and the adapter sequence and the adapter will therefore never be trimmed.
+However, when the length k is too small the trimming might be too specific and it might trim too many reads.
+Typically, the length k is chosen about the size of the smallest adapter sequence or slighty smaller.
+For more details, see [the webpage](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/).
+
+A typical command for BBDuk looks like this:
+**`${path_bbduk_software}/bbduk.sh -Xmx1g in=${pathdata}${filename} out=${filename::-6}_trimmed.fastq ref=TruSeq3-SE.fa ktrim=r k=23 mink=10 hdist=1 tpe tbo qtrim=rl trimq=14 minlen=30`**
+
+1. `-Xmx1g`. This defines the memory usage of the computer, in this case 1Gb (`1g`).
+Setting this too low or too high can result in an error (e.g. 'Could not reserve enough space for object heap').
+Depending on the maximum memory of your computer, setting this to `1g` should not result in such an error.
+2. `in` and `out`. Input and Output files. Note that defining an absolute path for the path-out command does not work properly.
+Best is to simply put a filename for the file containing the trimmed reads which is then stored in the same directory as the input file and then move this trimmed reads file to any other location using:
+`mv ${pathdata}${filename::-6}_trimmed.fastq ${path_trimm_out}`
+3. `ref`. This command points to a .fasta file containg the adapters.
+This should be stored in the location where the other files are stored for the BBDuk software (`${path_bbduk_software}/resources`)
+Next are a few commands relating to the kmers algorithm.
+4. `ktrim`. This can be set to either right trimming (`r`, default), left trimming (`l`) or to None setting (`N`).
+basically, this means what needs to be trimmed when an adapter is found, where right trimming is towards the 5'-end and left trimming is towards the 3'-end and None setting is not trimming, but simply setting the nucleotides that match the adapter sequence to N, which means it will be ignored during alignment.
+For example, when setting this option to `ktrim=r`, than when a sequence is found that matches an adapter sequence, all the basepairs on the right of this matched sequence will be deleted including the matched sequence itself.
+5. `k`. This defines the number of kmers to be used. This should be not be longer than the smallest adapter sequences and should also not be too short as there might too much trimmed. Typically values around 20 works fine.
+6. `mink`. When the lenght of a read is not a perfect multiple of the value of `k`, then at the end of the read there is a sequence left that is smaller than length k. Setting `mink` allows the software to use smaller kmers as well.
+The sequence at the end of a read are matched with adapter sequences using kmers with lenght between mink and k.
+7. `hdist`. 
+
+Check the quality of the trimmed sequence using the command:
+
+**`${path_fastqc_software}fastqc --outdir ${path_fastqc_out} ${path_trimm_out}${filename::-6}'_trimmed.fastq'`**
+
+### 3. Sequence alignment and Reference sequence indexing; BWA (0.7.17) (Linux)
+
 Next the sequences alignment is performed which is done in the Linux Virtual Machine.
 Before starting the Linux Virtual Machine, the trimmed reads need to be copied to the shared folder with the command (note the accolades for the path_sharedfolder since this path contains a space and otherwise it is not correctly implemented):
 
-**`cp ${path_trimm_out}${filename::-6}'_trimmed.fastq' "${path_sharedfolder}"`**
+`cp ${path_trimm_out}${filename::-6}'_trimmed.fastq' "${path_sharedfolder}"`
 
 Now the protocol continues in the Linux Virtual Machine.
-
-### 3. Sequence alignment and Reference sequence indexing; BWA (0.7.17) (Linux)
 
 The reads from sequencing are aligned to a reference genome.
 This is done in the Linux Virtual Machine, so the previously defined variables do not work anymore in the Virtual Machine.
