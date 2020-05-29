@@ -147,7 +147,7 @@ def transposon_profile(bed_files=None, chrom_user_set=None, bar_width_user_set=N
     
         ax1.set_axisbelow(True)
         ax1.grid(True)
-        ax1.set_ylabel('Reference', fontsize=font_size)
+        ax1.set_ylabel('Trimmomatic', fontsize=font_size)
 #        ax1.set_ylabel('Tranposon count Dataset 1', fontsize=font_size)
         ax1.set_xlim(0,chr_length_dict.get(chrom))
         ax1.set_ylim(0,max_ylim)
@@ -167,7 +167,7 @@ def transposon_profile(bed_files=None, chrom_user_set=None, bar_width_user_set=N
     
         ax2.set_axisbelow(True)
         ax2.grid(True)
-        ax2.set_ylabel('My processed data', fontsize=font_size)
+        ax2.set_ylabel('BBDuk', fontsize=font_size)
 #        ax2.set_ylabel('Transposon count Dataset 2', fontsize=font_size)
         ax2.set_xlabel('Basepair position on chromosome '+chrom, fontsize=font_size)
         ax2.set_ylim(0,max_ylim)
@@ -340,9 +340,9 @@ def read_profile(chrom='I',bar_width=None,wig_files = None):
 if __name__ == '__main__':
 #    read_profile(chrom='i',wig_files=[r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig",
 #                                      r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.wig"])
-    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_KornmannAlignment\E-MTAB-4885.WT2.bam.bed",
-                                    r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing1\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.bam.bed"],
+    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing1\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.bam.bed",
+                                    r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing2\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.bam.bed"],
                         chrom_user_set=None,
                         bar_width_user_set=None,
-                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing1",
-                        savefigure_name=r'Cerevisiae_Michel2017_WT2_Processing1_Compare')
+                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing2\Cerevisiae_Michel2017_WT2_Compare_Processing1-Processing2",
+                        savefigure_name=r'Cerevisiae_Michel2017_WT2_Compare_Processing1-Processing2')

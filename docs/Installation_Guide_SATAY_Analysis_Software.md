@@ -74,6 +74,13 @@ If a folder is already shared and a new folder is wanted to be shared as well, p
 20. To check, enter `'id [username]'`. This should give a list that needs to include 'vboxsf'
 21. Restart the VM.
 
+In order to run java based programs in Linux, Java needs to be installed.
+There are several ways of installing Java, but one of the simplest ways is using the command line with the following commands:
+
+1. Enter `sudo -s` (enter password if requisted)
+2. Enter `apt-get install openjdf-11-jre`. (If this version of java is not found, check which versions are available by entering `apt-get install openjdf` followed by a double tab. This should give a list of all available installations. It also gives you the opportunity to install the jdk (Java Developer Kit) instead of the jre (Java Runtime Environment), but if you don't plan to develop software in Java, the jre, what is used here, is good enough).
+3. Restart the terminal. Check the installation by entering `java -version`
+
 ## 1. Fastqc (Windows)
 
 [[https://www.bioinformatics.babraham.ac.uk/projects/fastqc/](url)]
@@ -83,7 +90,7 @@ It is java based and therefore does not need to be installed.
 To run interactively, click the 'run-fastqc' batch file.
 To run non-interactively, enter in 'fastqc' in the command line.
 
-## 2a. Trimmomatic-0.39 (Windows)
+## 2a. Trimmomatic-0.39 (Windows or Linux)
 
 [[http://www.usadellab.org/cms/?page=trimmomatic](url)]
 
@@ -100,7 +107,7 @@ The adapters folder contains some adapters that can be used during trimming if d
 It is java based and therefore does not need to be installed.
 Click the 123fastq executable jar file to run the program.
 
-## 2b. BBDuk-38.84 (Windows)
+## 2b. BBDuk-38.84 (Windows or Linux)
 
 [[https://jgi.doe.gov/data-and-tools/bbtools/](url)]
 

@@ -504,7 +504,7 @@ A short overview is given for different software tools that can be used for proc
 Next, a step-by-step tutorial is given as an example how to process the data.
 Most of this is done using command line based tools.
 
-An overview of the different steps including some software that can handle this is show here:
+An overview of the different steps including some software that can handle this is shown here:
 
 1. Checking the raw FASTA or FASTQ data can be done using the
     ([**FASTQC**](<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>)) software (Windows, Linux, Mac. Requires Java).
@@ -516,7 +516,7 @@ An overview of the different steps including some software that can handle this 
     Also **BBDuk** can be used for trimming (which belongs to BBMap).
 
 3. The trimmed sequence reads need to be aligned using a reference
-    sequence, for example the *S. Cerevisiae* [S288C Ref64-2-1 reference sequence](<https://downloads.yeastgenome.org/sequence/S288C_reference/>) or the [W303 strain sequence](<http://sgd-archive.yeastgenome.org/sequence/strains/W303/W303_SGD_2015_JRIU00000000/>) from SGD.
+    sequence, for example the *S. Cerevisiae* [S288C Ref64-2-1 reference sequence](<https://downloads.yeastgenome.org/sequence/S288C_reference/>) or the [W303 reference sequence](<http://sgd-archive.yeastgenome.org/sequence/strains/W303/W303_SGD_2015_JRIU00000000/>) from SGD.
     Aligning can be done, for example, using ([**SnapGene**](<https://www.snapgene.com/>)) (Windows, Linux, Mac. This does not
     import large files and is therefore not suitable for whole genome
     sequencing), ([**BBMap**](<https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbmap-guide/>)) (Linux, Mac, Windows (seems to give problems when installing on windows machines), might be possible to integrate it in Python, ([**BWA**](<http://bio-bwa.sourceforge.net/>)) (Linux, Mac), ([**Bowtie2**](<http://bowtie-bio.sourceforge.net/bowtie2/index.shtml>)) (Linux, Mac) or ([**ClustalOmega**](<http://www.clustal.org/omega/>)) (Windows, Linux, Mac).
@@ -794,12 +794,12 @@ For example, the 'overrepresented sequences' as found by Fastqc can be clipped b
 A .fasta file can be created by simply creating a text file and adding the sequences that need to be clipped, for example, in the form:
 
 > Sequence1
-
-CATG
-
+>
+> CATG
+>
 > Sequence2
-
-GATC
+>
+> GATC
 
 Or a .fasta can be copied from either Trimmomatic software package or the BBDuk package, both which are provided with some standard adapter sequences.
 In the case of Trimmomatic it is advised to use the TruSeq3 adapter file when using MiSeq sequencing.
@@ -1003,8 +1003,13 @@ Check if everything is ok with the .bam file using
 
 **`samtools quickcheck ${pathvm_data}${filenamevm}'.bam'`**.
 
+This checks if the file appears to be intact by checking the header is valid, there are sequences in the beginning of the file and that there is a valid End-Of_File command at the end.
+It thus check only the beginning and the end of the file and therefore any errors in the middle of the file are not noted.
+But this makes this command really fast.
 If no output is generated, the file is good.
 If desired, more information can be obtained using `samtools flagstat ${pathvm_data}${filenamevm}'.bam'` or `samtools stats ${pathvm_data}${filenamevm}'.bam'`.
+Especially the latter can be a bit overwhelming with data, but this gives a thorough description of the quality of the bam file.
+For more information see [this documentation](http://www.htslib.org/doc/1.6/samtools.html).
 
 For many downstream tools, the .bam file needs to be sorted.
 This can be done using SAMtools, but this might give problems.
