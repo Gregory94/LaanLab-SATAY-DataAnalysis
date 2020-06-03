@@ -81,12 +81,13 @@ There are several ways of installing Java, but one of the simplest ways is using
 2. Enter `apt-get install openjdf-11-jre`. (If this version of java is not found, check which versions are available by entering `apt-get install openjdf` followed by a double tab. This should give a list of all available installations. It also gives you the opportunity to install the jdk (Java Developer Kit) instead of the jre (Java Runtime Environment), but if you don't plan to develop software in Java, the jre, what is used here, is good enough).
 3. Restart the terminal. Check the installation by entering `java -version`
 
-## 1. Fastqc (Windows)
+## 1. Fastqc (Windows or Linux)
 
 [[https://www.bioinformatics.babraham.ac.uk/projects/fastqc/](url)]
 
 Fastqc is used for quality checking.
-It is java based and therefore does not need to be installed.
+To install Fastqc in Linux, open the bash and go to the fastqc folder in the bash.
+Type in the command `sudo apt install fastqc` (this might require a password).
 To run interactively, click the 'run-fastqc' batch file.
 To run non-interactively, enter in 'fastqc' in the command line.
 

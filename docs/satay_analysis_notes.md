@@ -622,6 +622,10 @@ Some useful commands:
 6. When using or defining strings of texts, putting the string between accolades ('') tells the bash to take the text within the accolades literally.
 Remember this when using the variables, as `'${var}'` is literally taken as the string ${var} whereas when using `${var}` (without accolades) the bash will try implement the variable 'var' depending on what you have defined before for this variable.
 
+These commands are summarized in a text file ('Linux_Processing_Commands.txt' located at the [SATAY github repository](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis)).
+The variables containing the paths and names in this file (the codes in the first block of codes) can be changed according to your data.
+The commands can then be literally copy-pasted in the bash and it should work properly.
+
 ### 1. Quality checking of the sequencing reads; FASTQC (0.11.9)
 
 FASTQC creates a report for the quality of sequencing data.
@@ -750,11 +754,11 @@ Typically the adapter clipping is performed as one of the first steps and removi
 
 A typical command for trimmomatic looks like this:
 
-**`java -jar ${path_trimm_software}'trimmomatic-0.39.jar' SE -phred33 ${pathdata}${filename} ${path_trimm_out}${filename::-6}'_trimmed.fastq' ILLUMINACLIP:'TruSeq3-SE.fa':2:30:10 LEADING:14 TRAILING:14 SLIDINGWINDOW:10:14 MINLEN:30`**
+`java -jar ${path_trimm_software}'trimmomatic-0.39.jar' SE -phred33 ${pathdata}${filename} ${path_trimm_out}${filename::-6}'_trimmed.fastq' ILLUMINACLIP:'TruSeq3-SE.fa':2:30:10 LEADING:14 TRAILING:14 SLIDINGWINDOW:10:14 MINLEN:30`
 
 Check the quality of the trimmed sequence using the command:
 
-**`${path_fastqc_software}fastqc --outdir ${path_fastqc_out} ${path_trimm_out}${filename::-6}'_trimmed.fastq'`**
+`${path_fastqc_software}fastqc --outdir ${path_fastqc_out} ${path_trimm_out}${filename::-6}'_trimmed.fastq'`
 
 The following can be set to be set by typing the following fields after the above command (the fields must be in the given order, the optional fields can be ignored if not needed, see also <http://www.usadellab.org/cms/?page=trimmomatic>):
 
@@ -1047,7 +1051,7 @@ Further analysis is done in windows, meaning that the sorted .bam files needs to
 
 **`mv ${pathdata} ${path_sf}`**
 
-Next, the data analysis is performed using custom made codes in Matlab.
+Next, the data analysis is performed using custom made codes in Matlab in Windows.
 
 ### 5. Determining transposon insertions: Matlab (Code from Benoit [Michel et. al. 2017])
 
