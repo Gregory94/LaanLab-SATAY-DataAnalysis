@@ -587,7 +587,8 @@ Since the software tools are mostly commandline based, it might be convenient to
     D. The processing can be performed in shared folder, but this is not recommended.
     It is better to move the folder temporarily to the hard drive of the Virtual Machine.
     For this define the location where the processing is performed (in this example located in the Documents directory)
-    (**`pathdata='~/Documents/data_processing/${foldername}'`**)
+    (**`pathdata=~/Documents/data_processing/${foldername}`**)
+    If this directory does not already exists, make it using the command `mkdir ${pathdata}`
 
     E. Move datafolder from shared folder to data processing folder
     (**`mv ${path_sf}${foldername} ${pathdata}`**)
@@ -595,13 +596,16 @@ Since the software tools are mostly commandline based, it might be convenient to
     F. Path to the location where the Trimmomatic software is located
     (**`path_trimm_software=~/Documents/Software/Trimmomatic-0.39/`**).
 
-    G. Path to the location where the BBDuk software is located (**`path_bbduk_software='~/Documents/Software/BBMap/bbmap/'`**)
+    G. Path to the location where the BBDuk software is located (**`path_bbduk_software=~/Documents/Software/BBMap/bbmap/`**)
 
-    H. Path to the outcome folder for the fastqc software (**`path_fastqc_out=${pathdata}/Cerevisiae_WT2_Seqdata_Michel2017_QC/`**).
+    H. Path to the outcome folder for the fastqc software (**`path_fastqc_out=${pathdata}/Cerevisiae_WT2_Michel2017_QC/`**).
 
-    I. Path to the outcome folder for the trimmomatic software (**`path_trimm_out=${pathdata}/Cerevisiae_WT2_Seqdata_Michel2017_Trimmed/`**).
+    I. Path to the outcome folder for the trimmomatic software (**`path_trimm_out=${pathdata}/Cerevisiae_WT2_Michel2017_Trimmed/`**).
 
-    J. Path to the outcome folder for the aligned software (**`path_align_out=${pathdata}/Cerevisiae_WT2_Seqdata_Michel2017_Aligned/`**).
+    J. Path to the outcome folder for the aligned software (**`path_align_out=${pathdata}/Cerevisiae_WT2_Michel2017_Aligned/`**).
+
+    K. Path to the reference genome directory
+    (**`path_refgenome=/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa`**)
 
 Some useful commands:
 
@@ -615,6 +619,9 @@ Some useful commands:
 
 5. `less`: open the first few lines of a files that can be read as a text file.
 
+6. When using or defining strings of texts, putting the string between accolades ('') tells the bash to take the text within the accolades literally.
+Remember this when using the variables, as `'${var}'` is literally taken as the string ${var} whereas when using `${var}` (without accolades) the bash will try implement the variable 'var' depending on what you have defined before for this variable.
+
 ### 1. Quality checking of the sequencing reads; FASTQC (0.11.9)
 
 FASTQC creates a report for the quality of sequencing data.
@@ -627,7 +634,7 @@ The advantage of using 123FASTQ is that it can also do trimming (using Trimmomat
 
 If using the command line for checking a single file use the command:
 
-**`fastqc --outdir ${path_fastqc_out} ${pathdata}$/{filename}`**
+**`fastqc --outdir ${path_fastqc_out} ${pathdata}/${filename}`**
 
 (Note that the output directory should already exist, as the program does not create paths).
 In the output directory, a .html file and a folder is created, both with the same name as the input file.
@@ -692,12 +699,17 @@ Some duplication might not be bad and therefore a warning or error here does not
 The program gives a warning (when sequences are found to be present between 0.1% and 1% of the total amount of sequences) or an error (when there are sequences occurring more 1% of all sequences), but this does not always mean that the data is bad and might be ignored.
 For Illumina sequencing for satay experiments, the sequences often start with either 'CATG' or 'GATC' which are the recognition sites for NlaIII and DpnII respectively.
 
-- **Adapter (Kmers) content**: Shows an accumulative percentage plot of repeated sequences with a positional bias appearing in the data.
+- **Adapter content**: Shows an accumulative percentage plot of repeated sequences with a positional bias appearing in the data.
 So if many reads have the same sequence at (or near) the same location, then this might trigger a warning in this section.
 Ideally this is a flat line at zero (meaning that there are no repeated sequences present in the data).
 If this is not a flat line at zero, it might be necessary to cut the reported sequences during the trimming step.
 If this section gives a warning, a list is shown with all the repeated sequences including some statistics.
 It can be useful to delete these sequences in the trimming step.
+
+- **Kmer content**: indicates sequences with a position bias that are ofen repeated.
+If a specific sequence occurs at the same location (i.e. basepair number) in many reads, then this module will show which sequence at which location turns up frequently.
+Note that in later editions (0.11.6 and up) this module is by default turned off.
+If you want to turn this module on again, go to the Configuration folder in the Fastqc folder and edit the limits.txt file in the line where it says 'kmer  ignore  1' and change the 1 in a 0.
 
 ### 2. Trimming of the sequencing reads
 
@@ -844,6 +856,7 @@ One option can be to create a custom fasta file where all the sequences are plac
 To do this, in order to let everything work properly it is best to alter one of the existing .fa files.
 First copy that file as a backup using a different name (e.g. in the `#{path_bbduk_software}/resources` directory type the command `cp adapters.fa adapters_original_backup.fa`).
 Then, alter the adapters.fa file with any sequences you want to get trimmed.
+Note to not put empty lines in the text file, otherwise BBDuk might yield an error about not finding the adapters.fa file.
 
 Typically it is useful to clip overrepresented sequences that were found by FASTQC and sequences that start with 'CATG' or 'GATC' which are the recognition sites for NlaIII and DpnII respectively.
 Note that the trimming is performed in the order in which the steps are given as input.
@@ -860,11 +873,11 @@ Typically, the length k is chosen about the size of the smallest adapter sequenc
 For more details, see [this webpage](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/).
 
 A typical command for BBDuk looks like this:
-**`${path_bbduk_software}/bbduk.sh -Xmx1g in=${pathdata}${filename} out=${filename::-6}_trimmed.fastq ref=adapters.fa ktrim=r k=23 mink=10 hdist=1 qtrim=r trimq=14 minlen=30`**
+**`${path_bbduk_software}/bbduk.sh -Xmx1g in=${pathdata}/${filename} out=${path_trimm_out}${filename::-6}'_trimmed.fastq' ref=${path_bbduk_software}/resources/adapters.fa ktrim=r k=23 mink=10 hdist=1 qtrim=r trimq=14 minlen=30`**
 
 1. `-Xmx1g`. This defines the memory usage of the computer, in this case 1Gb (`1g`).
 Setting this too low or too high can result in an error (e.g. 'Could not reserve enough space for object heap').
-Depending on the maximum memory of your computer, setting this to `1g` should not result in such an error.
+Depending on the maximum memory of your computer, setting this to `1g` should typically not result in such an error.
 2. `in` and `out`. Input and Output files. Note that defining an absolute path for the path-out command does not work properly.
 Best is to simply put a filename for the file containing the trimmed reads which is then stored in the same directory as the input file and then move this trimmed reads file to any other location using:
 `mv ${pathdata}${filename::-6}_trimmed.fastq ${path_trimm_out}`
@@ -902,16 +915,9 @@ So when reads are expected to be all 75bp long, this will discard the last basep
 
 Finally, to check the quality of the trimmed sequence using the command:
 
-**`fastqc --outdir ${path_fastqc_out} ${path_trimm_out}${filename::-6}'_trimmed.fastq'`**
+**`fastqc --outdir ${path_fastqc_out} ${path_trimm_out}$/{filename::-6}'_trimmed.fastq'`**
 
 ### 3. Sequence alignment and Reference sequence indexing; BWA (0.7.17) (Linux)
-
-Next the sequences alignment is performed which is done in the Linux Virtual Machine.
-Before starting the Linux Virtual Machine, the trimmed reads need to be copied to the shared folder with the command (note the accolades for the path_sharedfolder since this path contains a space and otherwise it is not correctly implemented):
-
-`cp ${path_trimm_out}${filename::-6}'_trimmed.fastq' "${path_sharedfolder}"`
-
-Now the protocol continues in the Linux Virtual Machine.
 
 The alignment can be completed using different algorithms within BWA, but the ‘Maximal Exact Matches’ (MEM) algorithm is the recommended one (which is claimed to be the most accurate and fastest algorithm and is compatible with many downstream analysis tools, see [documentation](<http://bio-bwa.sourceforge.net/bwa.shtml>) for more information).
 BWA uses a FM-index, which uses the Burrows Wheeler Transform (BWT), to exactly align all the reads to the reference genome at the same time.
@@ -931,7 +937,7 @@ This creates 5 more files in the same folder as the reference genome that BWA us
 
 The alignment command should be given as
 
-**`bwa mem [options] ${pathvm_refgenome} ${pathvm_data}${filenamevm} > ${pathvm_data}${filenamevm}'.sam'`**
+**`bwa mem [options] ${path_refgenome} ${path_trimm_out}${filename::-6}'_trimmed.fastq' > ${path_align_out}${filename::-6}'_trimmed.sam'`**
 
 where `[options]` can be different statements as given in the
 documentation. Most importantly are:
@@ -1009,17 +1015,17 @@ The meaning of the characters are:
 
 Create a .bam file using the command
 
-**`samtools view –b ${pathvm_data}${filenamevm}'.sam' > ${pathvm_data}${filenamevm}'.bam'`.**
+**`samtools view –b ${path_align_out}${filename::-6}'_trimmed.sam' > ${path_align_out}${filename::-6}'_trimmed.bam'`.**
 
 Check if everything is ok with the .bam file using
 
-**`samtools quickcheck ${pathvm_data}${filenamevm}'.bam'`**.
+**`samtools quickcheck ${path_align_out}${filename::-6}'_trimmed.bam'`**.
 
 This checks if the file appears to be intact by checking the header is valid, there are sequences in the beginning of the file and that there is a valid End-Of_File command at the end.
 It thus check only the beginning and the end of the file and therefore any errors in the middle of the file are not noted.
 But this makes this command really fast.
 If no output is generated, the file is good.
-If desired, more information can be obtained using `samtools flagstat ${pathvm_data}${filenamevm}'.bam'` or `samtools stats ${pathvm_data}${filenamevm}'.bam'`.
+If desired, more information can be obtained using `samtools flagstat ${path_align_out}${filename::-6}'_trimmed.bam'` or `samtools stats ${path_align_out}${filename::-6}'_trimmed.bam'`.
 Especially the latter can be a bit overwhelming with data, but this gives a thorough description of the quality of the bam file.
 For more information see [this documentation](http://www.htslib.org/doc/1.6/samtools.html).
 
@@ -1027,19 +1033,19 @@ For many downstream tools, the .bam file needs to be sorted.
 This can be done using SAMtools, but this might give problems.
 A faster and more reliable method is using the software sambamba using the command
 
-**`sambamba-0.7.1-linux-static sort –m 500MB ${pathvm_data}${filenamevm}'.bam'`**
+**`sambamba-0.7.1-linux-static sort –m 500MB ${path_align_out}${filename::-6}'_trimmed.bam'`**
 
 (where `–m` allows for specifying the memory usage which is 500MB in this example).
 This creates a file with the extension .sorted.bam, which is the sorted version of the original bam file.
 Also an index is created with the extension .bam.bai.
 If this latter file is not created, it can be made using the command
 
-`sambamba-0.7.1-linux-static index  ${pathvm_data}${filenamevm}'.bam'`.
+`sambamba-0.7.1-linux-static index  ${path_align_out}${filename::-6}'_trimmed.bam'`.
 
 Now the reads are aligned to the reference genome and sorted and indexed.
 Further analysis is done in windows, meaning that the sorted .bam files needs to be moved to the shared folder.
 
-**`mv ${pathvm_data}${filenamevm}'.'* ${pathvm_sharedfolder}`**
+**`mv ${pathdata} ${path_sf}`**
 
 Next, the data analysis is performed using custom made codes in Matlab.
 
