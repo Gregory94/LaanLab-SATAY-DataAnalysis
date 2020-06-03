@@ -622,7 +622,7 @@ Some useful commands:
 6. When using or defining strings of texts, putting the string between accolades ('') tells the bash to take the text within the accolades literally.
 Remember this when using the variables, as `'${var}'` is literally taken as the string ${var} whereas when using `${var}` (without accolades) the bash will try implement the variable 'var' depending on what you have defined before for this variable.
 
-These commands are summarized in a text file ('Linux_Processing_Commands.txt' located at the [SATAY github repository](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis)).
+These commands are summarized in a text file ('Linux_Processing_Commands.txt' located at the [SATAY github repository](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/docs/Linux_Processing_Commands.txt)).
 The variables containing the paths and names in this file (the codes in the first block of codes) can be changed according to your data.
 The commands can then be literally copy-pasted in the bash and it should work properly.
 
@@ -646,7 +646,7 @@ The .html file can be used to quickly see the graphs.
 Also, a zipped folder is created where the raw data of the quality check is stored.
 For explanation about the different graphs, see the fastqc\_manual pdf or [<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3%20Analysis%20Modules/>] (or the paper ‘Preprocessing and Quality Control for Whole-Genome’ from Wright et.al. or the ‘Assessing Read Quality’ workshop from the Datacarpentry Genomics workshop).
 
-For more commands, type `${path_fastqc_software} --help`.
+For more commands, type `fastqc --help`.
 Some useful commands might be:
 
 - --contaminants Reads a file where sequences are stored of (potential) contaminants.
