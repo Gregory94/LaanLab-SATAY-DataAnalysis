@@ -136,7 +136,7 @@ Therefore it is hard to tell the fitness of cells when a transposon is inserted 
 
 Ideally only the transposons inserted in non-essential genomic regions will have reads (since only these cells can create a colony before sequencing), creating a clear difference between the essential and non-essential genes.
 However, sometimes non-essential genes also have few or no transposon insertion sites.
-According to Michel et.al. this can have 3 main reasons.
+According to [Michel et.al.](https://elifesciences.org/articles/23570) this can have 3 main reasons.
 
 1. During alignment of the reads, the reads that represent repeated DNA sequences are discarded, since there is no unique way of fitting
  them in the completed sequence.
@@ -161,17 +161,18 @@ This is shown by Michel et.al. to be caused that some regions (that code for spe
 The transposons in these essential genes are clearly located at a specific region in the gene, the one that codes for a non-essential subdomain.
 However, this is not always possible, as in some cases deletion of non-essential subdomains of essential genes create unstable, unexpressed or toxin proteins.
 The difference in essentiality between subdomains in a single protein only happens in essential genes, not in non-essential genes.
-Michel et.al. devised an algorithm to estimate the likelihood $L$ of an essential gene having an essential sub domain and a non-essential subdomain:
+Michel et.al. devised an algorithm to estimate the likelihood $L$ of a gene having an essential subdomain:
 
-$$L = \frac{\text{d }N_{\text{cds}}}{l_{\text{cds}}}$$,
+$$L = \frac{\text{d }N_{\text{cds}}}{l_{\text{cds}}}$$
 
-Where $d$ is the longest interval (in terms of base pairs) between 5 neighboring transposons in a Coding DNA Sequence (cds) ($\geq 300$ bp), $N_{cds}$ is the total number transposons mapping in the cds ($\geq 20$) transposons) and $l_{cds}$ is the total length of the CDS.
+where $d$ is the longest interval (in terms of base pairs) between 5 neighboring transposons in a Coding DNA Sequence (cds) ($\geq 300$ bp), $N_{cds}$ is the total number transposons mapping in the cds ($\geq 20$) transposons) and $l_{cds}$ is the total length of the CDS.
 Additionally, it must hold that $0.1 l_{cds} \leq d \leq 0.9 l_{cds}$.
 
 It is expected that only essential genes cary essential subdomains, and indeed what was found by Michel et.al. that the genes with the highest likelihood were mostly also genes previously annotated as essential by other studies.
+
 Because of the reasons mentioned before, not a simple binary conclusion can be made solely based on the amount of transposon insertions or the number of reads.
 Instead, a gene with little reads *might* be essential, but to be sure the results from other experiments need to be implemented as well, for example where the cells were grown in a different growth conditions.
-Therefore, SATAY analysis says something about the relative fitness of the cells in the current conditions.
+Therefore, SATAY analysis only says something about the relative fitness of cells where a specific gene is inhibited in the current growth conditions.
 
 # Methods and File types
 
@@ -228,7 +229,7 @@ This is usually enough for the reads to become unambiguous.
 The resulting data from the sequencing is stored in a FASTQ file where all individual reads are stored including a quality score of the sequencing.
 The reads are in random order and therefore the first step in the processing is aligning of the reads in the FASTQ files with a reference genome.
 
-Note that the quality of the reads typically decreases near the end of the reads due to the chemistry processes required for sequencing (this depends on the kind of method used).
+Note that the quality of the reads typically decreases near the 3'-end of the reads due to the chemistry processes required for sequencing (this depends on the kind of method used).
 For Illumina sequencing, the main reasons are signal decay and dephasing, both causing a relative increase in the background noise.
 Dephasing occurs when a DNA fragment is not de-blocked properly.
 A DNA fragment is copied many times and all copies incorporate a fluorescent nucleotide that can be imaged to identify the nucleotide.
@@ -247,7 +248,7 @@ For example, take the next 6bp sequence that is copied 5 times:
 4. `GAT GT`
 5. `G AT G`
 
-The first two reads are deblocked properly and they give the right nucleotide.
+The first two reads are deblocked properly and they give all the right nucleotides.
 But the third and fourth have one round that is not deblocked properly (indicated by the empty region between the nucleotides), hence the nucleotide is always lagging one bp after the failed deblocking.
 The fifth copy has two failed deblocking situations, hence is lagging two bp.
 The first nucleotide is a G for all 5 copies, therefore the quality of this nucleotide is perfect.
@@ -386,11 +387,13 @@ There are 42 scores, each of which are related to a specific error.
 See for example [phred score conversion table](<https://drive5.com/usearch/manual/quality_score.html>) for a conversion table.
 
 ## Determine essentiality based on transposon counts
+
 Using the number of transposons and reads, it can be determined which genes are potentially essential and which are not.
 To check this method, the transposon count for wild type cells are determined.
 Currently, genes that are taken as essential are the annotated essentials based on previous research (see files located in `X:\tnw\BN\LL\Shared\Gregory\Gene_Database\`).
 
 ### Distribution number of insertions and reads compared with essential and non-essential genes
+
 (*See `statistics_pergene.py`*)
 
 Ideally, the number of transposon insertions of all essential genes are small and the number of insertions in non-essential genes are is large so that there is a clear distinction can be made.
@@ -412,6 +415,7 @@ Significant attention needs to be given to the postprocessing of the data.
 ![Reads and transposon density after processing.](./media/Tn_Reads_Pergene_MyAnalysis.png)
 
 ### Profile plot for number of reads
+
 (*See `TransposonRead_Profile_Plot.py`*)
 
 To create a visual overview where the insertions are and how many reads there are for each insertion, a profile plot is created for each chromosome.
@@ -431,6 +435,7 @@ Also an alternative version of this plot is made (`TransposonRead_Profile_Compar
 ![Comparison of the same datasets, but with different processing steps. Shown here is the transposon count for the two files including the absolute difference between the two datasets show in blue. Note also here that some regions has a higher likelihood of bearing transposons compared to the surrounding regions.](./media/Cerevisiae_Michel2017_WT2_Compare_chromIX.png)
 
 ### Profile plot number of reads per individual genes
+
 (*See `gene_reads.py`*)
 
 Instead of plotting the number of reads for an entire chromosome, it is also useful to plot the read profile for individual genes to see how the insertion sites and reads are distributed within a gene.
@@ -537,14 +542,15 @@ An overview of the different steps including some software that can handle this 
 
 ### 0. Initializing
 
-The next steps are not obligatory, but might help in organizing the data.
-The **bold** printed commands are put so that they can be copied directly to the bash.
-(Note to modify the respective paths on your own machine in this Initialization step).
+The steps discussed in this section are not obligatory, but might help in organizing the data.
+The **bold** printed commands in this and the following sections are put so that they can be copied directly to the bash.
+(Note to modify the respective paths on your own machine in this Initialization step, though).
 If the paths below are correctly defined, the boldface commands defined in the different processing steps can be literally copied and pasted in the bash.
+A suggestion is to put all the commands with the correct paths in a text file and store this text file together with the raw sequencing file (an example is given in the 'Linux_Processing_Commands.txt' file located at the [SATAY github repository](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/docs/Linux_Processing_Commands.txt)).
+Then all the commands can be easily copy-pasted in the bash and all the processing steps can be traced back later.
 
 Since this protocol works mostly in the Linux Virtual Machine, the commands below are defined for Linux.
-
-First, a possible method for organizing the data on Windows is shown, but feel free to change this as you like.
+First, a possible method for organizing the data is shown, but feel free to change this as you like.
 
 1. Create an empty datafolder.
 
@@ -558,28 +564,26 @@ First, a possible method for organizing the data on Windows is shown, but feel f
 
     C. filename_Aligned
 
-4. Copy the datafolder to the shared folder for processing in the Virtual Machine using the commands
+4. When this is done in Windows, copy the datafolder to the shared folder for processing in the Virtual Machine using the commands (using git-bash)
 
 **`#!/bin/bash`**
 
-**`pathwin_sharedfolder='/C/Users/gregoryvanbeek/Documents/VirtualBox VMs/VMSharedFolder_Ubuntu64_1'`**
+**`pathwin_sharedfolder='/C/Users/gregoryvanbeek/Documents/ VirtualBox VMs/ VMSharedFolder_Ubuntu64_1'`**
 
-**`pathwin_data='C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_ProcessingTest'`**
+**`pathwin_data='C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\ Cerevisiae_WT2_Seqdata_Michel2017_ProcessingTest'`**
 
 **`cp -r ${pathwin_data} "${pathwin_sharedfolder}"`**
 
-The main processing is done in the Linux Virtual Machine.
+5. The main processing is done in the Linux Virtual Machine.
 Since the software tools are mostly commandline based, it might be convenient to be able to define variables, for example for the paths to the difference programs and files so that these do not have te be entered every single time.
-
-5. For this start with the command that enables defining variables:
-
-**`#!/bin/bash`**.
+For this start with the command that enables defining variables **`#!/bin/bash`**.
 
 6. Define the following variables. (copy paste the commands in the bash using `shift+Ins`. Remember to first alter the respective variables given below to the paths and filenames in your computer):
 
     A. Path to the shared folder used for communicating with the virtual machine running Linux (**`path_sf=/media/sf_VMSharedFolder_Ubuntu64_1/`**).
 
-    B. Name of the folder containing the data (**`foldername='Cerevisiae_WT2_Seqdata_Michel2017_ProcessingTest'`**)
+    B. Name of the folder containing the data
+    (**`foldername='Cerevisiae_WT2_Seqdata_ Michel2017_ProcessingTest'`**)
 
     C. Name of the data file
     (**`filename='Cerevisiae_WT2_Michel2017.fastq'`**)
@@ -588,24 +592,29 @@ Since the software tools are mostly commandline based, it might be convenient to
     It is better to move the folder temporarily to the hard drive of the Virtual Machine.
     For this define the location where the processing is performed (in this example located in the Documents directory)
     (**`pathdata=~/Documents/data_processing/${foldername}`**)
-    If this directory does not already exists, make it using the command `mkdir ${pathdata}`
+    If this directory does not already exists, create it using the command `mkdir ${pathdata}`
 
-    E. Move datafolder from shared folder to data processing folder
+    E. Move the datafolder from shared folder to data processing folder
     (**`mv ${path_sf}${foldername} ${pathdata}`**)
 
     F. Path to the location where the Trimmomatic software is located
-    (**`path_trimm_software=~/Documents/Software/Trimmomatic-0.39/`**).
+    (**`path_trimm_software=~/Documents/ Software/Trimmomatic-0.39/`**).
 
-    G. Path to the location where the BBDuk software is located (**`path_bbduk_software=~/Documents/Software/BBMap/bbmap/`**)
+    G. Path to the location where the BBDuk software is located
+    (**`path_bbduk_software=~/Documents/ Software/BBMap/bbmap/`**)
 
-    H. Path to the outcome folder for the fastqc software (**`path_fastqc_out=${pathdata}/Cerevisiae_WT2_Michel2017_QC/`**).
+    H. Path to the outcome folder for the fastqc software
+    (**`path_fastqc_out=${pathdata}/ Cerevisiae_WT2_Michel2017_QC/`**).
 
-    I. Path to the outcome folder for the trimmomatic software (**`path_trimm_out=${pathdata}/Cerevisiae_WT2_Michel2017_Trimmed/`**).
+    I. Path to the outcome folder for the trimmomatic software
+    (**`path_trimm_out=${pathdata}/ Cerevisiae_WT2_Michel2017_Trimmed/`**).
 
-    J. Path to the outcome folder for the aligned software (**`path_align_out=${pathdata}/Cerevisiae_WT2_Michel2017_Aligned/`**).
+    J. Path to the outcome folder for the aligned software
+    (**`path_align_out=${pathdata}/ Cerevisiae_WT2_Michel2017_Aligned/`**).
 
-    K. Path to the reference genome directory
-    (**`path_refgenome=/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa`**)
+    K. Path to the reference genome fasta file
+    (**`path_refgenome=/home/gregoryvanbeek/Documents/
+    Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa`**)
 
 Some useful commands:
 
@@ -622,8 +631,10 @@ Some useful commands:
 6. When using or defining strings of texts, putting the string between accolades ('') tells the bash to take the text within the accolades literally.
 Remember this when using the variables, as `'${var}'` is literally taken as the string ${var} whereas when using `${var}` (without accolades) the bash will try implement the variable 'var' depending on what you have defined before for this variable.
 
+7. Copying texts in the bash does not work using `crtl-v`, instead use `shift-insert`
+
 These commands are summarized in a text file ('Linux_Processing_Commands.txt' located at the [SATAY github repository](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/docs/Linux_Processing_Commands.txt)).
-The variables containing the paths and names in this file (the codes in the first block of codes) can be changed according to your data.
+The variables containing the paths and names in this file can be changed according to your data.
 The commands can then be literally copy-pasted in the bash and it should work properly.
 
 ### 1. Quality checking of the sequencing reads; FASTQC (0.11.9)
@@ -696,7 +707,7 @@ Although at the end of the sequences it might occur few times, but it should not
 - **Sequence duplication level**: Indicates how often some sequences appear the data.
 Ideally, all reads occur only few times and a high peak is expected near 1.
 If peaks are observed at higher numbers, this might indicate enrichment bias during the sequencing preparation (e.g. over amplification during PCR).
-Only the first 100000 sequences are considered and when the length of the reads is over 75bp, the reads are cut down to pieces of 50bp. 
+Only the first 100000 sequences are considered and when the length of the reads is over 75bp, the reads are cut down to pieces of 50bp.
 Some duplication might not be bad and therefore a warning or error here does not need to concern.
 
 - **Overrepresented sequences**: List of sequences that appear in more 0.1% of the total (this is only considered for the first 100000 sequences and reads over 75bp are truncated to 50bp pieces).
@@ -725,6 +736,8 @@ An alternative is BBDuk, which is part of the BBMap software package.
 This allows for more options, but can therefore also be more confusing to use initially.
 Both software packages are explained below, but only one needs to be used.
 Currently, it is advised to use BBDuk (see section 2b).
+
+For a discussion about trimming, see for example the discussion in [MacManes et.al. 2014](https://www.frontiersin.org/articles/10.3389/fgene.2014.00013/full), [Del Fabbro et.al. 2013](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0085024) or [Delhomme et. al. 2014](https://pdfs.semanticscholar.org/daa6/191f2a91a1bd5008f2bda068ae3f99ec85fd.pdf).
 
 #### 2a. Trimming of the sequencing reads; Trimmomatic (0.39)
 
@@ -758,7 +771,7 @@ A typical command for trimmomatic looks like this:
 
 Check the quality of the trimmed sequence using the command:
 
-`${path_fastqc_software}fastqc --outdir ${path_fastqc_out} ${path_trimm_out}${filename::-6}'_trimmed.fastq'`
+`${path_fastqc_software}fastqc --outdir ${path_fastqc_out} ${path_trimm_out} ${filename::-6}'_trimmed.fastq'`
 
 The following can be set to be set by typing the following fields after the above command (the fields must be in the given order, the optional fields can be ignored if not needed, see also <http://www.usadellab.org/cms/?page=trimmomatic>):
 
@@ -793,7 +806,11 @@ High values for short reads (so many perfect matches are needed) allows for clip
 Note a bug in the software is that the FASTA file with the adapters need to be located in your current folder.
 A path to another folder with the adapter files yields an error. [optional] [<https://wiki.bits.vib.be/index.php/Parameters_of_Trimmomatic>];
 
-- `SLIDINGWINDOW` Sliding window trimming which cuts out sequences within the window if the average quality score within the window is lower than a certain threshold. Parameters should be given as `SLIDINGWINDOW:L_window:Q_min` where `L_window` is the window size (in terms of basepairs) and `Q_min` the average threshold quality. [optional];
+- `SLIDINGWINDOW` Sliding window trimming which cuts out sequences witin the window and all the subsequent basepairs in the read if the average quality score within the window is lower than a certain threshold.
+The window moves from the 5'-end to the 3'-end.
+Note that if the first few reads of a sequence if of low quality, but the remaining of the sequence is of high quality, the entire sequence will be removed just because of the first few bad quality nucleotides.
+If this sitatuation occurs, it might be useful to first apply the HEADCROP option (see below).
+Parameters should be given as `SLIDINGWINDOW:L_window:Q_min` where `L_window` is the window size (in terms of basepairs) and `Q_min` the average threshold quality. [optional];
 
 - `LEADING` Cut the bases at the start (5’ end) of a read if the quality is below a certain threshold. Note that when, for example, the parameter is set to 3, the quality score Q=0 to Q=2 will be removed.
 Parameters should be given as `LEADING:Q_min` where `Q_min` is the threshold quality score.
@@ -837,11 +854,11 @@ Before running BBDuk, a .fasta file can to be created that allows clipping unwan
 For example, the 'overrepresented sequences' as found by Fastqc can be clipped by adding the sequences to the .fasta file.
 A .fasta file can be created by simply creating a text file and adding the sequences that need to be clipped, for example, in the form:
 
-> Sequence1
+> \> Sequence1
 >
 > CATG
 >
-> Sequence2
+> \> Sequence2
 >
 > GATC
 
@@ -889,7 +906,7 @@ Best is to simply put a filename for the file containing the trimmed reads which
 This should be stored in the location where the other files are stored for the BBDuk software (`${path_bbduk_software}/resources`)
 Next are a few commands relating to the kmers algorithm.
 4. `ktrim`. This can be set to either right trimming (`r`, default), left trimming (`l`) or to None setting (`N`).
-basically, this means what needs to be trimmed when an adapter is found, where right trimming is towards the 5'-end and left trimming is towards the 3'-end and None setting is not trimming, but simply setting the nucleotides that match the adapter sequence to N, which means it will be ignored during alignment.
+Basically, this means what needs to be trimmed when an adapter is found, where right trimming is towards the 5'-end and left trimming is towards the 3'-end and None setting is not trimming, but simply setting the nucleotides that match the adapter sequence to N, which means it will be ignored during alignment.
 For example, when setting this option to `ktrim=r`, than when a sequence is found that matches an adapter sequence, all the basepairs on the right of this matched sequence will be deleted including the matched sequence itself.
 5. `k`. This defines the number of kmers to be used. This should be not be longer than the smallest adapter sequences and should also not be too short as there might too much trimmed. Typically values around 20 works fine.
 6. `mink`. When the lenght of a read is not a perfect multiple of the value of `k`, then at the end of the read there is a sequence left that is smaller than length k. Setting `mink` allows the software to use smaller kmers as well near the end of the reads.
@@ -1019,7 +1036,7 @@ The meaning of the characters are:
 
 Create a .bam file using the command
 
-**`samtools view –b ${path_align_out}${filename::-6}'_trimmed.sam' > ${path_align_out}${filename::-6}'_trimmed.bam'`.**
+**`samtools view –b ${path_align_out}${filename::-6}'_trimmed.sam' > ${path_align_out} ${filename::-6}'_trimmed.bam'`.**
 
 Check if everything is ok with the .bam file using
 
@@ -1292,6 +1309,12 @@ read count is the actual count (and thus not used the equation
 
 Chen, P., Wang, D., Chen, H., Zhou, Z., & He, X. (2016). The nonessentiality of essential genes in yeast provides therapeutic insights into a human disease. Genome research, 26(10), 1355-1362.
 
+Del Fabbro, C., Scalabrin, S., Morgante, M., & Giorgi, F. M. (2013). An extensive evaluation of read trimming effects on Illumina NGS data analysis. PloS one, 8(12).
+
+Delhomme, N., Mähler, N., Schiffthaler, B., Sundell, D., Mannepperuma, C., & Hvidsten, T. R. (2014). Guidelines for RNA-Seq data analysis. Epigenesys protocol, 67, 1-24.
+
+MacManes, M. D. (2014). On the optimal trimming of high-throughput mRNA sequence data. Frontiers in genetics, 5, 13.
+
 Michel, A. H., Hatakeyama, R., Kimmig, P., Arter, M., Peter, M., Matos, J., ... & Kornmann, B. (2017). Functional mapping of yeast genomes by saturated transposition. Elife, 6, e23570.
 
 Pfeifer, S. P. (2017). From next-generation resequencing reads to a high-quality variant data set. Heredity, 118(2), 111-124.
@@ -1299,3 +1322,8 @@ Pfeifer, S. P. (2017). From next-generation resequencing reads to a high-quality
 Segal, E. S., Gritsenko, V., Levitan, A., Yadav, B., Dror, N., Steenwyk, J. L., ... & Kunze, R. (2018). Gene essentiality analyzed by in vivo transposon mutagenesis and machine learning in a stable haploid isolate of Candida albicans. MBio, 9(5), e02048-18.
 
 Usaj, M., Tan, Y., Wang, W., VanderSluis, B., Zou, A., Myers, C. L., ... & Boone, C. (2017). TheCellMap. org: A web-accessible database for visualizing and mining the global yeast genetic interaction network. G3: Genes, Genomes, Genetics, 7(5), 1539-1549
+
+\pagebreak
+
+> ***"I want to be a healer, and love all things that grow and are not barren"***
+> - J.R.R. Tolkien
