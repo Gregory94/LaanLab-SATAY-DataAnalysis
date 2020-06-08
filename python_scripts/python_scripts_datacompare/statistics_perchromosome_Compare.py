@@ -190,8 +190,8 @@ def textfile_dataset_compare(bed_files=None,text_file=False):
 
 #%%
 if __name__ == '__main__':
-    textfile_dataset_compare(bed_files=[r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed",
-                                      r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed"],
-                                     text_file=r"C:\Users\gregoryvanbeek\Desktop\test_DataCompare.txt")
+    textfile_dataset_compare(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_KornmannAlignment\E-MTAB-4885.WT2.bam.bed",
+                                      r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.sorted.bam.bed"],
+                                     text_file=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_Michel2017_WT2_DataCompare.txt")
 #    textfile_dataset_compare(bed_files=[r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed"],
 #                                     text_file=r"C:\Users\gregoryvanbeek\Desktop\test_DataCompare.txt")
