@@ -16,10 +16,13 @@ def stats_pergene(filepath, filename, normalize=True):
     '''
     
 #%% GET ALL KNOWN ESSENTIAL GENES FROM TWO DIFFERENT FILES AND COMBINE THEM IN ONE LIST
-    essential_genes_files = [r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt",
-                            r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt"]
-    gene_information_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt"
+    file_dirname = os.path.dirname(os.path.abspath('__file__'))
 
+
+    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_2.txt')]
+    
+    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 
 #%% PUT ALL KNOWN ESSENTIAL GENES FROM MULTIPLE FILES IN ONE LIST
     known_essential_gene_list = []

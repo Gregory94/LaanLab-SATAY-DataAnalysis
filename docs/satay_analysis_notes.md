@@ -588,6 +588,9 @@ For this start with the command that enables defining variables **`#!/bin/bash`*
     C. Name of the data file
     (**`filename='Cerevisiae_WT2_Michel2017.fastq'`**)
 
+    D. Name of the trimmed data file
+    (**`filename_trimmed='Cerevisiae_WT2_Michel2017_trimmed.fastq'`**)
+
     D. The processing can be performed in shared folder, but this is not recommended.
     It is better to move the folder temporarily to the hard drive of the Virtual Machine.
     For this define the location where the processing is performed (in this example located in the Documents directory)
@@ -737,7 +740,7 @@ This allows for more options, but can therefore also be more confusing to use in
 Both software packages are explained below, but only one needs to be used.
 Currently, it is advised to use BBDuk (see section 2b).
 
-For a discussion about trimming, see for example the discussion in [MacManes et.al. 2014](https://www.frontiersin.org/articles/10.3389/fgene.2014.00013/full), [Del Fabbro et.al. 2013](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0085024) or [Delhomme et. al. 2014](https://pdfs.semanticscholar.org/daa6/191f2a91a1bd5008f2bda068ae3f99ec85fd.pdf).
+For a discussion about trimming, see for example the discussion in [MacManes et.al. 2014](https://www.frontiersin.org/articles/10.3389/fgene.2014.00013/full), [Del Fabbro et.al. 2013](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0085024) or [Delhomme et. al. 2014](https://pdfs.semanticscholar.org/daa6/191f2a91a1bd5008f2bda068ae3f99ec85fd.pdf) or at [basepairtech.com](https://www.basepairtech.com/blog/trimming-for-rna-seq-data/#:~:text=Quality%20trimming%20decreases%20the%20overall,useful%20data%20for%20downstream%20analyses.&text=Too%20aggressive%20quality%20trimming%20can,%2C%20estimation%20of%20gene%20expression)(although this discussion is on RNA, similar arguments hold for DNA sequence analysis).
 
 #### 2a. Trimming of the sequencing reads; Trimmomatic (0.39)
 
@@ -767,11 +770,11 @@ Typically the adapter clipping is performed as one of the first steps and removi
 
 A typical command for trimmomatic looks like this:
 
-`java -jar ${path_trimm_software}'trimmomatic-0.39.jar' SE -phred33 ${pathdata}${filename} ${path_trimm_out}${filename::-6}'_trimmed.fastq' ILLUMINACLIP:'TruSeq3-SE.fa':2:30:10 LEADING:14 TRAILING:14 SLIDINGWINDOW:10:14 MINLEN:30`
+`java -jar ${path_trimm_software}'trimmomatic-0.39.jar' SE -phred33 ${pathdata}${filename} ${path_trimm_out}${filename_trimmed} ILLUMINACLIP:'TruSeq3-SE.fa':2:30:10 LEADING:14 TRAILING:14 SLIDINGWINDOW:10:14 MINLEN:30`
 
 Check the quality of the trimmed sequence using the command:
 
-`${path_fastqc_software}fastqc --outdir ${path_fastqc_out} ${path_trimm_out} ${filename::-6}'_trimmed.fastq'`
+`${path_fastqc_software}fastqc --outdir ${path_fastqc_out} ${path_trimm_out}${filename_trimmed}`
 
 The following can be set to be set by typing the following fields after the above command (the fields must be in the given order, the optional fields can be ignored if not needed, see also <http://www.usadellab.org/cms/?page=trimmomatic>):
 
@@ -894,15 +897,23 @@ Typically, the length k is chosen about the size of the smallest adapter sequenc
 For more details, see [this webpage](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/).
 
 A typical command for BBDuk looks like this:
-**`${path_bbduk_software}/bbduk.sh -Xmx1g in=${pathdata}/${filename} out=${path_trimm_out}${filename::-6}'_trimmed.fastq' ref=${path_bbduk_software}/resources/adapters.fa ktrim=r k=23 mink=10 hdist=1 qtrim=r trimq=14 minlen=30`**
+**`${path_bbduk_software}/bbduk.sh -Xmx1g in=${pathdata}/${filename} out=${path_trimm_out}${filename_trimmed} ref=${path_bbduk_software}/resources/adapters.fa ktrim=r k=23 mink=10 hdist=1 qtrim=r trimq=14 minlen=30`**
+
+Next an overview is given with some of the most useful options.
+For a full overview use call `bbduk.sh` in the bash without any options.
 
 1. `-Xmx1g`. This defines the memory usage of the computer, in this case 1Gb (`1g`).
 Setting this too low or too high can result in an error (e.g. 'Could not reserve enough space for object heap').
 Depending on the maximum memory of your computer, setting this to `1g` should typically not result in such an error.
-2. `in` and `out`. Input and Output files. Note that defining an absolute path for the path-out command does not work properly.
+2. `in` and `out`. Input and Output files.
+For paired-end sequencing, use also the commands `in2` and `out2`.
+Use `outm` (and `outm2` when using paired-end reads) to also save all reads that failed to pass the trimming.
+Note that defining an absolute path for the path-out command does not work properly.
 Best is to simply put a filename for the file containing the trimmed reads which is then stored in the same directory as the input file and then move this trimmed reads file to any other location using:
 `mv ${pathdata}${filename::-6}_trimmed.fastq ${path_trimm_out}`
-3. `ref`. This command points to a .fasta file containg the adapters.
+3. `qin`. Set the quality format.
+33 for phred 33 or 64 for phred 64 or auto for autodetect (default).
+4. `ref`. This command points to a .fasta file containg the adapters.
 This should be stored in the location where the other files are stored for the BBDuk software (`${path_bbduk_software}/resources`)
 Next are a few commands relating to the kmers algorithm.
 4. `ktrim`. This can be set to either right trimming (`r`, default), left trimming (`l`) or to None setting (`N`).
@@ -936,7 +947,7 @@ So when reads are expected to be all 75bp long, this will discard the last basep
 
 Finally, to check the quality of the trimmed sequence using the command:
 
-**`fastqc --outdir ${path_fastqc_out} ${path_trimm_out}$/{filename::-6}'_trimmed.fastq'`**
+**`fastqc --outdir ${path_fastqc_out} ${path_trimm_out}/${filename_trimmed}`**
 
 ### 3. Sequence alignment and Reference sequence indexing; BWA (0.7.17) (Linux)
 
@@ -958,7 +969,7 @@ This creates 5 more files in the same folder as the reference genome that BWA us
 
 The alignment command should be given as
 
-**`bwa mem [options] ${path_refgenome} ${path_trimm_out}${filename::-6}'_trimmed.fastq' > ${path_align_out}${filename::-6}'_trimmed.sam'`**
+**`bwa mem [options] ${path_refgenome} ${path_trimm_out}${filename_trimmed} > ${path_align_out}${filename_trimmed::-6}'.sam'`**
 
 where `[options]` can be different statements as given in the
 documentation. Most importantly are:
@@ -1036,17 +1047,17 @@ The meaning of the characters are:
 
 Create a .bam file using the command
 
-**`samtools view –b ${path_align_out}${filename::-6}'_trimmed.sam' > ${path_align_out} ${filename::-6}'_trimmed.bam'`.**
+**`samtools view –b ${path_align_out}${filename_trimmed::-6}'.sam' > ${path_align_out}${filename_trimmed::-6}'.bam'`.**
 
 Check if everything is ok with the .bam file using
 
-**`samtools quickcheck ${path_align_out}${filename::-6}'_trimmed.bam'`**.
+**`samtools quickcheck ${path_align_out}${filename_trimmed::-6}'.bam'`**.
 
 This checks if the file appears to be intact by checking the header is valid, there are sequences in the beginning of the file and that there is a valid End-Of_File command at the end.
 It thus check only the beginning and the end of the file and therefore any errors in the middle of the file are not noted.
 But this makes this command really fast.
 If no output is generated, the file is good.
-If desired, more information can be obtained using `samtools flagstat ${path_align_out}${filename::-6}'_trimmed.bam'` or `samtools stats ${path_align_out}${filename::-6}'_trimmed.bam'`.
+If desired, more information can be obtained using `samtools flagstat ${path_align_out}${filename_trimmed::-6}'.bam'` or `samtools stats ${path_align_out}${filename_trimmed::-6}'.bam'`.
 Especially the latter can be a bit overwhelming with data, but this gives a thorough description of the quality of the bam file.
 For more information see [this documentation](http://www.htslib.org/doc/1.6/samtools.html).
 
@@ -1054,14 +1065,14 @@ For many downstream tools, the .bam file needs to be sorted.
 This can be done using SAMtools, but this might give problems.
 A faster and more reliable method is using the software sambamba using the command
 
-**`sambamba-0.7.1-linux-static sort –m 500MB ${path_align_out}${filename::-6}'_trimmed.bam'`**
+**`sambamba-0.7.1-linux-static sort –m 500MB ${path_align_out}${filename_trimmed::-6}'.bam'`**
 
 (where `–m` allows for specifying the memory usage which is 500MB in this example).
 This creates a file with the extension .sorted.bam, which is the sorted version of the original bam file.
 Also an index is created with the extension .bam.bai.
 If this latter file is not created, it can be made using the command
 
-`sambamba-0.7.1-linux-static index  ${path_align_out}${filename::-6}'_trimmed.bam'`.
+`sambamba-0.7.1-linux-static index  ${path_align_out}${filename_trimmed::-6}'.bam'`.
 
 Now the reads are aligned to the reference genome and sorted and indexed.
 Further analysis is done in windows, meaning that the sorted .bam files needs to be moved to the shared folder.
@@ -1077,9 +1088,26 @@ Before the data can be used as an input for the Matlab code provided by the Korn
 **`mv "${path_sharedfolder}/"* ${path_align_out}`**
 
 The Matlab code is provided by Benoit (see the [website](https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script)) and is based on the [paper by Michel et. al.](<https://elifesciences.org/articles/23570>).
-Running the code requires the user to select a .bam file.
+Running the code requires the user to select a .bam  or .sorted.bam file (or .ordered.bam which is similar to the .sorted.bam).
+If the .bam file is chosen or there is no .bam.bai (bam index-)file present in the same folder, the script will automatically generate the .sorted.bam and a .bam.bai file.
 In the same folder as the bam file the Matlab variables ‘yeastGFF.mat’ and ‘names.mat’ should be present (which can be found on the [website cited above](https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script)).
-Line numbers correspond to the original, unaltered code.
+The script will generate a number of files (some of them are explained below):
+
+1. .sorted.bam (if not present already)
+
+2. .bam.bai (if not present already)
+
+3. .sorted.bam.linearindex
+
+4. .sorted.bam.mat (used as a backup of the matlab script results)
+
+5. .sorted.bam_pergene.txt (contains information about transposons and reads for individual genes)
+
+6. .sorted.bam.bed (contains information about the location and the number of reads per transposon insertion)
+
+7. .sorted.bam.wig (contains information about the location and the number of reads per transposon insertion)
+
+The line numbers below correspond to the original, unaltered code.
 
 [line1-13] After loading the .BAM file, the ‘baminfo’ command is used
 to collect the properties for the sequencing data. These include (among
