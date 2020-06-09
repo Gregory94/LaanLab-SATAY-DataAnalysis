@@ -311,10 +311,10 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
         ax1.set_yscale('log')
         ax1.set_axisbelow(True)
         ax1.grid(True)
-        ax1.set_ylabel('Read count (log_10) Dataset 1', fontsize=12)
+        ax1.set_ylabel('Trimmmed1', fontsize=font_size)#('Read count (log_10) Dataset 1', fontsize=font_size)
         ax1.set_xticklabels([])
-        ax1.set_ylim(0.5,max_ylim)
         ax1.set_xlim(0,chr_length_dict.get(chrom))
+        ax1.set_ylim(0.5,max_ylim)
 
 
         ax2 = plt.subplot(grid[1,0])
@@ -332,10 +332,10 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
         ax2.set_yscale('log')
         ax2.set_axisbelow(True)
         ax2.grid(True)
-        ax2.set_ylabel('Read count (log_10) Dataset 2', fontsize=font_size)
+        ax2.set_ylabel('Trimmed2', fontsize=font_size)#('Read count (log_10) Dataset 2', fontsize=font_size)
         ax2.set_xlabel('Basepair position on chromosome '+chrom, fontsize=font_size)
-        ax2.set_ylim(0.5,max_ylim)
         ax2.set_xlim(0,chr_length_dict.get(chrom))
+        ax2.set_ylim(0.5,max_ylim)
         ax2.invert_yaxis()
         ax2.legend(loc='lower left', fontsize=font_size)
         
@@ -350,16 +350,16 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
 
 #%%
 if __name__ == '__main__':
-#    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing1\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.bam.wig",
-#                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing2\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.bam.wig"],
-#                            chrom_user_set=None,
-#                            bar_width_user_set=None,
-#                            savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing2\Cerevisiae_Michel2017_WT2_Compare_trimmomatic-bbduk",
-#                            savefigure_name=r'Cerevisiae_Michel2017_WT2_CompareReads_trimm-bbduk')
+#    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned1\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed",
+#                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned2\Cerevisiae_WT2_Michel2017_trimmed2.bam.bed"],
+#                        chrom_user_set=None,
+#                        bar_width_user_set=None,
+#                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Compare1-2",
+#                        savefigure_name=r'Cerevisiae_WT2_Michel2017_TnCompare_trimmed1-trimmed2')
 
-    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing1\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.bam.bed",
-                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing2\Cerevisiae_WT2_Seqdata_Michel2017_Aligned\Cerevisiae_WT2_Michel2017_trimmed.fastq.bam.bed"],
-                        chrom_user_set=None,
-                        bar_width_user_set=None,
-                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_Processing2\Cerevisiae_Michel2017_WT2_Compare_trimmomatic-bbduk",
-                        savefigure_name=r'Cerevisiae_Michel2017_WT2_CompareTn_trimm-bbduk')
+    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned1\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig",
+                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned2\Cerevisiae_WT2_Michel2017_trimmed2.bam.wig"],
+                            chrom_user_set=None,
+                            bar_width_user_set=None,
+                            savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Compare1-2",
+                            savefigure_name=r'Cerevisiae_WT2_Michel2017_ReadCompare_trimmed1-trimmed2')

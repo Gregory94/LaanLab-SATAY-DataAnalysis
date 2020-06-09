@@ -10,7 +10,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sb
-sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_modules')
+
+file_dirname = os.path.dirname(os.path.abspath('__file__'))
+sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
 from chromosome_and_gene_positions import gene_position
 from gene_names import gene_aliases
 from chromosome_names_in_files import chromosome_name_bedfile
@@ -26,11 +28,12 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
     The output is a bar plot where the number of reads divided by the number of transposons.
     '''
 #%% USED FILES
-    gff_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3"
-    gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
+    gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
+
 #%%SAVE FILES
     if savefigure == True:
-        save_figure_path = r'X:\tnw\BN\LL\Shared\Gregory\Python\Python Figures\gene_reads_figures'
+        save_figure_path = file_dirname
 #%% GET START AND END POSITION OF GENE
     if gene_name.upper() == 'HOLOCUS' or gene_name == 'HO-LOCUS':
         gene_pos = ['IV',46271,48031]
