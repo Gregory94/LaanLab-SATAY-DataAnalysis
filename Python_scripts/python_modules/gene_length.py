@@ -8,8 +8,9 @@ def gene_length_bp(gene_information_file = None):
     '''
 
     if gene_information_file == None:
-        gene_information_file = r'Yeast_Protein_Names.txt'
-        #gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
+        import os
+        file_dirname = os.path.dirname(os.path.abspath('__file__'))
+        gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
 
     gene_length_dict = {}
     with open(gene_information_file) as f:
@@ -41,8 +42,9 @@ def gene_length_aa(gene_information_file = None):
     '''
 
     if gene_information_file == None:
-        gene_information_file = r'Yeast_Protein_Names.txt'
-        #gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
+        import os
+        file_dirname = os.path.dirname(os.path.abspath('__file__'))
+        gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
 
     gene_length_dict = {}
     with open(gene_information_file) as f:
@@ -66,4 +68,4 @@ def gene_length_aa(gene_information_file = None):
     return(gene_length_dict)
 
 if __name__ == '__main__':
-    gene_length()
+    gene_length_aa()

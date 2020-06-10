@@ -3,6 +3,8 @@ Except for 'chromosomename_roman_to_arabic', the functions require an input with
 If no input is given, the program automatically searches for the file at in the current directory.
 The function 'chromosomename_roman_to_arabic' does not take any input. It returns two conversion lists for numbers 1 to 16 to get from arabic to roman numerals or vice versa, respectively.
 '''
+
+#%%
 def chromosome_position(gff_file = None):
     '''Get the start and end position of each chromosome and determine their respective length.
     Input is a .gff file downloaded from https://www.ensembl.org/Saccharomyces_cerevisiae/Info/Index
@@ -12,9 +14,13 @@ def chromosome_position(gff_file = None):
     'b' = chromosome start position
     'c' = chromosome end position
     '''
+
     if gff_file == None:
-        gff_file = r'Saccharomyces_cerevisiae.R64-1-1.99.gff3'
-        #gff_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3'
+        import os
+        file_dirname = os.path.dirname(os.path.abspath('__file__'))
+        gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+
+
 
     #CONVERT ROMAN NUMERALS TO ARABIC NUMERALS
     roman_to_arabic_dict = {}
@@ -58,7 +64,7 @@ def chromosome_position(gff_file = None):
 
 
 
-
+#%%
 def chromosomename_roman_to_arabic():
     '''This creates two dictionaries for translating the chromosome names from roman to arabic numerals or vice versa.
     The call is like this: arabic_to_roman_dict, roman_to_arabic_dict = chromosomename_roman_to_arabic()
@@ -83,7 +89,7 @@ def chromosomename_roman_to_arabic():
 
 
 
-
+#%%
 def gene_position(gff_file = None):
     '''Get the start and end position of each gene and determine their respective length.
     Input is a .gff file downloaded from https://www.ensembl.org/Saccharomyces_cerevisiae/Info/Index
@@ -93,8 +99,9 @@ def gene_position(gff_file = None):
     '''
 
     if gff_file == None:
-        gff_file = r'Saccharomyces_cerevisiae.R64-1-1.99.gff3'
-        #gff_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3'
+        import os
+        file_dirname = os.path.dirname(os.path.abspath('__file__'))
+        gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
 
     gene_pos_dict = {}
     with open(gff_file) as f:
@@ -116,5 +123,6 @@ def gene_position(gff_file = None):
     return(gene_pos_dict)
 
 
+#%%
 if __name__ == '__main__':
     gene_position()
