@@ -5,7 +5,7 @@ Created on Thu Apr 23 09:25:54 2020
 @author: gregoryvanbeek
 """
 
-import sys
+import os,sys
 import numpy as np
 #import matplotlib.pyplot as plt
 import pandas as pd
@@ -15,7 +15,7 @@ from chromosome_and_gene_positions import chromosome_position, chromosomename_ro
 from chromosome_names_in_files import chromosome_name_bedfile
 
 #%%
-def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=False):
+def chromosome_insertion_periodicity(chromosome=None,bed_file=None,gff_file=None,printing=False):
     '''Determines statistical values for the transposon insertion per chromosome.
     When the printing variable is set to True, it prints these values and creates a plot for showing the distribution of the distance between insertions in terms of basepairs.
     The functions returns the distance between insertions in terms of basepairs for the chromosome given as a roman numeral.
@@ -23,8 +23,12 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=Fals
     '''
 
 #%% USED FILES
-    gff_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3"
-
+    if gff_file is None:
+        file_dirname = os.path.dirname(os.path.abspath('__file__'))
+        if os.path.isfile(os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')):
+            gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+        else:
+            gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
 #%% GET CHROMOSOME START AND END POSTIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
 
@@ -179,5 +183,4 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,printing=Fals
 
 #%%
 if __name__ == '__main__':
-#    chromosome_insertion_periodicity(bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed",plot=True)
-    chromosome_insertion_periodicity(chromosome='xvi',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed",printing=True)
+    chromosome_insertion_periodicity(chromosome='xvi',bed_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed",printing=True)

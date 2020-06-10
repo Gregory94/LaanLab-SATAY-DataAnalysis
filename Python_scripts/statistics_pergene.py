@@ -246,4 +246,4 @@ def stats_pergene(filepath, filename, normalize=True):
 
 #%%
 if __name__ == '__main__':
-    stats_pergene(filepath=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit",filename="E-MTAB-4885.WT1.bam_pergene.txt", normalize=True)
+    stats_pergene(filepath=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing",filename="Cerevisiae_WT2_Michel2017_trimmed1.bam_pergene.txt", normalize=True)

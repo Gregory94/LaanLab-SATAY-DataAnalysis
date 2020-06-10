@@ -15,7 +15,9 @@ def chromosome_name_bedfile(bed_file=None):
     '''
     
     if bed_file == None:
-        bed_file = r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed"
+        import os
+        file_dirname = os.path.dirname(os.path.abspath('__file__'))
+        bed_file = os.path.join(file_dirname,'..','..','satay_analysis_testdata','Output_Processing','Cerevisiae_WT2_Michel2017_trimmed1.bam.bed')
 
 
 
@@ -78,7 +80,10 @@ def chromosome_name_bedfile(bed_file=None):
 #%%
 def chromosome_name_wigfile(wig_file=None):
     if wig_file == None:
-        wig_file = r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig"
+        import os
+        file_dirname = os.path.dirname(os.path.abspath('__file__'))
+        wig_file = os.path.join(file_dirname,'..','..','satay_analysis_testdata','Output_Processing','Cerevisiae_WT2_Michel2017_trimmed1.bam.wig')
+
 
 
 
