@@ -9,7 +9,9 @@ Both functions require the modules chromosome_and_gene_positions.py, essential_g
 import os, sys
 import numpy as np
 import matplotlib.pyplot as plt
-sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_modules')
+
+file_dirname = os.path.dirname(os.path.abspath('__file__'))
+sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from essential_genes_names import list_known_essentials
 from gene_names import gene_aliases
@@ -39,10 +41,10 @@ def transposon_profile(bed_files=None, chrom_user_set=None, bar_width_user_set=N
     '''
     #bed_file = r'X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed'
 #%% USED FILES
-    gff_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3"
-    essential_genes_files = [r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt',
-                            r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt']
-    gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
+    gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_2.txt')]
+    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 #%% GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
     
