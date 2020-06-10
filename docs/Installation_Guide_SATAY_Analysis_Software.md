@@ -74,16 +74,24 @@ If a folder is already shared and a new folder is wanted to be shared as well, p
 20. To check, enter `'id [username]'`. This should give a list that needs to include 'vboxsf'
 21. Restart the VM.
 
-## 1. Fastqc (Windows)
+In order to run java based programs in Linux, Java needs to be installed.
+There are several ways of installing Java, but one of the simplest ways is using the command line with the following commands:
+
+1. Enter `sudo -s` (enter password if requisted)
+2. Enter `apt-get install openjdf-11-jre`. (If this version of java is not found, check which versions are available by entering `apt-get install openjdf` followed by a double tab. This should give a list of all available installations. It also gives you the opportunity to install the jdk (Java Developer Kit) instead of the jre (Java Runtime Environment), but if you don't plan to develop software in Java, the jre, what is used here, is good enough).
+3. Restart the terminal. Check the installation by entering `java -version`
+
+## 1. Fastqc (Windows or Linux)
 
 [[https://www.bioinformatics.babraham.ac.uk/projects/fastqc/](url)]
 
 Fastqc is used for quality checking.
-It is java based and therefore does not need to be installed.
+To install Fastqc in Linux, open the bash and go to the fastqc folder in the bash.
+Type in the command `sudo apt install fastqc` (this might require a password).
 To run interactively, click the 'run-fastqc' batch file.
 To run non-interactively, enter in 'fastqc' in the command line.
 
-## 2. Trimmomatic-0.39 (Windows)
+## 2a. Trimmomatic-0.39 (Windows or Linux)
 
 [[http://www.usadellab.org/cms/?page=trimmomatic](url)]
 
@@ -92,13 +100,24 @@ It is java based and therefore does not need to be installed.
 To run, enter 'trimmomatic-0.39' in the command line.
 The adapters folder contains some adapters that can be used during trimming if desired.
 
-## 2a. 123Fastq-v1.1 (Windows) (optional)
+### 123Fastq-v1.1 (Windows) (optional)
 
 [[https://sourceforge.net/projects/project-123ngs/](url)]
 
 123Fastq is Fastqc and Trimmomatic combined in one interactive program.
 It is java based and therefore does not need to be installed.
 Click the 123fastq executable jar file to run the program.
+
+## 2b. BBDuk-38.84 (Windows or Linux)
+
+[[https://jgi.doe.gov/data-and-tools/bbtools/](url)]
+
+BBDuk is an alternative for Trimmomatic for trimming of fastq files.
+It java based and therefore does not need to be installed.
+It is part of the bbtools packages (named the bbmap when downloaded).
+Once downloaded, unpack the .tar.gz package.
+Run the bbduk.sh executable in the bbmap directory.
+The adapter.fa file is included and located in the /resources directory.
 
 ## 3. BWA (Linux)
 
