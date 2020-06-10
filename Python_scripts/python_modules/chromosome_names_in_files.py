@@ -127,7 +127,7 @@ def chromosome_name_wigfile(wig_file=None):
         if line_split[0] == chrom_line:
             chromosome_name = line_split[1].replace('chrom=chr','').strip('\n')
             chrom_names_dict[chromosome_romannames_list[chr_counter]] = chromosome_name
-            print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chromosome_name)
+#            print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chromosome_name)
             
             chrom_start_line_dict[chromosome_romannames_list[chr_counter]] = line_counter+2 #GET START INDEX IN THE BED FILE OF THE CURENT CHROMOSOME
             if chr_counter != 0:

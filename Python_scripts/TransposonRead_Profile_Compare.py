@@ -366,12 +366,12 @@ if __name__ == '__main__':
 #                            savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Compare1-2",
 #                            savefigure_name=r'Cerevisiae_WT2_Michel2017_ReadCompare_trimmed1-trimmed2')
 
-    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned1\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed",
-                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned2\Cerevisiae_WT2_Michel2017_trimmed2.bam.bed"],
+    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed",
+                                  r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed2.bam.bed"],
                             chrom_user_set='i',
                             bar_width_user_set=None)
 
-#    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned1\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig",
-#                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned2\Cerevisiae_WT2_Michel2017_trimmed2.bam.wig"],
+#    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig",
+#                                  r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed2.bam.wig"],
 #                            chrom_user_set='i',
 #                            bar_width_user_set=None)
