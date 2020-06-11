@@ -545,9 +545,7 @@ An overview of the different steps including some software that can handle this 
 The steps discussed in this section are not obligatory, but might help in organizing the data.
 The **bold** printed commands in this and the following sections are put so that they can be copied directly to the bash.
 (Note to modify the respective paths on your own machine in this Initialization step, though).
-If the paths below are correctly defined, the boldface commands defined in the different processing steps can be literally copied and pasted in the bash.
-A suggestion is to put all the commands with the correct paths in a text file and store this text file together with the raw sequencing file (an example is given in the 'Linux_Processing_Commands.txt' file located at the [SATAY github repository](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/docs/Linux_Processing_Commands.txt)).
-Then all the commands can be easily copy-pasted in the bash and all the processing steps can be traced back later.
+If the paths below are correctly defined, the boldface commands defined in the different processing steps below can be literally copied and pasted in the bash.
 
 Since this protocol works mostly in the Linux Virtual Machine, the commands below are defined for Linux.
 First, a possible method for organizing the data is shown, but feel free to change this as you like.
@@ -570,7 +568,7 @@ First, a possible method for organizing the data is shown, but feel free to chan
 
 **`pathwin_sharedfolder='/C/Users/gregoryvanbeek/Documents/ VirtualBox VMs/ VMSharedFolder_Ubuntu64_1'`**
 
-**`pathwin_data='C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\ Cerevisiae_WT2_Seqdata_Michel2017_ProcessingTest'`**
+**`pathwin_data='C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_ProcessingTest'`**
 
 **`cp -r ${pathwin_data} "${pathwin_sharedfolder}"`**
 
@@ -634,11 +632,11 @@ Some useful commands:
 6. When using or defining strings of texts, putting the string between accolades ('') tells the bash to take the text within the accolades literally.
 Remember this when using the variables, as `'${var}'` is literally taken as the string ${var} whereas when using `${var}` (without accolades) the bash will try implement the variable 'var' depending on what you have defined before for this variable.
 
-7. Copying texts in the bash does not work using `crtl-v`, instead use `shift-insert`
+7. Copying texts in the bash does not work using `crtl-v`, instead use `shift-Insert`
 
-These commands are summarized in a text file ('Linux_Processing_Commands.txt' located at the [SATAY github repository](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/docs/Linux_Processing_Commands.txt)).
-The variables containing the paths and names in this file can be changed according to your data.
-The commands can then be literally copy-pasted in the bash and it should work properly.
+A suggestion is to put all the commands with the correct paths in a text file and store this text file together with the raw sequencing file ('Linux_Processing_Commands.txt' located at the [SATAY github repository](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/docs/Linux_Processing_Commands.txt)).
+The variables containing the paths and names in this file can be changed to point at the right files and directories in your computer.
+Then all the commands can be easily copy-pasted in the bash and all the processing steps can be traced back later using this text file.
 
 ### 1. Quality checking of the sequencing reads; FASTQC (0.11.9)
 
@@ -654,9 +652,9 @@ If using the command line for checking a single file use the command:
 
 **`fastqc --outdir ${path_fastqc_out} ${pathdata}/${filename}`**
 
-(Note that the output directory should already exist, as the program does not create paths).
-In the output directory, a .html file and a folder is created, both with the same name as the input file.
-The .html file can be used to quickly see the graphs.
+(Note that the output directory should already exist, as the program does not create directories).
+In the output directory, a .html file and a (zipped) folder is created, both with the same name as the input file.
+The .html file can be used to quickly see the graphs using a browser.
 Also, a zipped folder is created where the raw data of the quality check is stored.
 For explanation about the different graphs, see the fastqc\_manual pdf or [<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3%20Analysis%20Modules/>] (or the paper ‘Preprocessing and Quality Control for Whole-Genome’ from Wright et.al. or the ‘Assessing Read Quality’ workshop from the Datacarpentry Genomics workshop).
 
@@ -740,7 +738,7 @@ This allows for more options, but can therefore also be more confusing to use in
 Both software packages are explained below, but only one needs to be used.
 Currently, it is advised to use BBDuk (see section 2b).
 
-For a discussion about trimming, see for example the discussion in [MacManes et.al. 2014](https://www.frontiersin.org/articles/10.3389/fgene.2014.00013/full), [Del Fabbro et.al. 2013](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0085024) or [Delhomme et. al. 2014](https://pdfs.semanticscholar.org/daa6/191f2a91a1bd5008f2bda068ae3f99ec85fd.pdf) or at [basepairtech.com](https://www.basepairtech.com/blog/trimming-for-rna-seq-data/#:~:text=Quality%20trimming%20decreases%20the%20overall,useful%20data%20for%20downstream%20analyses.&text=Too%20aggressive%20quality%20trimming%20can,%2C%20estimation%20of%20gene%20expression)(although this discussion is on RNA, similar arguments hold for DNA sequence analysis).
+For a discussion about trimming, see for example the discussion in [MacManes et.al. 2014](https://www.frontiersin.org/articles/10.3389/fgene.2014.00013/full), [Del Fabbro et.al. 2013](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0085024) or [Delhomme et. al. 2014](https://pdfs.semanticscholar.org/daa6/191f2a91a1bd5008f2bda068ae3f99ec85fd.pdf) or at [basepairtech.com](https://www.basepairtech.com/blog/trimming-for-rna-seq-data/#:~:text=Quality%20trimming%20decreases%20the%20overall,useful%20data%20for%20downstream%20analyses.&text=Too%20aggressive%20quality%20trimming%20can,%2C%20estimation%20of%20gene%20expression) (although this discussion is on RNA, similar arguments hold for DNA sequence analysis).
 
 #### 2a. Trimming of the sequencing reads; Trimmomatic (0.39)
 
@@ -897,7 +895,7 @@ Typically, the length k is chosen about the size of the smallest adapter sequenc
 For more details, see [this webpage](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/).
 
 A typical command for BBDuk looks like this:
-**`${path_bbduk_software}/bbduk.sh -Xmx1g in=${pathdata}/${filename} out=${path_trimm_out}${filename_trimmed} ref=${path_bbduk_software}/resources/adapters.fa ktrim=r k=23 mink=10 hdist=1 qtrim=r trimq=14 minlen=30`**
+**`${path_bbduk_software}/bbduk.sh -Xmx1g in=${pathdata}/${filename} out=${path_trimm_out}${filename_trimmed} ref=${path_bbduk_software} /resources/adapters.fa ktrim=r k=23 mink=10 hdist=1 qtrim=r trimq=14 minlen=30`**
 
 Next an overview is given with some of the most useful options.
 For a full overview use call `bbduk.sh` in the bash without any options.
@@ -907,43 +905,53 @@ Setting this too low or too high can result in an error (e.g. 'Could not reserve
 Depending on the maximum memory of your computer, setting this to `1g` should typically not result in such an error.
 2. `in` and `out`. Input and Output files.
 For paired-end sequencing, use also the commands `in2` and `out2`.
+The input accepts zipped files, but make sure the files have the right extension (e.g. file.fastq.gz).
 Use `outm` (and `outm2` when using paired-end reads) to also save all reads that failed to pass the trimming.
 Note that defining an absolute path for the path-out command does not work properly.
 Best is to simply put a filename for the file containing the trimmed reads which is then stored in the same directory as the input file and then move this trimmed reads file to any other location using:
 `mv ${pathdata}${filename::-6}_trimmed.fastq ${path_trimm_out}`
 3. `qin`. Set the quality format.
-33 for phred 33 or 64 for phred 64 or auto for autodetect (default).
+33 for phred 33 or 64 for phred 64 or auto for autodetect (default is auto).
 4. `ref`. This command points to a .fasta file containg the adapters.
 This should be stored in the location where the other files are stored for the BBDuk software (`${path_bbduk_software}/resources`)
 Next are a few commands relating to the kmers algorithm.
-4. `ktrim`. This can be set to either right trimming (`r`, default), left trimming (`l`) or to None setting (`N`).
-Basically, this means what needs to be trimmed when an adapter is found, where right trimming is towards the 5'-end and left trimming is towards the 3'-end and None setting is not trimming, but simply setting the nucleotides that match the adapter sequence to N, which means it will be ignored during alignment.
-For example, when setting this option to `ktrim=r`, than when a sequence is found that matches an adapter sequence, all the basepairs on the right of this matched sequence will be deleted including the matched sequence itself.
-5. `k`. This defines the number of kmers to be used. This should be not be longer than the smallest adapter sequences and should also not be too short as there might too much trimmed. Typically values around 20 works fine.
-6. `mink`. When the lenght of a read is not a perfect multiple of the value of `k`, then at the end of the read there is a sequence left that is smaller than length k. Setting `mink` allows the software to use smaller kmers as well near the end of the reads.
+5. `ktrim`. This can be set to either don't trim (`f`, default), right trimming (`r`), left trimming (`l`).
+Basically, this means what needs to be trimmed when an adapter is found, where right trimming is towards the 5'-end and left trimming is towards the 3'-end.
+For example, when setting this option to `ktrim=r`, then when a sequence is found that matches an adapter sequence, all the basepairs on the right of this matched sequence will be deleted including the matched sequence itself.
+When deleting the whole reads, set `ktrim=rl`.
+6. `kmask`. Instead of trimming a read when a sequence matches an adapter sequence, this sets the matching sequence to another symbol (e.g. `kmask=N`).
+7. `k`. This defines the number of kmers to be used. This should be not be longer than the smallest adapter sequences and should also not be too short as there might too much trimmed. Typically values around 20 works fine (default=27).
+8. `mink`. When the lenght of a read is not a perfect multiple of the value of `k`, then at the end of the read there is a sequence left that is smaller than length k. Setting `mink` allows the software to use smaller kmers as well near the end of the reads.
 The sequence at the end of a read are matched with adapter sequences using kmers with length between mink and k.
-7. `hdist`. This is the Hamming distance, which is defined as the minimum number of substitutions needed to convert one string in another string.
+9. `minkmerhits`. Determines how many kmers in the read must match the adapter sequence.
+Default is 1, but this can be increased when for example using short kmers to decrease the chance that wrong sequences are trimmed that happen to have a single matching kmer with an adapter.
+10. `minkmerfraction`. A kmer in this read is considered a match with an adapter when at least a fraction of the read matches the adapter kmer.
+11. `mincovfraction`. At least a fraction of the read needs to match adapter kmer sequences in order to be regarded a match.
+Use either `minkmerhits`, `minkmerfraction` or `mincovfraction`, but setting multiple results in that only one of them will be used during the processing.
+12. `hdist`. This is the Hamming distance, which is defined as the minimum number of substitutions needed to convert one string in another string.
 Basically this indicates how many errors are allowed between a read and and an adapter sequence to still count as an exact match.
 Typically does not need to be set any higher than 1, unless the reads are of very low quality.
 Note that high values of hdist also requires much more memory in the computer.
-8. `tpe` and `tbo`: This is only relevant for paired-end reads.
+13. `restrictleft` and `restrictright`. Only look for kmers left or right number bases.
+14. `tpe` and `tbo`: This is only relevant for paired-end reads.
 `tpe` cuts both the forward and the reverse read to the same length and `tbo` trims the reads if they match any adapter sequence while considering the overlap between two paired reads.
 
 So far all the options were regarding the adapter trimming (more options are available as well, check out the [user guide](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/)).
 These options go before any other options, for example the following:
 
-9. `qtrim=rl`. This an option for quality trimming which indicates whether the reads should be trimmed on the right (`r`), the left (`l`)or both.
-10. `trimq`. This sets the minimum quality that is still allowed.
-In this case, all quality score below Q=14 ($P_{error} = 0.04$) are trimmed.
-11. `minlen`. This sets the minimum length that the reads need to have after all previous trimming steps.
+15. `qtrim`. This an option for quality trimming which indicates whether the reads should be trimmed on the right (`r`), the left (`l`), both (`fl`), neither (`f`) or that a slidingwindow needs to be used (`w`).
+The threshold for the trimming quality is set by `trimq`.
+16. `trimq`. This sets the minimum quality that is still allowed using phred scores (e.g. Q=14 corresponds with $P_{error} = 0.04$).
+17. `minlength`. This sets the minimum length that the reads need to have after all previous trimming steps.
 Reads short than the value given here are discarded completely.
-12. `mlf`. Alternatively to the `minlen` option, the Minimum Length Fraction can be used which determines the fraction of the length of the read before and after trimming and if this drops below a certain value (e.g 50%, so `mlf=50`), then this read is trimmed.
-13. `ftl` and `ftr`. This cuts a specified amount of basepairs at the beginning (`ftl`) or the last specified amount of basepairs (`ftr`).
-Note that this is zero based, for example `ftl=10` trims basepairs 0-9.
-14. `maq`. Discard reads that have an average quality below the specified Q-value.
+18. `mlf`. Alternatively to the `minlen` option, the Minimum Length Fraction can be used which determines the fraction of the length of the read before and after trimming and if this drops below a certain value (e.g 50%, so `mlf=50`), then this read is trimmed.
+19. `maq`. Discard reads that have an average quality below the specified Q-value.
 This can be useful after quality trimming to discard reads where the really poor quality basepairs are trimmed, but the rest of the basepairs are of poor quality as well.
-15. `ftm`. This force Trim Modulo option can sometimes be useful when an extra, unwanted and typically very poor quality, basepair is added at the end of a read.
+20. `ftl` and `ftr` (`forcetrimleft` and `forcetrimright`). This cuts a specified amount of basepairs at the beginning (`ftl`) or the last specified amount of basepairs (`ftr`).
+Note that this is zero based, for example `ftl=10` trims basepairs 0-9.
+21. `ftm`. This force Trim Modulo option can sometimes be useful when an extra, unwanted and typically very poor quality, basepair is added at the end of a read.
 So when reads are expected to be all 75bp long, this will discard the last basepair in 76bp reads.
+When such extra basepairs are present, it will be noted in FastQC.
 
 Finally, to check the quality of the trimmed sequence using the command:
 
@@ -969,7 +977,7 @@ This creates 5 more files in the same folder as the reference genome that BWA us
 
 The alignment command should be given as
 
-**`bwa mem [options] ${path_refgenome} ${path_trimm_out}${filename_trimmed} > ${path_align_out}${filename_trimmed::-6}'.sam'`**
+**`bwa mem [options] ${path_refgenome} ${path_trimm_out}${filename_trimmed} > ${path_align_out} ${filename_trimmed::-6}'.sam'`**
 
 where `[options]` can be different statements as given in the
 documentation. Most importantly are:
@@ -1047,7 +1055,7 @@ The meaning of the characters are:
 
 Create a .bam file using the command
 
-**`samtools view –b ${path_align_out}${filename_trimmed::-6}'.sam' > ${path_align_out}${filename_trimmed::-6}'.bam'`.**
+**`samtools view –b ${path_align_out}${filename_trimmed::-6}'.sam' > ${path_align_out} ${filename_trimmed::-6}'.bam'`.**
 
 Check if everything is ok with the .bam file using
 
