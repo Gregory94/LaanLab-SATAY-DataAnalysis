@@ -1,0 +1,66 @@
+#!/bin/bash
+
+############################UPDATE THESE NAMES AND PATHS############################
+foldername='Cerevisiae_WT2_Seqdata_Michel2017_ProcessingTest1'
+
+filename='Cerevisiae_WT2_Michel2017.fastq.gz'
+####################################################################################
+
+
+
+
+
+path_sf=/media/sf_VMSharedFolder_Ubuntu64_1/
+
+path_refgenome=/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa
+
+pathdata=~/Documents/data_processing/${foldername}
+
+mkdir ${pathdata}
+
+mv ${path_sf}${filename} ${pathdata}
+
+path_fastqc_out=${pathdata}/Cerevisiae_WT2_Michel2017_QC/
+
+mkdir ${path_fastqc_out}
+
+path_trimm_out=${pathdata}/Cerevisiae_WT2_Michel2017_Trimmed/
+
+mkdir ${path_trimm_out}
+
+path_align_out=${pathdata}/Cerevisiae_WT2_Michel2017_Aligned/
+
+mkdir ${path_align_out}
+
+path_bbduk_software=~/Documents/Software/BBMap/bbmap/
+
+path_trimm_software=~/Documents/Software/Trimmomatic-0.39/
+
+
+
+
+
+fastqc --outdir ${path_fastqc_out} ${pathdata}/${filename}
+
+${path_bbduk_software}/bbduk.sh -Xmx1g in=${pathdata}/${filename} out=${path_trimm_out}${filename::-6}'_trimmed.fastq' ref=${path_bbduk_software}/resources/adapters.fa ktrim=r k=25 mink=20 hdist=1 qtrim=r trimq=14 minlen=30
+
+fastqc --outdir ${path_fastqc_out} ${path_trimm_out}/${filename::-6}'_trimmed.fastq'
+
+bwa mem -B 2 -O 3 ${path_refgenome} ${path_trimm_out}${filename::-6}'_trimmed.fastq' > ${path_align_out}${filename::-6}'_trimmed.sam'
+
+samtools view -b ${path_align_out}${filename::-6}'_trimmed.sam' > ${path_align_out}${filename::-6}'_trimmed.bam'
+
+samtools quickcheck ${path_align_out}${filename::-6}'_trimmed.bam'
+
+sambamba-0.7.1-linux-static sort -m 500MB ${path_align_out}${filename::-6}'_trimmed.bam'
+
+
+
+
+
+mv ${pathdata} ${path_sf}
+
+
+
+
+
