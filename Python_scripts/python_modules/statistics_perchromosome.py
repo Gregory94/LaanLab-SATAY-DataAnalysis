@@ -10,7 +10,9 @@ import numpy as np
 #import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sb
-sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_modules')
+
+file_dirname = os.path.dirname(os.path.abspath('__file__'))
+sys.path.insert(1,os.path.join(file_dirname))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic
 from chromosome_names_in_files import chromosome_name_bedfile
 
