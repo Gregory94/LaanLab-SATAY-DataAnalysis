@@ -26,6 +26,7 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,gff_file=None
 
 #%% USED FILES
     if gff_file is None:
+        import os
         file_dirname = os.path.dirname(os.path.abspath('__file__'))
         if os.path.isfile(os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')):
             gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')

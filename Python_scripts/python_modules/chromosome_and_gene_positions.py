@@ -125,4 +125,4 @@ def gene_position(gff_file = None):
 
 #%%
 if __name__ == '__main__':
-    gene_position()
+    chromosome_position()
