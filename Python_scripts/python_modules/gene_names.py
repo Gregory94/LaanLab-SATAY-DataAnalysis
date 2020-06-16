@@ -8,8 +8,7 @@ def list_gene_names(gene_information_file = None):
     '''
 
     if gene_information_file == None:
-        gene_information_file = r'Yeast_Protein_Names.txt'
-        #gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'        import os
+        import os
         file_dirname = os.path.dirname(os.path.abspath('__file__'))
         gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
 

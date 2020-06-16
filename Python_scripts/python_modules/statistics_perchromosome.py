@@ -12,8 +12,7 @@ import pandas as pd
 import seaborn as sb
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
-
+sys.path.insert(1,os.path.join(file_dirname))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic
 from chromosome_names_in_files import chromosome_name_bedfile
 
@@ -27,6 +26,7 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,gff_file=None
 
 #%% USED FILES
     if gff_file is None:
+        import os
         file_dirname = os.path.dirname(os.path.abspath('__file__'))
         if os.path.isfile(os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')):
             gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
