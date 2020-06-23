@@ -9,10 +9,13 @@
 ### Adapter sequences for trimming should be stored in '~/Documents/Software/BBMap/bbmap/resources/adapters.fa' respecting fasta convention.
 ### The software is called in this order: 1.Quality checking (fastqc) 2.trimming (bbduk) 3.Quality checking trimmed data (fastqc) 4.alignment (bwa) 5.converting sam to bam (samtools) 6.indexing bam file (sambamba).
 ### Finally, the data file and all the created files are moved to the shared folder.
+### There are two trimming software packages, 'bbduk' and 'trimmomatic'.
+### You can use either one of them by settings the appropriate option in the USER SETTINGS.
+### When selecting one trimming software, the options of the other program will be ignored.
 ### The workflow will ask after the first quality report if you want to continue.
 ### Pressing 'n' will abort the workflow and allows you to make changes according to the quality report.
 ### Restarting the workflow cause it to skip over the initial quality report (unless you deleted it) and continues with the trimming and alignment steps.
-### In case of emergency, press ctrl-c in the terminal.
+### In case of emergency, press ctrl-c (possibly multiple times) in the terminal.
 
 
 
@@ -21,10 +24,10 @@
 ####################### USER SETTINGS ######################
 
 # Define filename (can also be a zipped file ending with .gz)
-filename='SRR062634.filt.fastq'
+filename='Cerevisiae_WT2_Michel2017.fastq.gz'
 
 # Define foldername where the analysis results are stored
-foldername='TestTrimming1'
+foldername='Cerevisiae_WT2_Michel2017_SettingsTest4'
 
 
 ###### Set options for trimming software ######
@@ -32,14 +35,14 @@ foldername='TestTrimming1'
 trimming_software='b'
 
 ###    bbduk    ###
-trimming_settings_bbduk='ktrim=r k=4 hdist=0 qtrim=r trimq=4 minlen=30'
+trimming_settings_bbduk='ktrim=r k=4 hdist=0 qtrim=r trimq=4 minlen=10'
 ## Set adapter sequences
 ## Open file using xdg-open ~/Documents/Software/BBMap/bbmap/resources/adapters.fa
 ###################
 
 ### trimmomatic ###
 trimmomatic_initialization='SE -phred33'
-trimming_settings_trimmomatic='ILLUMINACLIP:adapters.fa:2:30:10 SLIDINGWINDOW:10:14 MINLEN:30'
+trimming_settings_trimmomatic='ILLUMINACLIP:adapters.fa:0:30:10 SLIDINGWINDOW:10:4 MINLEN:30'
 ## Set adapter sequences
 ## Open file using xdg-open ~/Documents/Software/BBMap/bbmap/resources/adapters.fa
 ###################
@@ -57,7 +60,7 @@ alignment_settings='-B 2 -O 3'
 
 # Ask for confirmation to continue after quality report raw data (t for True or f for False).
 # When False, the program continues automatically.
-ask_user=T
+ask_user=F
 
 
 
@@ -167,7 +170,7 @@ then
 	fi
 fi
 
-
+# Trimming
 if [[ ${trimming_software} =~ ^[bB]$ ]]
 then
 	echo 'Data trimming using bbduk ...'
@@ -186,25 +189,30 @@ else
 	exit 1
 fi
 
+# Quality report trimmed data
 echo 'Quality checking trimmed data ...'
 fastqc --outdir ${path_fastqc_out} ${path_trimm_out}/${filename_trimmed}
 echo 'Quality checking trimmed data completed. Results are stored at' ${path_fastqc_out}
 echo ''
 
+# Sequence alignment
 echo 'Sequence alignment ...'
 bwa mem ${alignment_settings} ${path_refgenomeS288C} ${path_trimm_out}/${filename_trimmed} > ${path_align_out}/${filename_sam}
 echo 'Sequence alignment is completed. Results are stored in' ${path_align_out}/${filename_sam}
 echo ''
 
+# Converting sam file to its binary equivalent
 echo 'Converting sam to bam ...'
 samtools view -b ${path_align_out}/${filename_sam} > ${path_align_out}/${filename_bam}
 echo 'Converting sam to bam completed. Results are stored in' ${path_align_out}/${filename_bam}
 echo ''
 
+# Quickcheck bam file
 echo 'Checking bam file ...'
 samtools quickcheck ${path_align_out}/${filename_bam}
 echo ''
 
+# Indexing and sorting bam file
 echo 'Indexing bam file ...'
 sambamba-0.7.1-linux-static sort -m 500MB ${path_align_out}/${filename_bam}
 echo 'Indexing completed. Results are stored in' ${path_align_out}
@@ -213,7 +221,7 @@ echo ''
 
 
 
-
+# Moving results to shared folder.
 echo 'Processing completed. Moving results to shared folder ...'
 mv ${pathdata} ${path_sf}
 [ -d ${path_sf}$(basename ${pathdata}) ] && echo 'Files sucessfully moved to shared folder.' || 'WARNING: Files not moved to shared folder.'
