@@ -788,12 +788,12 @@ If not sure, check if the .fastq file contains, for example, an exclamation mark
 In case of SE, a single output file needs to be specified.
 Needs to have the same extension as the input file (e.g. .fastq) [required];
 
-- `ILLUMINACLIP:TruSeq3-SE.fa:2:15` or `ILLUMINACLIP:TruSeq3-PE.fa:2:30:10` (for Single End reads or Paired End reads respectively). This cuts the adapter and other Illumina specific sequences from the reads.
+- `ILLUMINACLIP:TruSeq3-SE.fa:2:30:10` or `ILLUMINACLIP:TruSeq3-PE.fa:2:30:10` (for Single End reads or Paired End reads respectively). This cuts the adapter and other Illumina specific sequences from the reads.
 The first parameter after `:` indicates a FASTA file (this should be located in the same folder as the sequencing data).
-The second paramter indicates the Seed Mismatches which indicates the maximum mismatch count that still allows for a full match to be performed.
-The third parameter (for SE, fourth parameter for PE) is the Simple Clip Threshold which specifies how accurate the match between the adapter and the read.
+The second parameter is the Seed Mismatches which indicates the maximum mismatch count that still allows for a full match to be performed.
 The third parameter for PE sets the Palindrome Clip Threshold specifies how accurate the match between the two 'adapter
-ligated' reads must be for PE palindrome read alignment.
+ligated' reads must be for PE palindrome read alignment (Works only for PE, but needs to be set for SE as well).
+The fourth parameter is the Simple Clip Threshold which specifies how accurate the match between the adapter and the read.
 
 A number of adapters are stored in the ‘adapters’ folder at the location where the trimmomatic program is saved.
 In case of MiSeq sequencing, the TruSeq3 adapter file is advised.
@@ -809,7 +809,7 @@ A path to another folder with the adapter files yields an error. [optional] [<ht
 
 - `SLIDINGWINDOW` Sliding window trimming which cuts out sequences witin the window and all the subsequent basepairs in the read if the average quality score within the window is lower than a certain threshold.
 The window moves from the 5'-end to the 3'-end.
-Note that if the first few reads of a sequence if of low quality, but the remaining of the sequence is of high quality, the entire sequence will be removed just because of the first few bad quality nucleotides.
+Note that if the first few reads of a sequence is of low quality, but the remaining of the sequence is of high quality, the entire sequence will be removed just because of the first few bad quality nucleotides.
 If this sitatuation occurs, it might be useful to first apply the HEADCROP option (see below).
 Parameters should be given as `SLIDINGWINDOW:L_window:Q_min` where `L_window` is the window size (in terms of basepairs) and `Q_min` the average threshold quality. [optional];
 

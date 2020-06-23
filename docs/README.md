@@ -1,5 +1,5 @@
 ---
-title: "README"
+title: "README for Virtual Machine"
 output: pdf_document
 documentclass: article
 classoption: onecolumn
@@ -89,6 +89,10 @@ If you want to update the software, use the command line with the following comm
 
 The password and user name are stored on the N-drive.
 When turning off, go to the top right corner and click on the sound and battery icon and power off the system.
+
+If the names of the folders are changed, the paths in the workflow might not work properly anymore.
+If you change the paths (e.g. to the software or the reference genomes), make sure you change all the relevant paths in the workflow accordingly.
+The default workflow is setup to respect the folder structure as is defined in the figure below.
 
 The default folder structure during processing is given in the following figure.
 Note that the subfolder in the data_processing directory might not be present before a workflow has started, but will automatically be generated when the workflow is running.

@@ -185,7 +185,6 @@ else
 	echo 'Trimming software not recognized, please check settings'
 	exit 1
 fi
-exit 1
 
 echo 'Quality checking trimmed data ...'
 fastqc --outdir ${path_fastqc_out} ${path_trimm_out}/${filename_trimmed}
