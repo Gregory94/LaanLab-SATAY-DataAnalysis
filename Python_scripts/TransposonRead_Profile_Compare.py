@@ -149,7 +149,7 @@ def transposon_profile(bed_files=None, chrom_user_set=None, bar_width_user_set=N
     
         ax1.set_axisbelow(True)
         ax1.grid(True)
-        ax1.set_ylabel('Tranposon count Dataset 1', fontsize=font_size)
+        ax1.set_ylabel('Tranposon count Kornmann processing', fontsize=font_size)
         ax1.set_xlim(0,chr_length_dict.get(chrom))
         ax1.set_ylim(0,max_ylim)
     
@@ -168,7 +168,7 @@ def transposon_profile(bed_files=None, chrom_user_set=None, bar_width_user_set=N
     
         ax2.set_axisbelow(True)
         ax2.grid(True)
-        ax2.set_ylabel('Transposon count Dataset 2', fontsize=font_size)
+        ax2.set_ylabel('Transposon count dataset', fontsize=font_size)
         ax2.set_xlabel('Basepair position on chromosome '+chrom, fontsize=font_size)
         ax2.set_ylim(0,max_ylim)
         ax2.set_xlim(0,chr_length_dict.get(chrom))
@@ -313,7 +313,7 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
         ax1.set_yscale('log')
         ax1.set_axisbelow(True)
         ax1.grid(True)
-        ax1.set_ylabel('Trimmmed1', fontsize=font_size)#('Read count (log_10) Dataset 1', fontsize=font_size)
+        ax1.set_ylabel('Read count Kornmann processing', fontsize=font_size)#('Read count (log_10) Dataset 1', fontsize=font_size)
         ax1.set_xticklabels([])
         ax1.set_xlim(0,chr_length_dict.get(chrom))
         ax1.set_ylim(0.5,max_ylim)
@@ -334,7 +334,7 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
         ax2.set_yscale('log')
         ax2.set_axisbelow(True)
         ax2.grid(True)
-        ax2.set_ylabel('Trimmed2', fontsize=font_size)#('Read count (log_10) Dataset 2', fontsize=font_size)
+        ax2.set_ylabel('Read count dataset', fontsize=font_size)#('Read count (log_10) Dataset 2', fontsize=font_size)
         ax2.set_xlabel('Basepair position on chromosome '+chrom, fontsize=font_size)
         ax2.set_xlim(0,chr_length_dict.get(chrom))
         ax2.set_ylim(0.5,max_ylim)
@@ -352,12 +352,12 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
 
 #%%
 if __name__ == '__main__':
-#    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned1\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed",
-#                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned2\Cerevisiae_WT2_Michel2017_trimmed2.bam.bed"],
-#                        chrom_user_set=None,
-#                        bar_width_user_set=None,
-#                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Compare1-2",
-#                        savefigure_name=r'Cerevisiae_WT2_Michel2017_TnCompare_trimmed1-trimmed2')
+    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_KornmannAlignment\E-MTAB-4885.WT2.bam.bed",
+                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Michel2017_SettingsTest2\align_out\Cerevisiae_WT2_Michel2017_trimmed.bam.bed"],
+                        chrom_user_set=None,
+                        bar_width_user_set=None,
+                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Michel2017_SettingsTest2\TnRead_Compare_KornmannProcessing",
+                        savefigure_name=r'Cerevisiae_WT2_Michel2017_TnCompare_Kornmann_SettingsTest2')
 
 #    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned1\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig",
 #                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned2\Cerevisiae_WT2_Michel2017_trimmed2.bam.wig"],
@@ -366,10 +366,10 @@ if __name__ == '__main__':
 #                            savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Compare1-2",
 #                            savefigure_name=r'Cerevisiae_WT2_Michel2017_ReadCompare_trimmed1-trimmed2')
 
-    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed",
-                                  r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed2.bam.bed"],
-                            chrom_user_set='i',
-                            bar_width_user_set=None)
+#    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_KornmannAlignment\E-MTAB-4885.WT2.bam.bed",
+#                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Michel2017_SettingsTest1\align_out\Cerevisiae_WT2_Michel2017_trimmed.bam.bed"],
+#                            chrom_user_set='i',
+#                            bar_width_user_set=None)
 
 #    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig",
 #                                  r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed2.bam.wig"],

@@ -24,11 +24,27 @@
 filename='SRR062634.filt.fastq'
 
 # Define foldername where the analysis results are stored
-foldername='test_processing'
+foldername='TestTrimming1'
 
 
-# Set options for trimming software (bbduk)
-trimming_settings='ktrim=r k=25 mink=20 hdist=1 qtrim=r trimq=14 minlen=30'
+###### Set options for trimming software ######
+# set 'b' for bbduk, set 't' for trimmomatic
+trimming_software='b'
+
+###    bbduk    ###
+trimming_settings_bbduk='ktrim=r k=4 hdist=0 qtrim=r trimq=4 minlen=30'
+## Set adapter sequences
+## Open file using xdg-open ~/Documents/Software/BBMap/bbmap/resources/adapters.fa
+###################
+
+### trimmomatic ###
+trimmomatic_initialization='SE -phred33'
+trimming_settings_trimmomatic='ILLUMINACLIP:adapters.fa:2:30:10 SLIDINGWINDOW:10:14 MINLEN:30'
+## Set adapter sequences
+## Open file using xdg-open ~/Documents/Software/BBMap/bbmap/resources/adapters.fa
+###################
+###############################################
+
 
 # Set options for alignment software (bwa mem)
 alignment_settings='-B 2 -O 3'
@@ -105,7 +121,17 @@ echo 'Creating log file ...'
 echo ${filename}	$(date +%F_%T) > ${pathdata}/${filename%.fastq*}'_log.txt'
 echo '' >> ${pathdata}/${filename%.fastq*}'_log.txt'
 echo 'Trimming options:' >> ${pathdata}/${filename%.fastq*}'_log.txt'
-echo ${trimming_settings} >> ${pathdata}/${filename%.fastq*}'_log.txt'
+
+if [[ ${trimming_software} =~ ^[bB]$ ]]
+then
+	echo 'BBDuk' >> ${pathdata}/${filename%.fastq*}'_log.txt'
+	echo ${trimming_settings_bbduk} >> ${pathdata}/${filename%.fastq*}'_log.txt'
+elif [[ ${trimming_software} =~ ^[tT]$ ]]
+then
+	echo 'Trimmomatic' >> ${pathdata}/${filename%.fastq*}'_log.txt'
+	echo ${trimmomatic_initialization} ${trimming_settings_trimmomatic} >> ${pathdata}/${filename%.fastq*}'_log.txt'
+fi
+
 echo '' >> ${pathdata}/${filename%.fastq*}'_log.txt'
 echo 'Alignment options:' >> ${pathdata}/${filename%.fastq*}'_log.txt'
 echo ${alignment_settings} >> ${pathdata}/${filename%.fastq*}'_log.txt'
@@ -135,17 +161,31 @@ if [[ ${ask_user} =~ ^[tT]$ ]]
 then
 	read -p 'Continue processing? (press "y" if yes, press "n" if no): ' -n 1 -r
 	echo
-	if [[ $REPLY =~ ^[nN]$ ]]
+	if [[ ! $REPLY =~ ^[yY]$ ]]
 	then
 		exit 1
 	fi
 fi
 
 
-echo 'Data trimming ...'
-${path_bbduk_software}bbduk.sh -Xmx1g in=${pathdata}/${filename} out=${path_trimm_out}/${filename_trimmed} ref=${path_bbduk_adapters} ${trimming_settings}
-echo 'Trimming is completed. Results are stored in' ${path_trimm_out}/${filename_trimmed}
-echo ''
+if [[ ${trimming_software} =~ ^[bB]$ ]]
+then
+	echo 'Data trimming using bbduk ...'
+	${path_bbduk_software}bbduk.sh -Xmx1g in=${pathdata}/${filename} out=${path_trimm_out}/${filename_trimmed} ref=${path_bbduk_adapters} ${trimming_settings_bbduk}
+	echo 'Trimming with bbduk is completed. Results are stored in' ${path_trimm_out}/${filename_trimmed}
+	echo ''
+elif [[ ${trimming_software} =~ ^[tT]$ ]]
+then
+	echo 'Data trimming using trimmomatic ...'
+	currentpath=$(pwd)
+	cd ${path_bbduk_software}/resources/
+	java -jar ${path_trimm_software}trimmomatic-0.39.jar ${trimmomatic_initialization} ${pathdata}/${filename} ${path_trimm_out}/${filename_trimmed} ${trimming_settings_trimmomatic}
+	cd ${currentpath}
+else
+	echo 'Trimming software not recognized, please check settings'
+	exit 1
+fi
+exit 1
 
 echo 'Quality checking trimmed data ...'
 fastqc --outdir ${path_fastqc_out} ${path_trimm_out}/${filename_trimmed}

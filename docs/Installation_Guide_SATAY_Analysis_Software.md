@@ -78,7 +78,7 @@ For this, apply the following steps:
 4. Restart the system.
 
 Things that might not be working yet are the guest additions.
-These are needed for optimizing the virtual machines performance and are needed for allowing the virtual machine to communicate with some of the hardware of the physical machine like screen size and shared folders (for example, if you use VirtualBox for first time, the screen of the virtual machine might be tiny, but this is because it can not yet communicate the screen size of your physical computer).
+These are needed for optimizing the virtual machines performance and are needed for allowing the virtual machine to communicate with some of the hardware of the physical machine like screen size and shared folders (for example, if you use VirtualBox for first time, the screen of the virtual machine might be tiny, but this is because it does not yet recognize the screen size of your physical computer).
 
 To set up the guest additions use the following commands and options
 
@@ -89,7 +89,8 @@ To set up the guest additions use the following commands and options
 5. Start the VM and check if the shared folder is present (either on the desktop, the files folder or in the media folder).
 6. To automatically resize the screen of the virtual machine, go to the 'view' tab in the top of the screen and select 'Auto-resize guest display'.
 
-The desktop of the virtual machine include the shared folder and a text file with the commands for the preprocessing pipeline.
+The desktop of the virtual machine include the shared folder and a README file.
+The home directory of the VM (which is the default location where the terminal app opens from which all the commands are entered) includes the file processing_workflow.sh which is a workflow that automatically performs all the processing steps.
 In the files app, the documents folder includes three subfolders:
 
 - data_processing: This location can be used to temporarily store the sequencing data.
@@ -100,6 +101,7 @@ In the files app, the documents folder includes three subfolders:
 
 The adapters.fasta file in which the adapter sequences are stored that are used during trimming is located in ~/Documents/Software/BBMap/bbmap/resources/adapters.fa.
 Documents that are placed in the shared folder can be seen in both the virtual machine and the host computer.
+For a more detailed explanation of the Virtual Machine layout and how to use the workflow_processing.sh file, see the README file on the desktop of the VM.
 
 ## Creating a virtual machine from scratch
 
