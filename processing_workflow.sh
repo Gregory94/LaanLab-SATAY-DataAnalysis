@@ -27,7 +27,7 @@
 filename='Cerevisiae_WT2_Michel2017.fastq.gz'
 
 # Define foldername where the analysis results are stored
-foldername='Cerevisiae_WT2_Michel2017_SettingsTest4'
+foldername='Cerevisiae_WT2_Michel2017_SettingsTest9'
 
 
 ###### Set options for trimming software ######
@@ -35,7 +35,7 @@ foldername='Cerevisiae_WT2_Michel2017_SettingsTest4'
 trimming_software='b'
 
 ###    bbduk    ###
-trimming_settings_bbduk='ktrim=r k=4 hdist=0 qtrim=r trimq=4 minlen=10'
+trimming_settings_bbduk='ktrim=r k=4 hdist=0 qtrim=r trimq=4'
 ## Set adapter sequences
 ## Open file using xdg-open ~/Documents/Software/BBMap/bbmap/resources/adapters.fa
 ###################
@@ -51,6 +51,17 @@ trimming_settings_trimmomatic='ILLUMINACLIP:adapters.fa:0:30:10 SLIDINGWINDOW:10
 
 # Set options for alignment software (bwa mem)
 alignment_settings='-B 2 -O 3'
+
+# Set which reference genome you want to use (type 's' for S288C or 'w' for W303)
+refgenome='s'
+
+
+# Create sorted and indexed bam file ('y' for yes, 'n' for no)?
+sort_and_index='n'
+
+
+# Save sam file ('y' for yes, 'n' for no)? This file is always converted to its binary equivalent (.bam ) and the sam file is rarely used but takes up relatively a lot of memory.
+delete_sam='y'
 
 ############################################################
 
@@ -93,8 +104,19 @@ path_align_out=${pathdata}/align_out
 path_sf=/media/sf_VMSharedFolder_Ubuntu64_1/
 
 # Define paths to reference genomes (both S288C and W303)
-path_refgenomeS288C=/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa
-path_refgenomeW303=/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_W303/W303_SGD_2015_JRIU00000000.fsa
+if [[ ${refgenome} =~ ^[sS]$ ]]
+then
+	path_refgenome=/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa
+	name_refgenome='S288C'
+	echo 'Reference genome:' ${name_refgenome}
+elif [[ ${refgenome} =~ ^[wW]$ ]]
+then
+	path_refgenome=/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_W303/W303_SGD_2015_JRIU00000000.fsa
+	name_refgenome='W303'
+	echo 'Reference genome:' ${name_refgenome}
+else
+	echo 'ERROR: Reference genome not defined. Please check settings.' && exit 1
+fi
 
 # Define path bbduk software
 path_bbduk_software=~/Documents/Software/BBMap/bbmap/
@@ -139,8 +161,14 @@ echo '' >> ${pathdata}/${filename%.fastq*}'_log.txt'
 echo 'Alignment options:' >> ${pathdata}/${filename%.fastq*}'_log.txt'
 echo ${alignment_settings} >> ${pathdata}/${filename%.fastq*}'_log.txt'
 echo '' >> ${pathdata}/${filename%.fastq*}'_log.txt'
+echo 'Reference genome used:' ${name_refgenome} >> ${pathdata}/${filename%.fastq*}'_log.txt'
+echo '' >> ${pathdata}/${filename%.fastq*}'_log.txt'
 echo 'Adapter sequences from adapters.fa:' >> ${pathdata}/${filename%.fastq*}'_log.txt'
 cat ${path_bbduk_adapters} >> ${pathdata}/${filename%.fastq*}'_log.txt'
+
+
+
+
 
 ### Start processing workflow
 echo ''
@@ -197,7 +225,7 @@ echo ''
 
 # Sequence alignment
 echo 'Sequence alignment ...'
-bwa mem ${alignment_settings} ${path_refgenomeS288C} ${path_trimm_out}/${filename_trimmed} > ${path_align_out}/${filename_sam}
+bwa mem ${alignment_settings} ${path_refgenome} ${path_trimm_out}/${filename_trimmed} > ${path_align_out}/${filename_sam}
 echo 'Sequence alignment is completed. Results are stored in' ${path_align_out}/${filename_sam}
 echo ''
 
@@ -213,16 +241,27 @@ samtools quickcheck ${path_align_out}/${filename_bam}
 echo ''
 
 # Indexing and sorting bam file
-echo 'Indexing bam file ...'
-sambamba-0.7.1-linux-static sort -m 500MB ${path_align_out}/${filename_bam}
-echo 'Indexing completed. Results are stored in' ${path_align_out}
-echo ''
-
+if [[ ${sort_and_index} =~ ^[yY]$ ]]
+then
+	echo 'Indexing bam file ...'
+	sambamba-0.7.1-linux-static sort -m 500MB ${path_align_out}/${filename_bam}
+	echo 'Indexing completed. Results are stored in' ${path_align_out}
+	echo ''
+fi
 
 
 
 # Moving results to shared folder.
-echo 'Processing completed. Moving results to shared folder ...'
+echo 'Processing completed.'
+
+if [[ ${delete_sam} =~ ^[yY]$ ]]
+then
+	echo 'Removing .sam file ...'
+	rm ${path_align_out}/${filename_sam}
+	echo 'sam file removed.'
+fi
+
+echo 'Moving results to shared folder ...'
 mv ${pathdata} ${path_sf}
 [ -d ${path_sf}$(basename ${pathdata}) ] && echo 'Files sucessfully moved to shared folder.' || 'WARNING: Files not moved to shared folder.'
 

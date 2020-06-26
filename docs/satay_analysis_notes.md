@@ -932,7 +932,7 @@ Use either `minkmerhits`, `minkmerfraction` or `mincovfraction`, but setting mul
 Basically this indicates how many errors are allowed between a read and and an adapter sequence to still count as an exact match.
 Typically does not need to be set any higher than 1, unless the reads are of very low quality.
 Note that high values of hdist also requires much more memory in the computer.
-13. `restrictleft` and `restrictright`. Only look for kmers left or right number bases.
+13. `restrictleft` and `restrictright`. Only look for kmers in the left or right number bases.
 14. `tpe` and `tbo`: This is only relevant for paired-end reads.
 `tpe` cuts both the forward and the reverse read to the same length and `tbo` trims the reads if they match any adapter sequence while considering the overlap between two paired reads.
 
