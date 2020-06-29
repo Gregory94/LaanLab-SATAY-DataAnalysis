@@ -11,12 +11,20 @@ For detailed information about all the software tools used and the experimental 
 
 ## Matlab_TransposonMapping
 
-Contains files for transposon mapping based on .bam files. This code is originally created by the Kornmann-lab.
+Contains files for transposon mapping based using .bam files.
+This code is originally created by [the Kornmann-lab](https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script).
 Currently the following Matlab codes and data files are present:
 
 1. tn_and_reads_per_gene.m: This inputs a .bam file and outputs the number of transposons and reads per gene.
 2. names.mat: Matlab data file with all genes names. This file is required for running the matlab code 1.
 3. yeastGFF.mat: Matlab data file with information about the genes. This file is required for running the matlab code 1.
+
+## Python_TransposonMapping
+
+'UNDER DEVELOPMENT'.
+Contains files for transposon mapping using .bam files.
+These python codes are based on the Matlab codes developed by the Kornmann lab (see codes in Matlab_TransposonMapping).
+The python codes run only in Linux and require the package [pysam](https://pysam.readthedocs.io/en/latest/index.html) installed from Bioconda.
 
 ## Python_scripts
 
