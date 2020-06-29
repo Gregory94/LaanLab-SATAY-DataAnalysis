@@ -250,3 +250,53 @@ Click the IGV_Win_2.8.0-installer and run the install process.
 
 This code relates the number of reads and transposon counts to the genes.
 This code is provided from the Kornmann-Lab.
+
+### 9. Removing unused software
+
+The installed version of Ubuntu comes with different application by default, for example an email application (thunderbird), an alternative to the Microsoft office package (LibreOffice) and some games.
+These application you will most likely not use and to save memory on your Virtual Machine, these can be uninstalled.
+To do this, go to the 'Ubuntu Software' application and go the tab 'installed'.
+Uninstall everything here that you are not planning to use.
+You can (re)install application here as well.
+
+## Installing additional software in Virtual Machine
+
+### 10. upgrading Python
+
+By default, Linux comes with Python already installed.
+In the terminal application, run the command `python --version` or `python3 --version` to see which version is installed.
+If python3 is installed with version 3.6, then this should be updated to python 3.7 or above.
+This can be done using the procedure explained on [this website](https://dev.to/serhatteker/how-to-upgrade-to-python-3-7-on-ubuntu-18-04-18-10-5hab).
+Running the command `python3.7` should open python 3.7 instead of version 3.6.
+
+Note that it might happen that the terminal does not launch anymore after upgrading the python version.
+This is something to do with the not properly removing one of the installation packages.
+To sort this out, go to the 'Ubuntu Sofware' application and install 'xterm'.
+When opening xterm, enter the commands `sudo rm /usr/bin/python3` followed by `sudo ln -s python3.6 /usr/bin/python3`.
+After this, close xterm and terminal should now launch again.
+
+### 11. Getting miniconda for install python packages
+
+The default Python application is quite bare equiped (for example it doesn't include numpy or matplotlib).
+These packages can be installed using a package installer.
+Two commonly used ones are pip and conda.
+Here we use conda.
+Conda is part of Anaconda, which is a distribution for Python and R.
+Installing Anaconda gives you a graphical user interface and many preinstalled packages, but this takes up a lot of space and many of these packages you probably do not need.
+To save memory on the virtual machine, install the minimal version of Anaconda called Miniconda.
+
+1. Download the Linux installer for Miniconda from [the conda website](https://docs.conda.io/en/latest/miniconda.html#linux-installers) (download the Linux 64 bit version).
+2. Check the hash code from the download by typing in the command `sha256sum [path/to/Miniconda3-latest-Linux-x86_64.sh]` (where the [path/to/Miniconda3-latest-Linux-x86_64.sh] needs to be replaced with the correct path and filename).
+This hash code should match exactly the has code provided on the download website.
+3. If the hash code is correct, run the command `bash [path/to/Miniconda3-latest-Linux-x86_64.sh]`.
+Accept the license agreement and enter the location where the software needs to be installed (or leave this at the default location).
+When the installer prompts `Do you wish the installer to initialize Miniconda3 by running conda init`, enter `yes`.
+4. Restart the terminal.
+5. Check the installation by running the command `conda list`, which should give you a list of packages that are installed in Python.
+
+To add a package run the command `conda install [package]`, where [package] should be replaced by the name of the package that you want to install.
+Recommended to install at least numpy and matplotlib.
+Conda uses specific locations to search for packages called channels.
+If you want some specific bioinformatic tools, it might be necessary to add the channel 'Bioconda' to Miniconda.
+To do this run the command `conda config --add channels bioconda`.
+Now, more packages can be installed, for example [pysam](https://pysam.readthedocs.io/en/latest/api.html) to read bam files in python.
