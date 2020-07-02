@@ -57,7 +57,7 @@ refgenome='s'
 
 
 # Create sorted and indexed bam file ('y' for yes, 'n' for no)?
-sort_and_index='n'
+sort_and_index='y'
 
 
 # Save sam file ('y' for yes, 'n' for no)? This file is always converted to its binary equivalent (.bam ) and the sam file is rarely used but takes up relatively a lot of memory.
@@ -71,7 +71,7 @@ delete_sam='y'
 
 # Ask for confirmation to continue after quality report raw data (t for True or f for False).
 # When False, the program continues automatically.
-ask_user=F
+ask_user=T
 
 
 

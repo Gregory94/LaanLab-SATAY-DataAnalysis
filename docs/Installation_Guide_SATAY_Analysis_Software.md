@@ -27,22 +27,14 @@ colorlinks: true
 ## Introduction
 
 This file discusses the installation procedures for the programs required for whole genome sequencing analysis and transposon mapping. The numbering corresponds with the order in which this software is used.
-Note that a part of the software is for windows and Linux, and a part is for Linux only. Therefore a virtual machine is included to run Ubuntu (or another unix based operating system to your liking).
+The processing software runs entirely in Linux, hence a Virtual Machine is used in which all the software runs.
 For a more detailed workflow and the commands of all the individual commands, see [satay_analysis_notes.md](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/docs/satay_analysis_notes.md).
 
-A Linux vrtual machine is already created that is completely set up and includes all the software discussed below.
+A Linux virtual machine is already created that is completely set up and includes all the software discussed below (located in the N-drive in the *VirtualMachines* folder called VM_Ubuntu64_1.vhd).
 This is located on the N-drive in the 'VirtualMacines' folder.
 Step 0 below discusses how this virtual machine can be installed on your computer and how to use it.
-The following steps are only important when you want to create a virtual machine from scratch so you can set it up completely to your liking or using another operating system than Ubuntu that is used existing virtual machine on the N-drive.
-
-To run a program in the command line, you need to specify the entire path to the location where the program is installed.
-An easier way is to add the program to the system path. This can be done with the command
-`setx PATH '/path/to/program'`.
-To check if the program is added to the path, use
-`echo $PATH$`.
-
-Some programs requires java to be installed. To check if java is installed, run the command 'java -version' in the command line.
-If it is not installed, download and install it from [https://www.java.com/nl/download/](url)
+After completing step 0, the virtual machine is ready to run.
+The following steps are *only* important when you want to create a virtual machine from scratch so you can set it up completely to your liking or using another operating system than Ubuntu which is used in the existing virtual machine on the N-drive.
 
 ## Using the already existing virtual machine
 
@@ -51,7 +43,7 @@ If it is not installed, download and install it from [https://www.java.com/nl/do
 [https://www.virtualbox.org/](url)
 
 Running a virtual machine requires VirtualBox (VB), which can be downloaded from the above link and installed using the normal procedure for installing software on Windows machines.
-The memory of the virtual machine (called the virtual hard drive (vhd)) is stored on the N-drive in the VirtualMachines folder with the name VM_Ubuntu64_1.vhd.
+The memory of the virtual machine (called the virtual hard drive (vhd)) is stored on the N-drive in the *VirtualMachines* folder with the name VM_Ubuntu64_1.vhd.
 **Before using this virtual machine, make sure you make a copy of the virtual hard drive** either to your local machine or, when there is not enough memory on your computer, somewhere on the drives in your personal folder.
 The file is over 50Gb in size, so it might be troublesome to store it locally.
 When storing it on the drives, make sure it has a stable internet connection when you use it since when the connection is lost, the virtual machine crashes as it cannot access its memory anymore.
@@ -104,6 +96,18 @@ Documents that are placed in the shared folder can be seen in both the virtual m
 For a more detailed explanation of the Virtual Machine layout and how to use the workflow_processing.sh file, see the README file on the desktop of the VM.
 
 ## Creating a virtual machine from scratch
+
+This and the following steps are only necessary when creating a virtual machine yourself.
+When you want to use the existing virtual machine where all the software is already installed, only follow step 0.
+
+To run a program in the command line, you need to specify the entire path to the location where the program is installed.
+An easier way is to add the program to the system path. This can be done with the command
+`setx PATH '/path/to/program'`.
+To check if the program is added to the path, use
+`echo $PATH$`.
+
+Some programs requires java to be installed. To check if java is installed, run the command 'java -version' in the command line.
+If it is not installed, download and install it from [https://www.java.com/nl/download/](url)
 
 ### 1. VirtualBox-6.1.4
 
