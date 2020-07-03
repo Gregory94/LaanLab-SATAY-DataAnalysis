@@ -8,6 +8,7 @@ This is a test script file for translating the Matlab code from the Kornmann lab
 import os, sys
 import numpy as np
 import pysam
+import timeit
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
 sys.path.insert(1,file_dirname)
@@ -55,22 +56,24 @@ for i in range(17):
 
 
 #%% GET ALL READS WITHIN A SPECIFIED GENOMIC REGION
-start_array = np.empty(shape=(total_reads), dtype=int)
-flag_array = np.empty(shape=(total_reads), dtype=int)
-readlength_array = np.empty(shape=(total_reads), dtype=int)
-
-readnumb_array = np.array([], dtype=int)
+# readnumb_array = [] #np.array([], dtype=int)
 tnnumber_dict = {}
 
-read_counter = 0
 ll = 0 #Number of unique insertions in entire genome
-temp = 'I'
-for kk in temp:#ref_tid_dict: # 'kk' is chromosome number in roman numerals
-    print('Gettings reads for chromosme ', key)
+for kk in ref_tid_dict: # 'kk' is chromosome number in roman numerals
+    read_counter = 0
+    timer_start = timeit.default_timer()
+    
+    N_reads_kk = chr_mappedreads_dict[kk][2]
+    start_array = np.empty(shape=(N_reads_kk), dtype=int)
+    flag_array = np.empty(shape=(N_reads_kk), dtype=int)
+    readlength_array = np.empty(shape=(N_reads_kk), dtype=int)
+
+    print('Getting reads for chromosme ', kk ,' ...')
     for reads in bamfile.fetch(kk, 0, chr_length_dict[kk]):
         read = str(reads).split('\t')
         
-        start_array[read_counter] = int(read[3]) +1
+        start_array[read_counter] = int(read[3]) + 1
         flag_array[read_counter] = int(read[1])
         readlength_array[read_counter] = int(len(read[9]))
 
@@ -93,7 +96,7 @@ for kk in temp:#ref_tid_dict: # 'kk' is chromosome number in roman numerals
     del flag0coor_array, flag16coor_array, startdirect_array, flagdirect_array, startindirect_array, flagindirect_array
     
     
-    start2_sortindices = start2_array.argsort()
+    start2_sortindices = start2_array.argsort(kind='mergesort') #use mergesort for stable sorting
     start2_array = start2_array[start2_sortindices]
     flag2_array = flag2_array[start2_sortindices]
     
@@ -101,24 +104,36 @@ for kk in temp:#ref_tid_dict: # 'kk' is chromosome number in roman numerals
     
     
 ##% CREATE ARRAY OF START POSITION AND FLAGS OF ALL READS IN GENEOME
-    tncoordinates_array = np.array([ref_tid_dict[kk]+1, start2_array[0], flag2_array[0]])
+    ref_tid_kk = int(ref_tid_dict[kk]+1)
+    if ll == 0:
+        tncoordinates_array = np.array([])
     
     mm = 0 # Number of unique reads per insertion
     jj = 1 # Number of unique reads in current chromosome (Number of transposons in current chromosome)
+    temp_counter = 0
     for ii in range(1,len(start2_array)):
-        if start2_array[ii]-start2_array[ii-1] <= 2 and flag2_array[ii] == flag2_array[ii-1]:
+        if abs(start2_array[ii]-start2_array[ii-1]) <= 2 and flag2_array[ii] == flag2_array[ii-1]:
             mm += 1
+            temp_counter += 1
         else:
-            avg_start_pos = abs(int(np.mean(start2_array[ii-mm-1 : ii]))) #!!!CHECK IF LAST VALUE IS CONSIDERED CORRECTLY!!!
-            tncoordinates_array = np.vstack((tncoordinates_array), [kk, avg_start_pos, flag2_array[ii]])
+            avg_start_pos = abs(int(np.mean(start2_array[ii-mm-1 : ii])))
+            if tncoordinates_array.size == 0:
+                tncoordinates_array = np.array([ref_tid_kk, int(avg_start_pos), int(flag2_array[ii-1])])
+                readnumb_list = [mm+1]
+            else:
+                tncoordinates_array = np.vstack((tncoordinates_array, [ref_tid_kk, int(avg_start_pos), int(flag2_array[ii-1])]))                
+                readnumb_list.append(mm+1)
             mm = 0
             jj += 1
             ll += 1
-
-        readnumb_array = np.append(readnumb_array, mm+1)
 
     tnnumber_dict[kk] = jj
     
     del jj, start_array, flag_array, readlength_array, start2_array, flag2_array
 
+    timer_stop = timeit.default_timer()
+    print('Loop over reads chromosome ', kk, ' complete. Time = ', timer_stop-timer_start, 'seconds')
+
+readnumb_array = np.array(readnumb_list)
+del readnumb_list
 
