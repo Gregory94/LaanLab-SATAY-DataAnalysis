@@ -3,6 +3,9 @@
 Spyder Editor
 
 This is a test script file for translating the Matlab code from the Kornmann lab to Python.
+
+To save  numpy array in text format:
+    np.savetxt(os.path.join(file_dirname,'tncoordinates_python.txt'),tncoordinates_array,delimiter=',',fmt='%i')
 """
 
 import os, sys
@@ -10,9 +13,11 @@ import numpy as np
 import pysam
 import timeit
 
-file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sys.path.insert(1,file_dirname)
-# from chromosome_and_gene_positions import gene_position
+dirname = os.path.dirname(os.path.abspath('__file__'))
+sys.path.insert(1,os.path.join(dirname,'python_modules'))
+from chromosome_and_gene_positions import gene_position
+from gene_names import gene_aliases
+from essential_genes_names import list_known_essentials
 
 #%% LOADING FILES
 path = os.path.join('/home', 'gregoryvanbeek', 'Documents', 'data_processing')
@@ -60,6 +65,7 @@ for i in range(17):
 tnnumber_dict = {}
 
 ll = 0 #Number of unique insertions in entire genome
+# temp = ['I','II']
 for kk in ref_tid_dict: # 'kk' is chromosome number in roman numerals
     read_counter = 0
     timer_start = timeit.default_timer()
@@ -103,7 +109,7 @@ for kk in ref_tid_dict: # 'kk' is chromosome number in roman numerals
     del start2_sortindices
     
     
-##% CREATE ARRAY OF START POSITION AND FLAGS OF ALL READS IN GENEOME
+##% CREATE ARRAY OF START POSITION AND FLAGS OF ALL READS IN GENOME
     ref_tid_kk = int(ref_tid_dict[kk]+1)
     if ll == 0:
         tncoordinates_array = np.array([])
@@ -116,7 +122,7 @@ for kk in ref_tid_dict: # 'kk' is chromosome number in roman numerals
             mm += 1
             temp_counter += 1
         else:
-            avg_start_pos = abs(int(np.mean(start2_array[ii-mm-1 : ii])))
+            avg_start_pos = abs(round(np.mean(start2_array[ii-mm-1 : ii])))
             if tncoordinates_array.size == 0:
                 tncoordinates_array = np.array([ref_tid_kk, int(avg_start_pos), int(flag2_array[ii-1])])
                 readnumb_list = [mm+1]
@@ -136,4 +142,45 @@ for kk in ref_tid_dict: # 'kk' is chromosome number in roman numerals
 
 readnumb_array = np.array(readnumb_list)
 del readnumb_list
+
+tncoordinatescopy_array = tncoordinates_array
+#%% GET LIST OF ALL GENES AND ALL ESSENTIAL GENES
+
+files_path = os.path.join(dirname,'..','data_files')
+# GET POSITION GENES
+gff_path = os.path.join(files_path,'Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+gene_pos_dict = gene_position(gff_path) #contains all genes, essential and nonessential
+
+# GET ALL ANNOTATED ESSENTIAL GENES
+essential_path1 = os.path.join(files_path,'Cervisiae_EssentialGenes_List_1.txt')
+essential_path2 = os.path.join(files_path,'Cervisiae_EssentialGenes_List_2.txt')
+known_essential_gene_list = list_known_essentials([essential_path1, essential_path2])
+
+# GET ALIASES OF ALL GENES
+names_path = os.path.join(files_path,'Yeast_Protein_Names.txt')
+aliases_designation_dict = gene_aliases(names_path)[0]
+
+# FOR ALL ANNOTATED ESSENTIAL GENES, DETERMINE THEIR ALIASES AND GET THE POSITION FROM GENE_POS_DICT
+essential_pos_dict = {}
+for gene in gene_pos_dict:
+    if gene in known_essential_gene_list:
+        essential_pos_dict[gene] = gene_pos_dict.get(gene)
+    else:
+        gene_aliases_list = []
+        for key, val in aliases_designation_dict.items():
+            if gene == key or gene in val: #if gene occurs as key or in the values list in aliases_designation_dict, put all its aliases in a single list.
+                gene_aliases_list.append(key)
+                for aliases in aliases_designation_dict.get(key):
+                    gene_aliases_list.append(aliases)
+    
+        for gene_alias in gene_aliases_list:
+            if gene_alias in known_essential_gene_list:
+                essential_pos_dict[gene_alias] = gene_pos_dict.get(gene)
+                break
+
+#%% CONCATENATE ALL CHROMOSOMES
+
+
+
+
 
