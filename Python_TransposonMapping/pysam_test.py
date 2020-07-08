@@ -5,7 +5,7 @@ Spyder Editor
 This is a test script file for translating the Matlab code from the Kornmann lab to Python.
 
 To save  numpy array in text format:
-    np.savetxt(os.path.join(file_dirname,'tncoordinates_python.txt'),tncoordinates_array,delimiter=',',fmt='%i')
+    np.savetxt(os.path.join(dirname,'tncoordinatescopy_python.txt'),tncoordinatescopy_array,delimiter=',',fmt='%i')
 """
 
 import os, sys
@@ -18,6 +18,9 @@ sys.path.insert(1,os.path.join(dirname,'python_modules'))
 from chromosome_and_gene_positions import gene_position
 from gene_names import gene_aliases
 from essential_genes_names import list_known_essentials
+
+#%% START TIMER
+timer_start_complete = timeit.default_timer()
 
 #%% LOADING FILES
 path = os.path.join('/home', 'gregoryvanbeek', 'Documents', 'data_processing')
@@ -40,10 +43,11 @@ bamfile = pysam.AlignmentFile(file, 'rb')
 
 #%% GET NAMES OF ALL CHROMOSOMES AS STORED IN THE BAM FILE
 ref_tid_dict = {} # 'I' | 0
+ref_name_list = []
 for i in range(17):
     ref_name = bamfile.get_reference_name(i)
     ref_tid_dict[ref_name] = bamfile.get_tid(ref_name)
-
+    ref_name_list.append(ref_name)
 
 #%% GET SEQUENCE LENGTHS OF ALL CHROMOSOMES
 chr_length_dict = {} # 'I' | 230218
@@ -66,7 +70,7 @@ tnnumber_dict = {}
 
 ll = 0 #Number of unique insertions in entire genome
 # temp = ['I','II']
-for kk in ref_tid_dict: # 'kk' is chromosome number in roman numerals
+for kk in ref_name_list: # 'kk' is chromosome number in roman numerals
     read_counter = 0
     timer_start = timeit.default_timer()
     
@@ -143,13 +147,13 @@ for kk in ref_tid_dict: # 'kk' is chromosome number in roman numerals
 readnumb_array = np.array(readnumb_list)
 del readnumb_list
 
-tncoordinatescopy_array = tncoordinates_array
+tncoordinatescopy_array = np.array(tncoordinates_array, copy=True)
 #%% GET LIST OF ALL GENES AND ALL ESSENTIAL GENES
 
 files_path = os.path.join(dirname,'..','data_files')
 # GET POSITION GENES
 gff_path = os.path.join(files_path,'Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-gene_pos_dict = gene_position(gff_path) #contains all genes, essential and nonessential
+genecoordinates_dict = gene_position(gff_path) #contains all genes, essential and nonessential
 
 # GET ALL ANNOTATED ESSENTIAL GENES
 essential_path1 = os.path.join(files_path,'Cervisiae_EssentialGenes_List_1.txt')
@@ -160,11 +164,11 @@ known_essential_gene_list = list_known_essentials([essential_path1, essential_pa
 names_path = os.path.join(files_path,'Yeast_Protein_Names.txt')
 aliases_designation_dict = gene_aliases(names_path)[0]
 
-# FOR ALL ANNOTATED ESSENTIAL GENES, DETERMINE THEIR ALIASES AND GET THE POSITION FROM GENE_POS_DICT
-essential_pos_dict = {}
-for gene in gene_pos_dict:
+# FOR ALL GENE IN GENECOORDINATES_DICT, CHECK IF THEY ARE ANNOTATED AS ESSENTIAL
+essentialcoordinates_dict = {}
+for gene in genecoordinates_dict:
     if gene in known_essential_gene_list:
-        essential_pos_dict[gene] = gene_pos_dict.get(gene)
+        essentialcoordinates_dict[gene] = genecoordinates_dict.get(gene)
     else:
         gene_aliases_list = []
         for key, val in aliases_designation_dict.items():
@@ -175,12 +179,18 @@ for gene in gene_pos_dict:
     
         for gene_alias in gene_aliases_list:
             if gene_alias in known_essential_gene_list:
-                essential_pos_dict[gene_alias] = gene_pos_dict.get(gene)
+                essentialcoordinates_dict[gene_alias] = genecoordinates_dict.get(gene)
                 break
 
 #%% CONCATENATE ALL CHROMOSOMES
 
+ll = 0
+for ii in range(1,len(ref_name_list)):
+    ll += chr_length_dict[ref_name_list[ii-1]]
+    aa = np.where(tncoordinatescopy_array[:,0] == ii + 1)
+    tncoordinatescopy_array[aa,1] = tncoordinatescopy_array[aa,1] + ll
 
-
-
+#%% END TIMER
+timer_stop_complete = timeit.default_timer()
+print('Script took %.2f seconds to run' %(timer_stop_complete - timer_start_complete))
 
