@@ -15,7 +15,7 @@ import timeit
 
 dirname = os.path.dirname(os.path.abspath('__file__'))
 sys.path.insert(1,os.path.join(dirname,'python_modules'))
-from chromosome_and_gene_positions import gene_position
+from chromosome_and_gene_positions import chromosomename_roman_to_arabic, gene_position
 from gene_names import gene_aliases
 from essential_genes_names import list_known_essentials
 
@@ -51,9 +51,14 @@ for i in range(17):
 
 #%% GET SEQUENCE LENGTHS OF ALL CHROMOSOMES
 chr_length_dict = {} # 'I' | 230218
+chr_summedlength_dict = {}
+ll = 0
 for key in ref_tid_dict:
-    chr_length_dict[key] = bamfile.get_reference_length(key)
-
+    ref_length = bamfile.get_reference_length(key)
+    chr_length_dict[key] = ref_length
+    chr_summedlength_dict[key] = ll
+    ll += ref_length
+del (ref_length, ll)
 
 #%% GET NUMBER OF MAPPED, UNMAPPED AND TOTAL AMOUNT OF READS PER CHROMOSOME
 chr_mappedreads_dict = {} # 'I' | [mapped, unmapped, total reads]
@@ -151,14 +156,17 @@ tncoordinatescopy_array = np.array(tncoordinates_array, copy=True)
 #%% GET LIST OF ALL GENES AND ALL ESSENTIAL GENES
 
 files_path = os.path.join(dirname,'..','data_files')
+chromosomenames_gff_dict = chromosomename_roman_to_arabic()[0] #These names should correspond to the chromosome names in the gff files
+
 # GET POSITION GENES
 gff_path = os.path.join(files_path,'Saccharomyces_cerevisiae.R64-1-1.99.gff3')
 genecoordinates_dict = gene_position(gff_path) #contains all genes, essential and nonessential
+# gff_gene_name, gff_gene_chr, gff_gene_start, gff_gene_end = gene_position(gff_path, get_dict=False)[0:4]
 
 # GET ALL ANNOTATED ESSENTIAL GENES
 essential_path1 = os.path.join(files_path,'Cervisiae_EssentialGenes_List_1.txt')
 essential_path2 = os.path.join(files_path,'Cervisiae_EssentialGenes_List_2.txt')
-known_essential_gene_list = list_known_essentials([essential_path1, essential_path2])
+essentialnames_list = list_known_essentials([essential_path1, essential_path2])
 
 # GET ALIASES OF ALL GENES
 names_path = os.path.join(files_path,'Yeast_Protein_Names.txt')
@@ -166,9 +174,12 @@ aliases_designation_dict = gene_aliases(names_path)[0]
 
 # FOR ALL GENE IN GENECOORDINATES_DICT, CHECK IF THEY ARE ANNOTATED AS ESSENTIAL
 essentialcoordinates_dict = {}
+gene_counter = 0
 for gene in genecoordinates_dict:
-    if gene in known_essential_gene_list:
-        essentialcoordinates_dict[gene] = genecoordinates_dict.get(gene)
+# for gene in gff_gene_name:
+    if gene in essentialnames_list:
+        essentialcoordinates_dict[gene] = genecoordinates_dict.get(gene).copy()
+        # essentialcoordinates_dict[gene] = [gff_gene_chr[gene_counter], gff_gene_start[gene_counter], gff_gene_end[gene_counter]]
     else:
         gene_aliases_list = []
         for key, val in aliases_designation_dict.items():
@@ -176,20 +187,53 @@ for gene in genecoordinates_dict:
                 gene_aliases_list.append(key)
                 for aliases in aliases_designation_dict.get(key):
                     gene_aliases_list.append(aliases)
-    
+
         for gene_alias in gene_aliases_list:
-            if gene_alias in known_essential_gene_list:
-                essentialcoordinates_dict[gene_alias] = genecoordinates_dict.get(gene)
+            if gene_alias in essentialnames_list:
+                essentialcoordinates_dict[gene_alias] = genecoordinates_dict.get(gene).copy()
+                # essentialcoordinates_dict[gene_alias] = [gff_gene_chr[gene_counter], gff_gene_start[gene_counter], gff_gene_end[gene_counter]]
                 break
+    gene_counter += 1
 
 #%% CONCATENATE ALL CHROMOSOMES
-
 ll = 0
 for ii in range(1,len(ref_name_list)):
     ll += chr_length_dict[ref_name_list[ii-1]]
     aa = np.where(tncoordinatescopy_array[:,0] == ii + 1)
     tncoordinatescopy_array[aa,1] = tncoordinatescopy_array[aa,1] + ll
 
+for key in genecoordinates_dict:
+    genecoordinates_dict[key][1] = genecoordinates_dict.get(key)[1] + chr_summedlength_dict.get(genecoordinates_dict.get(key)[0])
+    genecoordinates_dict[key][2] = genecoordinates_dict.get(key)[2] + chr_summedlength_dict.get(genecoordinates_dict.get(key)[0])
+
+for key in essentialcoordinates_dict:
+    essentialcoordinates_dict[key][1] = essentialcoordinates_dict.get(key)[1] + chr_summedlength_dict.get(essentialcoordinates_dict.get(key)[0])
+    essentialcoordinates_dict[key][2] = essentialcoordinates_dict.get(key)[2] + chr_summedlength_dict.get(essentialcoordinates_dict.get(key)[0])
+
+# test = []
+# for key in genecoordinates_dict:
+#     test.append(genecoordinates_dict.get(key)[1:3])
+#np.savetxt(os.path.join(dirname,'essentialcoordinates_python.txt'),test,delimiter=',',fmt='%i')
+
+#%% GET NUMBER OF TRANSPOSONS AND READS PER GENE
+tnpergene_dict = {}
+readpergene_dict = {}
+readpergenecrude_dict = {}
+for gene in genecoordinates_dict:
+    xx = np.where(np.logical_and(tncoordinatescopy_array[:,1] >= genecoordinates_dict.get(gene)[1], tncoordinatescopy_array[:,1] <= genecoordinates_dict.get(gene)[2]))
+    tnpergene_dict[gene] = np.size(xx)
+    readpergene_dict[gene] = sum(readnumb_array[xx]) - max(readnumb_array[xx], default=0)
+    readpergenecrude_dict[gene] = sum(readnumb_array[xx])
+
+
+tnperessential_dict = {}
+readperessential_dict = {}
+readperessentialcrude_dict = {}
+for gene in essentialcoordinates_dict:
+    xx = np.where(np.logical_and(tncoordinatescopy_array[:,1] >= essentialcoordinates_dict.get(gene)[1], tncoordinatescopy_array[:,1] <= essentialcoordinates_dict.get(gene)[2]))
+    readperessential_dict[gene] = sum(readnumb_array[xx]) - max(readnumb_array[xx], default=0)
+    readperessentialcrude_dict[gene] = sum(readnumb_array[xx])
+    
 #%% END TIMER
 timer_stop_complete = timeit.default_timer()
 print('Script took %.2f seconds to run' %(timer_stop_complete - timer_start_complete))

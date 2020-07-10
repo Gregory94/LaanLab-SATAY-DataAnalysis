@@ -75,5 +75,86 @@ for ii in range(0,N):
     if not lines_file0[ii] == lines_file1[ii]:
         differences_list.append([ii,lines_file0[ii],lines_file1[ii]])
 
+#%% compare essential names variables
+
+import os 
+
+paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\essentialgenes_pythonvm.txt",
+         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\essentialgenes_pythonwd.txt"]
+
+for path in paths:
+    if not os.path.exists(path):
+        print('The following path does not exists:')
+        print(path)
+
+file0 = open(paths[0])
+lines0 = file0.readlines()
+file0.close()
+
+file1 = open(paths[1])
+lines1 = file1.readlines()
+file1.close()
+
+match_list = []
+mismatch_list = []
+for gene in lines0:
+    if gene in lines1:
+        match_list.append(gene)
+    else:
+        mismatch_list.append(gene)
+        print(gene)
+
+#%% compare essentialcoordinates variables
+
+import os 
+
+paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\essentialcoordinates_matlab.txt",
+         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\essentialcoordinates_python.txt"]
+
+for path in paths:
+    if not os.path.exists(path):
+        print('The following path does not exists:')
+        print(path)
+
+file0 = open(paths[0])
+lines0 = file0.readlines()
+file0.close()
+
+file1 = open(paths[1])
+lines1 = file1.readlines()
+file1.close()
+
+startposition0 = []
+endposition0 = []
+for i in range(len(lines0)):
+    startposition0.append(int(lines0[i].split(',')[0]))
+    endposition0.append(int(lines0[i].split(',')[1].rstrip()))
+startposition0.sort()
+endposition0.sort()
+
+startposition1 = []
+endposition1 = []
+for i in range(len(lines1)):
+    startposition1.append(int(lines1[i].split(',')[0]))
+    endposition1.append(int(lines1[i].split(',')[1].rstrip()))
+startposition1.sort()
+endposition1.sort()
+
+
+start_matchlist = []
+start_mismatchlist = []
+end_matchlist = []
+end_mismatchlist = []
+for i in range(len(startposition0)):
+    if startposition0[i] in startposition1:
+        start_matchlist.append([startposition0[i], startposition0.index(startposition0[i]), startposition1.index(startposition0[i])])
+    else:
+        start_mismatchlist.append([startposition0[i], startposition0.index(startposition0[i])])
+
+    if endposition0[i] in endposition1:
+        end_matchlist.append([endposition0[i], endposition0.index(endposition0[i]), endposition1.index(endposition0[i])])
+    else:
+        end_mismatchlist.append([endposition0[i], endposition0.index(endposition0[i])])
+
 
 
