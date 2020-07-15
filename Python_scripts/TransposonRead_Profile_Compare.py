@@ -352,12 +352,19 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
 
 #%%
 if __name__ == '__main__':
-    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_KornmannAlignment\E-MTAB-4885.WT2.bam.bed",
-                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Michel2017_SettingsTest8\align_out\Cerevisiae_WT2_Michel2017_trimmed.bam.bed"],
+#    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_KornmannAlignment\E-MTAB-4885.WT2.bam.bed",
+#                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Michel2017_SettingsTest8\align_out\Cerevisiae_WT2_Michel2017_trimmed.bam.bed"],
+#                        chrom_user_set=None,
+#                        bar_width_user_set=None,
+#                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Michel2017_SettingsTest8\TnRead_Compare_KornmannProcessing",
+#                        savefigure_name=r'Cerevisiae_WT2_Michel2017_TnCompare_Kornmann_SettingsTest8')
+
+    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885.WT2.bam_matlab2.bed",
+                                  r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885.WT2.bam_python.bed"],
                         chrom_user_set=None,
                         bar_width_user_set=None,
-                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Michel2017_SettingsTest8\TnRead_Compare_KornmannProcessing",
-                        savefigure_name=r'Cerevisiae_WT2_Michel2017_TnCompare_Kornmann_SettingsTest8')
+                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\bedfile_compare",
+                        savefigure_name=r"bedfile_compare_matlab2_python")
 
 #    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdata_Michel2017_KornmannAlignment\E-MTAB-4885.WT2.bam.wig",
 #                            r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Michel2017_SettingsTest4\align_out\Cerevisiae_WT2_Michel2017_trimmed.bam.wig"],

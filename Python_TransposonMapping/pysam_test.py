@@ -144,7 +144,7 @@ for kk in ref_name_list: # 'kk' is chromosome number in roman numerals
 
     tnnumber_dict[kk] = jj
     
-    del jj, start_array, flag_array, readlength_array, start2_array, flag2_array
+    del jj, start_array, flag_array, readlength_array, flag2_array, start2_array
 
     timer_stop = timeit.default_timer()
     print('Loop over reads chromosome ', kk, ' complete. Time = ', timer_stop-timer_start, 'seconds')
@@ -153,6 +153,9 @@ readnumb_array = np.array(readnumb_list)
 del readnumb_list
 
 tncoordinatescopy_array = np.array(tncoordinates_array, copy=True)
+# np.savetxt(os.path.join(dirname,'tncoordinates_python.txt'),tncoordinates_array,delimiter=',',fmt='%i') #!!!
+# np.savetxt(os.path.join(dirname,'readnumb_python.txt'),readnumb_array,delimiter=',',fmt='%i') #!!!
+
 #%% GET LIST OF ALL GENES AND ALL ESSENTIAL GENES
 
 files_path = os.path.join(dirname,'..','data_files')
@@ -233,7 +236,30 @@ for gene in essentialcoordinates_dict:
     xx = np.where(np.logical_and(tncoordinatescopy_array[:,1] >= essentialcoordinates_dict.get(gene)[1], tncoordinatescopy_array[:,1] <= essentialcoordinates_dict.get(gene)[2]))
     readperessential_dict[gene] = sum(readnumb_array[xx]) - max(readnumb_array[xx], default=0)
     readperessentialcrude_dict[gene] = sum(readnumb_array[xx])
-    
+
+#%% CREATE BED FILE
+bedfile = file+'.bed'
+
+with open(bedfile, 'w') as f:
+    f.write('Trackname=' + filename + ' useScore=1\n')
+    coordinates_counter = 0
+    for tn in tncoordinates_array:
+        refname = [key for key, val in ref_tid_dict.items() if val == tn[0] - 1][0]
+        if refname == 'Mito':
+            refname = 'M'
+        f.write('chr' + refname + ' ' + str(tn[1]) + ' ' + str(tn[1] + 1) + ' . ' + str(100+readnumb_array[coordinates_counter]*20) + '\n')
+        coordinates_counter += 1
+
+
+#CHECK NUMBER OF INSERTIONS FOR EACH CHROMOSOME (NOTE, THIS IS SLOW)
+# test_list = []
+# for i in range(1,18):
+#     test_counter = 0
+#     for tn in tncoordinates_array:
+#         if tn[0] == i:
+#             test_counter += 1
+#     test_list.append([i,test_counter])
+# test_list
 #%% END TIMER
 timer_stop_complete = timeit.default_timer()
 print('Script took %.2f seconds to run' %(timer_stop_complete - timer_start_complete))

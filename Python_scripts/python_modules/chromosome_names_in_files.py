@@ -57,7 +57,7 @@ def chromosome_name_bedfile(bed_file=None):
     while stop_loop is False:
         line = lines[line_counter]
         chrom_name_current = line.split(' ')[0].replace('chr','')
-        if not chrom_name_current.startswith('track') and not chrom_name_current.startswith('M'): #SKIP HEADER AND MITOCHRONDRIAL CHROMOSOMES
+        if not chrom_name_current.startswith('track') and not chrom_name_current.startswith('M') and chr_counter < 16: #SKIP HEADER AND MITOCHRONDRIAL CHROMOSOMES
             if chrom_name_current != chrom_name_in_bed:
                 chrom_names_dict[chromosome_romannames_list[chr_counter]] = chrom_name_current
                 chrom_name_in_bed = chrom_name_current
@@ -143,4 +143,4 @@ def chromosome_name_wigfile(wig_file=None):
 
 #%%
 if __name__ == '__main__':
-    chromosome_name_wigfile()
+    chromosome_name_bedfile(bed_file=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885.WT2.bam_python.bed")
