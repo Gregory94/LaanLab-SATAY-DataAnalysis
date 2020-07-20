@@ -54,6 +54,9 @@ def gene_aliases(gene_information_file = None):
     aliases_sgd_dict = gene aliases for the search names in SGD (e.g. Bem1 and S000000404)
     aliases_swissprot_dict = gene aliases for Swiss Prot.
     The keys of the dictionaries are the systematic names of the genes (e.g. YBR200W for Bem1)
+    
+    Search through lists to get corresponding key:
+        [key for key, val in aliases.items() if 'TFC3' in val]
     '''
 
     if gene_information_file == None:

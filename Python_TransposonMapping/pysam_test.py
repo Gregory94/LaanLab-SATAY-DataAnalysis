@@ -25,6 +25,7 @@ timer_start_complete = timeit.default_timer()
 #%% LOADING FILES
 path = os.path.join('/home', 'gregoryvanbeek', 'Documents', 'data_processing')
 filename = os.path.join('E-MTAB-4885.WT2.bam')
+# filename = os.path.join('E-MTAB-4885.WT1.bam')
 
 file = os.path.join(path,filename)
 print('Running path: ', file)
@@ -136,11 +137,16 @@ for kk in ref_name_list: # 'kk' is chromosome number in roman numerals
                 tncoordinates_array = np.array([ref_tid_kk, int(avg_start_pos), int(flag2_array[ii-1])])
                 readnumb_list = [mm+1]
             else:
-                tncoordinates_array = np.vstack((tncoordinates_array, [ref_tid_kk, int(avg_start_pos), int(flag2_array[ii-1])]))                
+                tncoordinates_array = np.vstack((tncoordinates_array, [ref_tid_kk, int(avg_start_pos), int(flag2_array[ii-1])]))    
                 readnumb_list.append(mm+1)
             mm = 0
             jj += 1
             ll += 1
+        
+        if ii == len(start2_array) - 1: #include last read
+            avg_start_pos = abs(round(np.mean(start2_array[ii-mm-1 : ii])))
+            tncoordinates_array = np.vstack((tncoordinates_array, [ref_tid_kk, int(avg_start_pos), int(flag2_array[ii-1])]))
+            readnumb_list.append(mm+1)
 
     tnnumber_dict[kk] = jj
     
@@ -260,6 +266,51 @@ with open(bedfile, 'w') as f:
 #             test_counter += 1
 #     test_list.append([i,test_counter])
 # test_list
+
+#%% CREATE TEXT FILE WITH TRANSPOSONS AND READS PER GENE
+pergenefile = file+'_pergene.txt'
+
+with open(pergenefile, 'w') as f:
+    f.write('Gene name\tNumber of transposons per gene\tNumber of reads per gene\n')
+    for gene in tnpergene_dict:
+        tnpergene = tnpergene_dict[gene]
+        readpergene = readpergene_dict[gene]
+        f.write(gene + '\t' + str(tnpergene) + '\t' + str(readpergene) + '\n')
+
+#%% CREATE WIG FILE
+wigfile = file+'.wig'
+
+tncoordinateswig_array = tncoordinates_array.copy()
+readnumbwig_array = readnumb_array.copy()
+
+unique_index_array = np.array([], dtype=int)
+N_uniques_perchr_list = []
+ll = 0
+
+for kk in ref_name_list:
+    index = np.where(tncoordinateswig_array[:,0] == int(ref_tid_dict[kk]+1))
+    unique_index = np.unique(tncoordinateswig_array[index][:,1], return_index=True, return_counts=True)[1]
+    
+    unique_index_array = np.append(unique_index_array, unique_index, axis=0)
+    
+    ll += len(unique_index)
+    N_uniques_perchr_list.append(ll) #how many unique indices are found in the current chromosome
+
+
+
+duplicate_list = []
+ll = 0
+for ii in N_uniques_perchr_list:
+    for jj in range(ll,ii):
+        if int(jj) not in unique_index_array[ll:ii]:
+            duplicate_list.append(jj)
+    ll = ii
+        
+#SUM READNUMB VALUES AT INDEX IN DUPLICATE_LIST AND DUPLICATE_LIST-1    
+
+with  open(wigfile, 'w') as f:
+    f.write('track type=wiggle_0 ,maxheightPixels=60 name='+filename+'\n')
+
 #%% END TIMER
 timer_stop_complete = timeit.default_timer()
 print('Script took %.2f seconds to run' %(timer_stop_complete - timer_start_complete))

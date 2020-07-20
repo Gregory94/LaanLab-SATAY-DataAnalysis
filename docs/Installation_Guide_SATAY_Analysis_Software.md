@@ -239,7 +239,7 @@ sudo ln -s /path/to/sambamba-0.7.1-linux-static /usr/local/bin
 ```
 
 (where in the last line `/path/to/` needs to be replaced with the actual path.)
-To run, enter `sambamba` in the terminal.
+To run, enter `sambamba-0.7.1-linux-static` in the terminal.
 
 ### 7. IGV (Windows) (optional)
 

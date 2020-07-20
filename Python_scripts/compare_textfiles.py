@@ -8,6 +8,11 @@ THIS CODE READS TWO COMMA DELIMITED TEXTS FILES AND COMPARES THE DATA WITH EACH 
 THE ORDER IN WHICH THE PROGRAM SHOWS THE DIFFERENCES IN THE SAME ORDER AS WHICH THE PATHS ARE GIVEN.
 """
 
+import os, sys
+file_dirname = os.path.dirname(os.path.abspath('__file__'))
+sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
+from gene_names import gene_aliases
+sys.exit('')
 #%% compare variable: tncoordinates
 import os
 
@@ -195,8 +200,10 @@ for i in range(len(startposition0)):
 
 import os 
 
-paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885.WT2.bam_matlab.bed",
-         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885.WT2.bam_python.bed"]
+#paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\bedfile_compare_20200714\E-MTAB-4885.WT2.bam_matlab2.bed",
+#         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\bedfile_compare_20200714\E-MTAB-4885.WT2.bam_python.bed"]
+paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\E-MTAB-4885.WT1.bam_matlabUpdate.bed",
+         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\E-MTAB-4885.WT1.bam_pythonUpdate.bed"]
 
 for path in paths:
     if not os.path.exists(path):
@@ -210,7 +217,8 @@ with open(paths[1]) as file1:
     lines1 = file1.readlines()
 
 failed_chromosome_list = []
-chromosomes = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
+chromosomes = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','M']
+#chromosomes = ['V']
 for chromosome in chromosomes:
     chromosome_in_file = 'chr' + chromosome
     print('Checking chromosome ', chromosome)
@@ -219,12 +227,12 @@ for chromosome in chromosomes:
     for ll in range(len(lines0)):
         line0_list = lines0[ll].split(' ')
         if line0_list[0] == chromosome_in_file:
-            comp0_list.append(int(line0_list[1]))
+            comp0_list.append(int(line0_list[4]))
     
     for ll in range(len(lines1)):
         line1_list = lines1[ll].split(' ')
         if line1_list[0] == chromosome_in_file:
-            comp1_list.append(int(line1_list[1]))
+            comp1_list.append(int(line1_list[4]))
     
     if len(comp0_list) != len(comp1_list):
         print('WARNING: Number of insertions does not match for current chromosome.')
@@ -234,10 +242,10 @@ for chromosome in chromosomes:
     compare_list = []
     for ll in range(len(comp0_list)):
         if ll < len(comp1_list):
-            compare_list.append(comp0_list[ll] - comp1_list[ll])
+            compare_list.append(abs(comp0_list[ll] - comp1_list[ll]))
         else:
             compare_list.append(comp0_list[ll] - 0)
-    compare_list.sort(reverse=True)
+#    compare_list.sort(reverse=True)
     
     N_mismatch = 0
     for diff in compare_list:
@@ -245,7 +253,86 @@ for chromosome in chromosomes:
             N_mismatch += 1
     if N_mismatch > 0:
         print('Number of mismatches found: ', N_mismatch)
+        print('')
+#    else:
+    print('First readnumb value for comp0 is: ', comp0_list[0])
+    print('First readnumb value for comp1 is: ', comp1_list[0])
+    print('Last readnumb values for comp0 is: ', comp0_list[-5:])
+    print('Last readnumb values for comp1 is: ', comp1_list[-5:])
+    print('')
 
     if max(compare_list) > 1:
         failed_chromosome_list.append(chromosome)
 print('Check chromosomes: ',failed_chromosome_list)
+
+#%% COMPARE PERGENE.TXT FILES
+import os
+
+paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\E-MTAB-4885.WT2.bam_pergene_Matlab.txt",
+         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\E-MTAB-4885.WT2.bam_pergene_Python.txt"]
+
+for path in paths:
+    if not os.path.exists(path):
+        print('The following path does not exists:')
+        print(path)
+
+with open(paths[0]) as file0:
+    lines0 = file0.readlines()[1:]
+
+with open(paths[1]) as file1:
+    lines1 = file1.readlines()[1:]
+
+
+
+line0_dict = {}
+for line in lines0: #read lines from pergene.txt file created in the first path
+    line_list = line.split('\t')
+    if len(line_list) == 4:
+        line0_dict[line_list[0].strip()] = [line_list[1], line_list[2]]
+    elif 1 < len(line_list) < 4:
+        line0_dict[line_list[0].strip()] = [line_list[1], 0]
+    else:
+        line0_dict[line_list[0].strip()] = [0, 0]
+    
+
+line1_dict = {}
+for line in lines1: #read lines from pergene.txt file created in the first path
+    line_list = line.split('\t')
+    if len(line_list) == 4:
+        line1_dict[line_list[0].strip()] = [line_list[1], line_list[2]]
+    elif 1 < len(line_list) < 4:
+        line1_dict[line_list[0].strip()] = [line_list[1], 0]
+    else:
+        line1_dict[line_list[0].strip()] = [0, 0]
+
+
+aliases = gene_aliases(gene_information_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Yeast_Protein_Names.txt")[0]
+
+
+tn_diff = {}
+read_diff = {}
+genename_diff = []
+for genename in line0_dict:
+    
+    if genename in line1_dict:
+        tn_diff[genename] = int(line0_dict.get(genename)[0]) - int(line1_dict.get(genename)[0])
+        read_diff[genename] = int(line0_dict.get(genename)[1]) - int(line1_dict.get(genename)[1])
+
+    elif genename in aliases:
+        for alias in aliases.get(genename):
+            if alias in line1_dict:
+                tn_diff[genename] = int(line0_dict.get(genename)[0]) - int(line1_dict.get(alias)[0])
+                read_diff[genename] = int(line0_dict.get(genename)[1]) - int(line1_dict.get(alias)[1])
+
+    else:
+        alias = [key for key, val in aliases.items() if genename in val]
+        if not alias == [] and alias[0] in line1_dict:
+            tn_diff[genename] = int(line0_dict.get(genename)[0]) - int(line1_dict.get(alias[0])[0])
+            read_diff[genename] = int(line0_dict.get(genename)[1]) - int(line1_dict.get(alias[0])[1])
+        else:
+            tn_diff[genename] = int(line0_dict.get(genename)[0]) - 0
+            read_diff[genename] = int(line0_dict.get(genename)[1]) - 0
+    
+#    if tn_diff.get(genename) and read_diff.get(genename) != 0:
+#        genename_diff.append(genename)
+
