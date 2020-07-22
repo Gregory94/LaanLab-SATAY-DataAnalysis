@@ -16,8 +16,8 @@ sys.exit('')
 #%% compare variable: tncoordinates
 import os
 
-paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\tncoordinates_matlab.txt",
-         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\tncoordinates_python.txt"]
+paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\tncoordinates_matlab.txt",
+         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\tncoordinates_python.txt"]
 
 for path in paths:
     if not os.path.exists(path):
@@ -336,3 +336,108 @@ for genename in line0_dict:
 #    if tn_diff.get(genename) and read_diff.get(genename) != 0:
 #        genename_diff.append(genename)
 
+#%% COMPARE UNIQUE INDICES FOR WRITING .WIG FILE
+
+import os
+
+#paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\uniqueindex_Matlab.txt",
+#         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\uniqueindex_Python.txt"]
+paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\duplicateindex_Matlab.txt",
+         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\duplicateindex_Python.txt"]
+
+for path in paths:
+    if not os.path.exists(path):
+        print('The following path does not exists:')
+        print(path)
+
+with open(paths[0]) as file0:
+    lines0 = file0.readlines()
+
+with open(paths[1]) as file1:
+    lines1 = file1.readlines()
+
+comp_dict = {}
+diff_dict = {}
+for ii in range(0,len(lines0)):
+    if ii < len(lines1):
+        dd = int(lines0[ii]) - (int(lines1[ii]) + 1)
+        comp_dict[ii] = dd
+    else:
+        dd = int(lines0[ii]) - 0
+        comp_dict[ii] = dd
+
+    if not comp_dict[ii] == 0:
+        diff_dict[ii] = dd
+
+#%% COMPARE .WIG FILES
+import os
+
+paths = [r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\E-MTAB-4885.WT2.bam_matlab.wig",
+         r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\E-MTAB-4885.WT2.bam_python.wig"]
+
+for path in paths:
+    if not os.path.exists(path):
+        print('The following path does not exists:')
+        print(path)
+
+with open(paths[0]) as file0:
+    lines0 = file0.readlines()[1:]
+
+with open(paths[1]) as file1:
+    lines1 = file1.readlines()[1:]
+
+
+if len(lines0) >= len(lines1):
+    smallest_length = len(lines1)
+else:
+    smallest_length = len(lines0)
+
+
+
+tn_diff_dict = {}
+diff_ins_list = [] #stores the tn number of insertions where the difference in transposon number is larger than 1
+ll = 1
+for ii in range(0,smallest_length):
+    line0 = lines0[ii]
+    line1 = lines1[ii]
+    if not line0.lower().startswith('variablestep') and not line1.lower().startswith('variablestep'):
+        dd = int(line0.split()[0]) - int(line1.split()[0])
+        tn_diff_dict[ll] = dd
+
+    if not line0.rstrip() == line1.rstrip() and not line0.lower().startswith('variable') and not line1.lower().startswith('variable'):
+        if abs(int(line0.split()[0]) - int(line1.split()[0])) > 1:
+            diff_ins_list.append([ll+1, line0.rstrip(), line1.rstrip()])
+
+    ll += 1
+
+#index0_list = [i for i, value in enumerate(lines0) if value.lower().startswith('variablestep')]
+#index1_list = [i for i, value in enumerate(lines1) if value.lower().startswith('variablestep')]
+#
+#
+#
+#index0_list.append(len(lines0))
+#index1_list[16] = len(lines1)
+#
+#tn_diff_dict = {}
+#counter = 0
+#for ll in range(0,16):
+#    lines0_currentchr_list = [lines0[i] for i in range(index0_list[ll]+1, index0_list[ll+1])]
+#    lines1_currentchr_list = [lines1[i] for i in range(index1_list[ll]+1, index1_list[ll+1])]
+#
+#    if len(lines0_currentchr_list) > len(lines1_currentchr_list):
+#        for ii in lines0_currentchr_list:
+#            tn = int(ii.split()[0])
+#            if tn <= len(lines1_currentchr_list):
+#                tn_diff_dict[counter] = int(lines0[tn].split()[0]) - int(lines1[tn].split()[0])
+#            else:
+#                tn_diff_dict[counter] = int(lines0[tn].split()[0]) - 0
+#            counter += 1
+#
+#    elif len(lines0_currentchr_list) <= len(lines1_currentchr_list):
+#        for ii in lines0_currentchr_list:
+#            tn = int(ii.split()[0])
+#            if tn <= len(lines0_currentchr_list):
+#                tn_diff_dict[counter] = int(lines0[tn].split()[0]) - int(lines1[tn].split()[0])
+#            else:
+#                tn_diff_dict[counter] = 0 - int(lines1[tn].split()[0])
+#            counter += 1

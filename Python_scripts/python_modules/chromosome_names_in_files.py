@@ -120,11 +120,11 @@ def chromosome_name_wigfile(wig_file=None):
 
     chr_counter = 0
     line_counter = 0
+    chrom_line = 'variablestep'
     for line in lines:
         line.strip('\n')
-        chrom_line = 'variableStep'
         line_split = line.split(' ')
-        if line_split[0] == chrom_line:
+        if line_split[0].lower() == chrom_line and chr_counter < 16:
             chromosome_name = line_split[1].replace('chrom=chr','').strip('\n')
             chrom_names_dict[chromosome_romannames_list[chr_counter]] = chromosome_name
 #            print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chromosome_name)
@@ -143,4 +143,5 @@ def chromosome_name_wigfile(wig_file=None):
 
 #%%
 if __name__ == '__main__':
-    chromosome_name_bedfile(bed_file=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885.WT2.bam_python.bed")
+#    chromosome_name_bedfile(bed_file=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885.WT2.bam_python.bed")
+    chromosome_name_wigfile(wig_file=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\E-MTAB-4885.WT2.bam_python.wig")

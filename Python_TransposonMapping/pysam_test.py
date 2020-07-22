@@ -280,37 +280,65 @@ with open(pergenefile, 'w') as f:
 #%% CREATE WIG FILE
 wigfile = file+'.wig'
 
-tncoordinateswig_array = tncoordinates_array.copy()
 readnumbwig_array = readnumb_array.copy()
 
-unique_index_array = np.array([], dtype=int)
+unique_index_array = np.array([], dtype=int) #=cc
 N_uniques_perchr_list = []
 ll = 0
-
 for kk in ref_name_list:
-    index = np.where(tncoordinateswig_array[:,0] == int(ref_tid_dict[kk]+1))
-    unique_index = np.unique(tncoordinateswig_array[index][:,1], return_index=True, return_counts=True)[1]
+    index = np.where(tncoordinates_array[:,0] == int(ref_tid_dict[kk]+1)) #get indices for current chromosome.
+    unique_index = np.unique(tncoordinates_array[index][:,1], return_index=True)[1] #get all insertion locations (in tncoordinates, all rows, column 1)
+
+    unique_index_array = np.append(unique_index_array, (unique_index+ll), axis=0)
     
-    unique_index_array = np.append(unique_index_array, unique_index, axis=0)
-    
-    ll += len(unique_index)
-    N_uniques_perchr_list.append(ll) #how many unique indices are found in the current chromosome
+    if ll == 0:
+        ll += np.count_nonzero(tncoordinates_array[:,0] == int(ref_tid_dict[kk]+1))# + 1
+    else:
+        ll += np.count_nonzero(tncoordinates_array[:,0] == int(ref_tid_dict[kk]+1))
+    N_uniques_perchr_list.append(ll) #total amount unique indices found untill current chromosome
 
+# np.savetxt(os.path.join(dirname,'uniqueindex_python.txt'),unique_index_array,delimiter=',',fmt='%i')
 
-
-duplicate_list = []
+duplicate_list = [] #=dd
 ll = 0
+index_last_unique_previous_chromosome = 0
 for ii in N_uniques_perchr_list:
+    index_last_unique = np.where(unique_index_array <= ii)[0][-1]
     for jj in range(ll,ii):
-        if int(jj) not in unique_index_array[ll:ii]:
-            duplicate_list.append(jj)
+        if int(jj) not in unique_index_array[index_last_unique_previous_chromosome:index_last_unique]:
+            if ll == 0:
+                duplicate_list.append(jj)
+            else:
+                duplicate_list.append(jj)#-1)
+    index_last_unique_previous_chromosome = index_last_unique
     ll = ii
-        
+# np.savetxt(os.path.join(dirname,'duplicateindex_python.txt'),duplicate_list,delimiter=',',fmt='%i')
+# testposition_dict = {}
+# testorientation_dict = {}
+# for ii in duplicate_list:
+#     testposition_dict[ii] = tncoordinates_array[ii][1] - tncoordinates_array[ii-1][1]
+#     testorientation_dict[ii] = tncoordinates_array[ii][2] - tncoordinates_array[ii-1][2]
+
+
 #SUM READNUMB VALUES AT INDEX IN DUPLICATE_LIST AND DUPLICATE_LIST-1    
+for ii in duplicate_list:
+    readnumbwig_array[ii-1] = readnumbwig_array[ii-1] + readnumbwig_array[ii]
+
+readnumbwig_duplicatesremoved_array = np.delete(readnumbwig_array, duplicate_list, axis=0)
+tncoordinateswig_duplicatesremoved_array = np.delete(tncoordinates_array, duplicate_list, axis=0)
+
+
+# del duplicate_list, unique_index_array, N_uniques_perchr_list
+
 
 with  open(wigfile, 'w') as f:
     f.write('track type=wiggle_0 ,maxheightPixels=60 name='+filename+'\n')
-
+    for kk in ref_name_list:
+        f.write('VariableStep chrom=chr' + kk + '\n')
+        
+        index = np.where(tncoordinateswig_duplicatesremoved_array[:,0] == int(ref_tid_dict[kk]+1)) #get indices for current chromosome.
+        for ii in index[0]:
+            f.write(str(tncoordinateswig_duplicatesremoved_array[ii][1]) + ' ' + str(readnumbwig_duplicatesremoved_array[ii]) + '\n')
 #%% END TIMER
 timer_stop_complete = timeit.default_timer()
 print('Script took %.2f seconds to run' %(timer_stop_complete - timer_start_complete))
