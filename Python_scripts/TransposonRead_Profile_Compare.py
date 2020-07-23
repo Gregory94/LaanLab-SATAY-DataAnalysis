@@ -352,17 +352,17 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
 
 #%%
 if __name__ == '__main__':
-#    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885.WT2.bam_matlab2.bed",
-#                                  r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885.WT2.bam_python.bed"],
-#                        chrom_user_set=None,
-#                        bar_width_user_set=None,
-#                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\bedfile_compare",
-#                        savefigure_name=r"bedfile_compare_matlab2_python")
+    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\bedfile_compare_20200723\E-MTAB-4885.WT1.bam_matlab.bed",
+                                  r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\bedfile_compare_20200723\E-MTAB-4885.WT1.bam_python.bed"],
+                        chrom_user_set=None,
+                        bar_width_user_set=100,
+                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\bedfile_compare_20200723",
+                        savefigure_name=r"100binwidth_bedfile_compare_matlab_python")
 
-    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\wigfile_compare_20200722\E-MTAB-4885.WT2.bam_matlab.wig",
-                            r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\wigfile_compare_20200722\E-MTAB-4885.WT2.bam_python.wig"],
-                            chrom_user_set='XVI',
-                            bar_width_user_set=None,
-                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\wigfile_compare_20200722",
-                        savefigure_name=r"wigfile_compare_matlab_python")
+#    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\wigfile_compare_20200723\E-MTAB-4885.WT1.bam_matlab.wig",
+#                            r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\wigfile_compare_20200723\E-MTAB-4885.WT1.bam_python.wig"],
+#                            chrom_user_set=None,
+#                            bar_width_user_set=100,
+#                        savefigure_path=None,#r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\wigfile_compare_20200723",
+#                        savefigure_name=None)#r"smallbinwidth_wigfile_compare_matlab_python")
 

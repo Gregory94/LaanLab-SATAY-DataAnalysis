@@ -24,8 +24,8 @@ timer_start_complete = timeit.default_timer()
 
 #%% LOADING FILES
 path = os.path.join('/home', 'gregoryvanbeek', 'Documents', 'data_processing')
-filename = os.path.join('E-MTAB-4885.WT2.bam')
-# filename = os.path.join('E-MTAB-4885.WT1.bam')
+# filename = os.path.join('E-MTAB-4885.WT2.bam')
+filename = os.path.join('E-MTAB-4885.WT1.bam')
 
 file = os.path.join(path,filename)
 print('Running path: ', file)
@@ -247,7 +247,7 @@ for gene in essentialcoordinates_dict:
 bedfile = file+'.bed'
 
 with open(bedfile, 'w') as f:
-    f.write('Trackname=' + filename + ' useScore=1\n')
+    f.write('track name=' + filename + ' useScore=1\n')
     coordinates_counter = 0
     for tn in tncoordinates_array:
         refname = [key for key, val in ref_tid_dict.items() if val == tn[0] - 1][0]
