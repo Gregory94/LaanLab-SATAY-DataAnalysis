@@ -7,7 +7,7 @@
 ### Within this folder, three more folders are generated for the output of the quality report, trimming and alignment.
 ### Settings for trimming and alignment should be set in the 'trimming_settings' and 'alignment_settings' variables respectively.
 ### Adapter sequences for trimming should be stored in '~/Documents/Software/BBMap/bbmap/resources/adapters.fa' respecting fasta convention.
-### The software is called in this order: 1.Quality checking (fastqc) 2.trimming (bbduk) 3.Quality checking trimmed data (fastqc) 4.alignment (bwa) 5.converting sam to bam (samtools) 6.indexing bam file (sambamba).
+### The software is called in this order: 1.Quality checking (fastqc) 2.trimming (bbduk) 3.Quality checking trimmed data (fastqc) 4.alignment (bwa) 5.converting sam to bam (samtools) 6.indexing bam file (sambamba) 7.transposon mapping (python).
 ### Finally, the data file and all the created files are moved to the shared folder.
 ### There are two trimming software packages, 'bbduk' and 'trimmomatic'.
 ### You can use either one of them by settings the appropriate option in the USER SETTINGS.
@@ -24,10 +24,10 @@
 ####################### USER SETTINGS ######################
 
 # Define filename (can also be a zipped file ending with .gz)
-filename='Cerevisiae_WT2_Michel2017.fastq.gz'
+filename='SRR062634.filt.fastq.gz'
 
 # Define foldername where the analysis results are stored
-foldername='Cerevisiae_WT2_Michel2017_SettingsTest9'
+foldername='SRR062634_test'
 
 
 ###### Set options for trimming software ######
@@ -60,8 +60,12 @@ refgenome='s'
 sort_and_index='y'
 
 
+# Apply transposon mapping
+mapping='y'
+
+
 # Save sam file ('y' for yes, 'n' for no)? This file is always converted to its binary equivalent (.bam ) and the sam file is rarely used but takes up relatively a lot of memory.
-delete_sam='y'
+delete_sam='n'
 
 ############################################################
 
@@ -83,6 +87,7 @@ echo ''
 filename_trimmed=${filename%.fastq*}'_trimmed.fastq'
 filename_sam=${filename%.fastq*}'_trimmed.sam'
 filename_bam=${filename%.fastq*}'_trimmed.bam'
+filename_sort=${filename%.fastq*}'_trimmed.sorted.bam'
 
 # Define full path to data folder and create it if it doesn't exists
 pathdata=~/Documents/data_processing/${foldername}
@@ -127,7 +132,9 @@ path_bbduk_adapters=${path_bbduk_software}/resources/adapters.fa
 path_trimm_software=~/Documents/Software/Trimmomatic-0.39/
 [ ! -d ${path_trimm_software} ] && echo 'WARNING: Path to trimmomatic software does not exists.'
 
-
+# Define path to python script
+path_python_codes=~/Documents/Software/python_codes/
+[ ! -d ${path_python_codes} ] && echo 'WARNING: Path to python codes does not exists.'
 
 
 
@@ -246,6 +253,19 @@ then
 	echo 'Indexing bam file ...'
 	sambamba-0.7.1-linux-static sort -m 500MB ${path_align_out}/${filename_bam}
 	echo 'Indexing completed. Results are stored in' ${path_align_out}
+	echo ''
+fi
+
+
+# Transposon mapping
+if [[ ${mapping} =~ ^[yY]$ ]]
+then
+	echo 'Transposon mapping ...'
+	cd ~/Documents/Software/python_codes
+	python3 ${path_python_codes}transposonmapping_satay.py ${path_align_out}/${filename_sort}
+	cd ~/
+	echo ''
+	echo 'Transposon mapping complete. Results are stored in' ${path_align_out}
 	echo ''
 fi
 
