@@ -40,6 +40,7 @@ The installed software packages are
 - SAMTools and BCFTools (v1.10)
 - Sambamba (v0.7.1)
 - java (v11.0.7)
+- python code (transposonmapping_satay.py)
 
 Also, two reference sequences are stored:
 

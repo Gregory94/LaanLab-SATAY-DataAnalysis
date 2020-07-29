@@ -274,7 +274,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
     
     # GET ALIASES OF ALL GENES
     names_path = os.path.join(files_path,'Yeast_Protein_Names.txt')
-    aliases_designation_dict = gene_aliases(names_path)[0] #'YMR056C' \ ['AAC1'], ...
+    aliases_designation_dict = gene_aliases(names_path)[0] #'YMR056C' | ['AAC1'], ...
 
 
     

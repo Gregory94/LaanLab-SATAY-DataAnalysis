@@ -1097,14 +1097,54 @@ This python script is heavily based on the [Matlab script created by the Kornman
 
 The goal of this software is to create an overview of all insertion locations in the genome with the number of reads at those locations and to determine the number of insertions and reads for each gene.
 
-The python script loads a .bam file together with its .bam.bai index file.
-For this it requires the [pysam](<https://pysam.readthedocs.io/en/latest/api.html>) package which partly relies on the SAMTools software.
+In order to run the python script in Linux, go to the location where the script is stored and enter the command
+
+`python3 transposonmapping_satay.py /location/to/file.bam`
+
+The python script loads a .bam file together with its .bam.bai index file (the .bam.bai script is required).
+For this it requires the [pysam](<https://pysam.readthedocs.io/en/latest/api.html>) package which partly relies on the SAMTools software, hence this is only available on Linux (or Mac) systems (also when running the python on its own, so without the workflow, this python script will only work in Linux or Mac).
 Additional files required for the python script to work are (see also `N:\tnw\BN\LL\Shared\VirtualMachines\`):
 
 - [Yeast_Protein_Names.txt](<https://www.uniprot.org/docs/yeast>); includes all names for each gene including any aliases and different naming conventions.
 - Saccharomyces_cerevisiae.R64-1-1.99.gff3; includes for each gene the location in the genome.
 - [Cerevisiae_EssentialGenes_List_1](<https://rdrr.io/bioc/SLGI/man/essglist.html>); List of all essential genes.
 - [Cerevisiae_EssentialGenes_list_2](<http://www.essentialgene.org/>); List of all essential genes. This list and the previous list are very similar, but each of them contain some unique essential genes and to make sure as many essential genes are considered, both lists are used.
+
+The python scripts starts with loading the .bam file using pysam and determining some properties of the file, like the lengths and names of the chromosomes as used in the file and the number of mapped reads.
+After that, the script loops over all reads in each chromosome and gets the insertion location, orientation and length of the reads.
+The orientation of the reads are given by a flag, which typically is either 0 (forward orientation) or 16 (reverse orientation).
+The position of the reads is corrected if it is in reverse orientation.
+The most important results are stored in the variables `tncoordinates_array` (which stores the exact location of each read) and `readnumb_array` which stores the number of reads for each of the insertions.
+To count the number of reads, it is assumed that all insertions that are within two basepairs of each other belong together and hence the reads of those insertions are all summed up.
+This is to allow for small uncertainties during sequencing and alignment.
+The position of the total number of reads are determined by averaging the locations of the summed reads.
+When taking the sum of multiple reads, the highest read count is discarded (e.g. when the following number of reads are summed, [3,7,14], the value 14 is discarded and thus the total number of reads of those three insertions is 3+7=10 reads).
+This is orignally considered in the Matlab code by the Kornmann lab to reduce noise in the read data.
+See [the discussion on the SATAY user forum](<https://groups.google.com/forum/#!category-topic/satayusers/bioinformatics/uaTpKsmgU6Q>) for a more detailed explaination.
+
+Next, all the essential genes are retrieved from the additional files that were loaded in the beginning.
+Then, the chromosomes are concatenated into one large genome, so that the numbering of the basepair positions does not start at 0 for each chromosome, but rather continues counting upwards for the subsequent chromosomes.
+Finally, for all genes the number of insertions and reads are determined by checking the position of the genes and counting all transposons and reads that fall within the range of the gene.
+
+The data is stored in multiple files
+- .bed file
+- .wig file
+- _pergene.txt file
+- _peressential.txt file
+
+The .bed file (Browser Extensible Data) is used for storing the locations of the insertions and the number of reads.
+The different columns in the file are separated by spaces.
+The first column indicates the chromosome number (e.g. `chrI`), the second and third column the start and end position respectively, the fourth column includes a dummy variable (this is needed to comply the standard layout of the bed format) and the fifth column is the number of reads.
+For the number of the reads, the equation 20*reads+100 is used that linearly scales the values to enhance the contrast (e.g. 4 reads is represented as 180).
+
+The .wig file (Wiggle) contains similar information as the .bed file, but the layout is different.
+This file contains two columns separated by a space where the first column represents the location of the insertion and the second column the number of reads (the actual number of reads, thus not the using the equation as used in the .bed file).
+A difference between the .bed file and the .wig file is that in the in .wig file the insertions with different orientations are summed.
+In the .bed file a distinction is made between reads that come from transposons with different orientation, but this is not done in the .wig file.
+
+Finally two more file are created that include the number of insertions and reads per gene.
+This includes all genes (or only all annotated essential genes in case of _peressential.txt).
+These files contain three tab separated columns where in the first column the gene name is given (standard name is, e.g. Cdc42 or Bem1), the second column contains the number of insertions within the gene and the third column includes the number of reads.
 
 # Bibliography
 
