@@ -352,17 +352,17 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
 
 #%%
 if __name__ == '__main__':
-    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\bedfile_compare_20200723\E-MTAB-4885.WT1.bam_matlab.bed",
-                                  r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\bedfile_compare_20200723\E-MTAB-4885.WT1.bam_python.bed"],
+    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment\align_out_matlab\ERR1533143_trimmed.sorted.bam.bed",
+                                  r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment\align_out\ERR1533143_trimmed.sorted.bam.bed"],
                         chrom_user_set=None,
                         bar_width_user_set=100,
-                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\bedfile_compare_20200723",
-                        savefigure_name=r"100binwidth_bedfile_compare_matlab_python")
+                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment",
+                        savefigure_name=r"dDPL1_KornmannAlignment_100binwidth_bedfile_compare_matlab_python")
 
-#    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\wigfile_compare_20200723\E-MTAB-4885.WT1.bam_matlab.wig",
-#                            r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\wigfile_compare_20200723\E-MTAB-4885.WT1.bam_python.wig"],
+#    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment\align_out_matlab\ERR1533143_trimmed.sorted.bam.wig",
+#                             r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment\align_out\ERR1533143_trimmed.sorted.bam.wig"],
 #                            chrom_user_set=None,
 #                            bar_width_user_set=100,
-#                        savefigure_path=None,#r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT1\wigfile_compare_20200723",
-#                        savefigure_name=None)#r"smallbinwidth_wigfile_compare_matlab_python")
+#                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment",
+#                        savefigure_name=r"dDPL1_KornmannAlignment_100binwidth_wigfile_compare_matlab_python")
 

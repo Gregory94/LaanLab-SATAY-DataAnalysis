@@ -12,7 +12,8 @@ def list_gene_names(gene_information_file = None):
         file_dirname = os.path.dirname(os.path.abspath('__file__'))
         gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
 
-    gene_name_list = []
+    gene_name_list = [] #INLCUDES ALL GENE NAMES AND POTENTIAL ALIASES
+    gene_oln_list = [] #INCLUDE ONLY THE OLN NAMING CONVENTION
     gene_counter = 0
     with open(gene_information_file) as f:
         lines = f.readlines()
@@ -25,15 +26,36 @@ def list_gene_names(gene_information_file = None):
             l_list = l_short.split(' ')
             
             gene_name_list.append(l_list[0].strip(';'))
-            gene_name_list.append(l_list[1+extra_columns].strip(';'))
+
+            gene_oln = l_list[1+extra_columns].strip(';') #GET THE OLN NAME
+            if gene_oln == 'GAG' or gene_oln == 'POL': #CHECK WHETHER THE OLN IS 'GAG' OR 'POL'. IF YES, TAKE THE NEXT COLUMN
+                gene_name_list.append(l_list[2+extra_columns].strip(';'))
+                gene_oln_list.append(l_list[2+extra_columns].strip(';'))
+            else:
+                gene_name_list.append(gene_oln)
+                gene_oln_list.append(gene_oln)
 
             if l_list[1+extra_columns] == 'GAG' or l_list[1+extra_columns] == 'POL':    #THESE ARE SEQUENCES THAT SOMETIMES OCCUR WHICH HAVE TO BE IGNORED.
                 extra_columns = extra_columns + 1
             if extra_columns > 0:
                 for n in range(extra_columns):
-                    gene_name_list.append(l_list[1+n].strip(';'))
+                    gene_name = l_list[1+n].strip(';')
+                    if not gene_name == 'GAG' and not gene_name == 'POL':
+                        gene_name_list.append(gene_name)
             gene_counter += 1
 
+###SAVING OLN LIST
+#    from datetime import date
+#    current_date = date.today()
+#    oln_saving_file = r"S_Cerevisiae_protein_oln_name_full_genome.txt"
+#    gene_oln_list_sorted = sorted(gene_oln_list)
+#    with open(oln_saving_file, 'w') as f:
+#        
+#        f.write("org=S. Cerevisiae ; type=Genomic ; naming='oln' ; source file='Yeast_Protein_Names.txt' ; creation date=%s using 'gene_names.py'\n" % current_date)
+#        for oln_name in gene_oln_list_sorted:
+#            f.write("%s\n" % oln_name)
+    
+###
     print('Number of genes found in file = ',gene_counter)
     return(gene_name_list)
 
