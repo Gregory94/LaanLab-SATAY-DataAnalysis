@@ -2,18 +2,14 @@
 # -*- coding: utf-8 -*-
 """
 This is a tool developed for analysing transposon insertions for experiments using SAturated Transposon Analysis in Yeast (SATAY).
-This python code contains one function called transposonmapper().
 For more information about this code and the project, see github.com/Gregory94/LaanLab-SATAY-DataAnalysis
 
-This code is based on the Matlab code created by the Kornmann lab which is available at: sites.google.com/site/satayusers/
+This code is based on the Matlab code created by the Kornmann lab and is available at: sites.google.com/site/satayusers/
+It contains one function called transposonmapper().
 
 __Author__ = Gregory van Beek. LaanLab, department of Bionanoscience, Delft University of Technology
-__version__ = 1.2
-__Date last update__ = 2020-08-06
-
-Version history:
-    1.1; Added code for creating two text files for storing insertion locations per gene and per essential gene [2020-07-27]
-    1.2; Improved searching algorithm for essential genes [2020-08-06]
+__version__ = 1.1 [Added code for creating two text files for storing insertion locations per gene and per essential gene]
+__Date last update__ = 2020-07-27
 """
 
 import os, sys
@@ -39,27 +35,23 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
     '''
     This function is created for analysis of SATAY data using the species Saccharomyces Cerevisiae.
     It outputs the following files that store information regarding the location of all insertions:
-        - .bed-file: Includes all individual basepair locations of the whole genome where at least one transposon has been mapped and the number of insertions for each locations (the number of reads) according to the Browser Extensible Data (bed) format.
+        - .bed-file: Include all individual basepair locations of the whole genome where at least one transposon has been mapped and the number of insertions for each locations (the number of reads) according to the Browser Extensible Data (bed) format.
                     A distinction is made between reads that had a different reading orientation during sequencing. The number of reads are stored using the equation #reads*20+100 (e.g. 2 reads is stored as 140).
-        - .wig-file: Includes all individual basepair locations of the whole genome where at least one transposon has been mapped and the number of insertions for each locations (the number of reads) according to the Wiggle (wig) format.
+        - .wig-file: Include all individual basepair locations of the whole genome where at least one transposon has been mapped and the number of insertions for each locations (the number of reads) according to the Wiggle (wig) format.
                     In this file no distinction is made between reads that had a different reading orientation during sequencing. The number of reads are stored as the absolute count.
-        - _pergene.txt-file: Includes all genes (currently 6600) with the total number of insertions and number of reads within the genomic region of the gene.
-        - _peressential.txt-file: Includes all annotated essential genes (currently 1186) with the total number of insertions and number of reads within the genomic region of the gene.
-        - _pergene_insertions.txt-file: Includes all genes with their genomic location (i.e. chromosome number, start and end position) and the locations of all insertions within the gene location. It also include the number number of reads per insertions.
-        - _peressential_insertions.txt-file: Includes all essential genes with their genomic location (i.e. chromosome number, start and end position) and the locations of all insertions within the gene location. It also include the number number of reads per insertions.
-          (note that in the latter two files, the genomic locations are continous, for example chromosome II does not start at 0, but at 'length chromosome I + 1' etc.).
+        - _pergene.txt-file: Include all genes (currently 6600) with the total number of insertions and number of reads within the genomic region of the gene.
     The output files are saved at the location of the input file using the same name as the input file, but with the corresponding extension.
     
     The function assumes that the reads are already aligned to a reference genome.
-    The input data should be a .bam-file and the location where the .bam-file is stored should also contain an index file (.bam.bai-file, which for example can be created using sambamba).
-    This function takes the following inputs:
-        - bamfile [required]: Path to the bamfile. This location should also contain the .bam.bai index file (does not need to be input in this function).
+    The input data should be a .bam-file and the location where the .bam-file is stored should also contain an index file (.bai-file, which for example can be created using sambamba).
+    It takes the following inputs:
+        - bamfile [required]: Path to the bamfile. This location should also contain the index file (.bai).
         - gfffile [optional]: Path to a .gff-file including all gene information (e.g. downloaded from SGD).
         - essentialfiles [optional]: List of paths with text files that includes all essential gene names.
         - genenamesfile [optional]: Path to text file that includes aliases for all genes.
     When the arguments for the optional files are not given, the files are used that are stored at the following location:
         "path_current_pythonscript/../data_files"
-    The function uses the pysam package for handling bam files (see pysam.readthedocs.io/en/latest/index.html) and therefore this function only runs on Linux systems with SAMTools installed.
+    The function uses the pysam package for handling bam files (see pysam.readthedocs.io/en/latest/index.html)
     '''
 
 #%% LOADING BAM FILE
@@ -72,7 +64,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
         filename = os.path.basename(bamfile)
         path = bamfile.replace(filename,'')
 
-
+    
     if os.path.isfile(bamfile):
         print('Running: ', bamfile)
     else:
@@ -82,13 +74,13 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
 
 #%% LOADING ADDITIONAL FILES
     files_path = os.path.join(dirname,'..','..','data_files')
-
+    
     #LOADING GFF-FILE
     if gfffile is None:
         gfffile = os.path.join(files_path,'Saccharomyces_cerevisiae.R64-1-1.99.gff3')
     if not os.path.isfile(gfffile):
         raise ValueError('Path to GFF-file does not exist.')
-
+    
     #LOADING TEXT FILES WITH ESSENTIAL GENES
     if essentialfiles is None:
         essentialfiles = [os.path.join(files_path,'Cervisiae_EssentialGenes_List_1.txt'), os.path.join(files_path,'Cervisiae_EssentialGenes_List_2.txt')]
@@ -96,7 +88,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
         if not os.path.isfile(essential_file):
             raise ValueError('Following path does not exist: ' + essential_file)
     del essential_file
-
+    
     #LOADING TEXT FILE WITH GENE NAME ALIASES
     if genenamesfile is None:
         genenamesfile = os.path.join(files_path,'Yeast_Protein_Names.txt')
@@ -160,9 +152,9 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
         chr_mappedreads_dict[stat[0]] = [stat[1], stat[2], stat[3]]
         if stat[2] != 0:
             warnings.warn('Unmapped reads found in chromosome ' + stat[0])
-
-
-
+    
+    
+    
     del (stat, stats)
 
 
@@ -178,17 +170,17 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
         start_array = np.empty(shape=(N_reads_kk), dtype=int)
         flag_array = np.empty(shape=(N_reads_kk), dtype=int)
         readlength_array = np.empty(shape=(N_reads_kk), dtype=int)
-
-
+        
+        
         #RETREIVING ALL THE READS FROM THE CURRENT CHROMOSOME.
-        print('Getting reads for chromosome %s ...' % kk)
+        print('Getting reads for chromosome ', kk ,' ...')
         for reads in bam.fetch(kk, 0, chr_length_dict[kk], until_eof=True):
             read = str(reads).split('\t')
 
             start_array[read_counter] = int(read[3]) + 1
             flag_array[read_counter] = int(read[1])
             readlength_array[read_counter] = int(len(read[9]))
-
+    
             read_counter += 1
 
 
@@ -252,7 +244,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
 
 
         timer_end = timeit.default_timer()
-        print('Chromosome %s complated in %.3f seconds' % (kk, (timer_end - timer_start)))
+        print('Chromosome ', kk, ' completed in ', (timer_end - timer_start), ' seconds.')
 
 
 
@@ -279,27 +271,34 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
     essentialnames_list = list_known_essentials([essential_path1, essential_path2])
 
 
-
+    
     # GET ALIASES OF ALL GENES
     names_path = os.path.join(files_path,'Yeast_Protein_Names.txt')
     aliases_designation_dict = gene_aliases(names_path)[0] #'YMR056C' \ ['AAC1'], ...
 
 
-
+    
     # FOR ALL GENE IN GENECOORDINATES_DICT, CHECK IF THEY ARE ANNOTATED AS ESSENTIAL
     essentialcoordinates_dict = {}
-    for essential in essentialnames_list:
-        for key,val in aliases_designation_dict.items():
-            if essential == key:
-                essentialcoordinates_dict[key] = genecoordinates_dict.get(key).copy()
-                break
-            elif essential in val:
-                essentialcoordinates_dict[key] = genecoordinates_dict.get(key).copy()
-                break
+    for gene in genecoordinates_dict:
+        if gene in essentialnames_list:
+            essentialcoordinates_dict[gene] = genecoordinates_dict.get(gene).copy()
+        else:
+            gene_aliases_list = []
+            for key, val in aliases_designation_dict.items():
+                if gene == key or gene in val: #If gene occurs as key or in the values list in aliases_designation_dict, put all its aliases in a single list.
+                    gene_aliases_list.append(key)
+                    for aliases in aliases_designation_dict.get(key):
+                        gene_aliases_list.append(aliases)
+    
+            for gene_alias in gene_aliases_list:
+                if gene_alias in essentialnames_list:
+                    essentialcoordinates_dict[gene_alias] = genecoordinates_dict.get(gene).copy()
+                    break
 
 
 
-    del (gff_path, essential_path1, essential_path2, names_path, essential, essentialnames_list, key, val)
+    del (gff_path, essential_path1, essential_path2, names_path, gene, gene_alias, essentialnames_list, gene_aliases_list, key, val)
 
 
 
@@ -419,7 +418,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
 
     del (pergenefile, gene, gene_alias, tnpergene, readpergene)
 
-#%% CREATE TEXT FILE TRANSPOSONS AND READS PER ESSENTIAL GENE
+#%% CREATE TEXT FILE TRANSPOONS AND READS PER ESSENTIAL GENE
     peressentialfile = bamfile+'_peressential.txt'
     print('Writing peressential.txt file at: ',peressentialfile)
     
