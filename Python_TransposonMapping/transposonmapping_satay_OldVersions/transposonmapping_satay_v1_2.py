@@ -8,13 +8,12 @@ For more information about this code and the project, see github.com/Gregory94/L
 This code is based on the Matlab code created by the Kornmann lab which is available at: sites.google.com/site/satayusers/
 
 __Author__ = Gregory van Beek. LaanLab, department of Bionanoscience, Delft University of Technology
-__version__ = 1.3
-__Date last update__ = 2020-08-07
+__version__ = 1.2
+__Date last update__ = 2020-08-06
 
 Version history:
     1.1; Added code for creating two text files for storing insertion locations per gene and per essential gene [2020-07-27]
     1.2; Improved searching algorithm for essential genes [2020-08-06]
-    1.3; Load file containing all essential genes so that a search for essential genes in multiple file is not needed anymore. This file is created using Create_EssentialGenes_list.py located in the same directory as this code [2020-08-07]
 """
 
 import os, sys
@@ -27,14 +26,16 @@ dirname = os.path.dirname(os.path.abspath('__file__'))
 sys.path.insert(1,os.path.join(dirname,'python_modules'))
 from chromosome_and_gene_positions import chromosomename_roman_to_arabic, gene_position
 from gene_names import gene_aliases
+from essential_genes_names import list_known_essentials
 
 
-# bam_arg = sys.argv[1]
+
+bam_arg = sys.argv[1]
 
 
 
 #%%
-def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesfile=None):
+def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenamesfile=None):
     '''
     This function is created for analysis of SATAY data using the species Saccharomyces Cerevisiae.
     It outputs the following files that store information regarding the location of all insertions:
@@ -53,9 +54,9 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
     The input data should be a .bam-file and the location where the .bam-file is stored should also contain an index file (.bam.bai-file, which for example can be created using sambamba).
     This function takes the following inputs:
         - bamfile [required]: Path to the bamfile. This location should also contain the .bam.bai index file (does not need to be input in this function).
-        - gfffile [optional]: Path to a .gff-file including all gene information (e.g. downloaded from SGD). Default file is 'Saccharomyces_cerevisiae.R64-1-1.99.gff3'.
-        - essentialfiles [optional]: Path to a .txt file containing a list all essential genes. Every line should consist of a single essential gene and the file should have one header line. Ideally this file is created using 'Create_EssentialGenes_list.py'. Default file is 'Cerevisiae_AllEssentialGenes_List.txt'.
-        - genenamesfile [optional]: Path to text file that includes aliases for all genes. Default file is 'Yeast_Protein_Names.txt'.
+        - gfffile [optional]: Path to a .gff-file including all gene information (e.g. downloaded from SGD).
+        - essentialfiles [optional]: List of paths with text files that includes all essential gene names.
+        - genenamesfile [optional]: Path to text file that includes aliases for all genes.
     When the arguments for the optional files are not given, the files are used that are stored at the following location:
         "path_current_pythonscript/../data_files"
     The function uses the pysam package for handling bam files (see pysam.readthedocs.io/en/latest/index.html) and therefore this function only runs on Linux systems with SAMTools installed.
@@ -64,8 +65,8 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 #%% LOADING BAM FILE
     if bamfile is None:
         path = os.path.join('/home', 'gregoryvanbeek', 'Documents', 'data_processing')
-        # filename = 'E-MTAB-4885.WT2.bam'
-        filename = 'SRR062634.filt_trimmed.sorted.bam'
+        filename = 'E-MTAB-4885.WT2.bam'
+        # filename = 'SRR062634.filt_trimmed.sorted.bam'
         bamfile = os.path.join(path,filename)
     else:
         filename = os.path.basename(bamfile)
@@ -90,10 +91,11 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 
     #LOADING TEXT FILES WITH ESSENTIAL GENES
     if essentialfiles is None:
-        essentialfiles = os.path.join(files_path,'Cerevisiae_AllEssentialGenes_List.txt')
-    if not os.path.isfile(essentialfiles):
-        raise ValueError('Following path does not exist: ' + essentialfiles)
-    del essentialfiles
+        essentialfiles = [os.path.join(files_path,'Cervisiae_EssentialGenes_List_1.txt'), os.path.join(files_path,'Cervisiae_EssentialGenes_List_2.txt')]
+    for essential_file in essentialfiles:
+        if not os.path.isfile(essential_file):
+            raise ValueError('Following path does not exist: ' + essential_file)
+    del essential_file
 
     #LOADING TEXT FILE WITH GENE NAME ALIASES
     if genenamesfile is None:
@@ -250,8 +252,7 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 
 
         timer_end = timeit.default_timer()
-        print('Chromosome %s completed in %.3f seconds' % (kk, (timer_end - timer_start)))
-        print('')
+        print('Chromosome %s complated in %.3f seconds' % (kk, (timer_end - timer_start)))
 
 
 
@@ -273,13 +274,10 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 
 
     # GET ALL ANNOTATED ESSENTIAL GENES
-    essential_path = os.path.join(files_path,'Cerevisiae_AllEssentialGenes_List.txt')
-    essentialcoordinates_dict = {}
-    with open(essential_path, 'r') as f:
-        genes = f.readlines()[1:]
-        for gene in genes:
-            name = gene.strip('\n')
-            essentialcoordinates_dict[name] = genecoordinates_dict.get(name).copy()
+    essential_path1 = os.path.join(files_path,'Cervisiae_EssentialGenes_List_1.txt')
+    essential_path2 = os.path.join(files_path,'Cervisiae_EssentialGenes_List_2.txt')
+    essentialnames_list = list_known_essentials([essential_path1, essential_path2])
+
 
 
     # GET ALIASES OF ALL GENES
@@ -288,7 +286,20 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 
 
 
-    del (gff_path, gene, genes, name, essential_path)
+    # FOR ALL GENE IN GENECOORDINATES_DICT, CHECK IF THEY ARE ANNOTATED AS ESSENTIAL
+    essentialcoordinates_dict = {}
+    for essential in essentialnames_list:
+        for key,val in aliases_designation_dict.items():
+            if essential == key:
+                essentialcoordinates_dict[key] = genecoordinates_dict.get(key).copy()
+                break
+            elif essential in val:
+                essentialcoordinates_dict[key] = genecoordinates_dict.get(key).copy()
+                break
+
+
+
+    del (gff_path, essential_path1, essential_path2, names_path, essential, essentialnames_list, key, val)
 
 
 
@@ -368,7 +379,6 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 #%% CREATE BED FILE
     bedfile = bamfile+'.bed'
     print('Writing bed file at: ', bedfile)
-    print('')
 
 
     with open(bedfile, 'w') as f:
@@ -390,7 +400,7 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 #%% CREATE TEXT FILE WITH TRANSPOSONS AND READS PER GENE
     pergenefile = bamfile+'_pergene.txt'
     print('Writing pergene.txt file at: ', pergenefile)
-    print('')
+
 
     with open(pergenefile, 'w') as f:
 
@@ -412,8 +422,8 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 #%% CREATE TEXT FILE TRANSPOSONS AND READS PER ESSENTIAL GENE
     peressentialfile = bamfile+'_peressential.txt'
     print('Writing peressential.txt file at: ',peressentialfile)
-    print('')
-
+    
+    
     with open(peressentialfile, 'w') as f:
         
         f.write('Gene name\tNumber of transposons per gene\tNumber of reads per gene\n')
@@ -435,12 +445,12 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 #%% CREATE TEXT FILE WITH LOCATION OF INSERTIONS AND READS PER GENE
     pergeneinsertionsfile = bamfile+'_pergene_insertions.txt'
     print('Witing pergene_insertions.txt file at: ',pergeneinsertionsfile)
-    print('')
-
+    
+    
     with open(pergeneinsertionsfile, 'w') as f:
-
+        
         f.write('Gene name\tChromosome\tStart location\tEnd location\tInsertion locations\tReads per insertion location\n')
-
+        
         for gene in tncoordinates_pergene_dict:
             if gene in aliases_designation_dict:
                 gene_alias = aliases_designation_dict.get(gene)[0]
@@ -456,12 +466,12 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 #%% CREATE TEXT FILE WITH LOCATION OF INSERTIONS AND READS PER ESSENTIAL GENE
     peressentialinsertionsfile = bamfile+'_peressential_insertions.txt'
     print('Writing peressential_insertions.txt file at: ', peressentialinsertionsfile)
-    print('')
-
+    
+    
     with open(peressentialinsertionsfile, 'w') as f:
-
+        
         f.write('Essential gene name\tChromosome\tStart location\tEnd location\tInsertion locations\tReads per insertion location\n')
-
+        
         for essential in tncoordinates_peressential_dict:
             if essential in aliases_designation_dict:
                 essential_alias = aliases_designation_dict.get(essential)[0]
@@ -476,7 +486,7 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 #%% ADD INSERTIONS AT SAME LOCATION BUT WITH DIFFERENT ORIENTATIONS TOGETHER (FOR STORING IN WIG-FILE)
     wigfile = bamfile+'.wig'
     print('Writing wig file at: ', wigfile)
-    print('')
+
 
 
     readnumbwig_array = readnumb_array.copy()

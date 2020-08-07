@@ -1,4 +1,4 @@
-All essential genes found in lists:['Cervisiae_EssentialGenes_List_1.txt', 'Cervisiae_EssentialGenes_List_2.txt']
+All essential genes found in lists:['Cerevisiae_EssentialGenes_List_1.txt', 'Cerevisiae_EssentialGenes_List_2.txt']
 YAL001C
 YAL003W
 YAL025C
