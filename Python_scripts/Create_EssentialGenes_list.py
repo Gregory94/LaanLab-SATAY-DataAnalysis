@@ -41,7 +41,7 @@ def create_essentialgenes_list(inputfiles_list = None):
     '''
     
     if inputfiles_list == None:
-        ValueError('Input list containing one or more paths is missing.')
+        raise ValueError('Input list containing one or more paths is missing.')
     else:
         files = inputfiles_list
 

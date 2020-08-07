@@ -1107,8 +1107,7 @@ Additional files required for the python script to work are (see also `N:\tnw\BN
 
 - [Yeast_Protein_Names.txt](<https://www.uniprot.org/docs/yeast>); includes all names for each gene including any aliases and different naming conventions.
 - Saccharomyces_cerevisiae.R64-1-1.99.gff3; includes for each gene the location in the genome.
-- [Cerevisiae_EssentialGenes_List_1](<https://rdrr.io/bioc/SLGI/man/essglist.html>); List of all essential genes.
-- [Cerevisiae_EssentialGenes_list_2](<http://www.essentialgene.org/>); List of all essential genes. This list and the previous list are very similar, but each of them contain some unique essential genes and to make sure as many essential genes are considered, both lists are used.
+- Cerevisiae_AllEssentialGenes_List.txt; List of all essential genes.
 
 The python scripts starts with loading the .bam file using pysam and determining some properties of the file, like the lengths and names of the chromosomes as used in the file and the number of mapped reads.
 After that, the script loops over all reads in each chromosome and gets the insertion location, orientation and length of the reads.
@@ -1126,25 +1125,33 @@ Next, all the essential genes are retrieved from the additional files that were 
 Then, the chromosomes are concatenated into one large genome, so that the numbering of the basepair positions does not start at 0 for each chromosome, but rather continues counting upwards for the subsequent chromosomes.
 Finally, for all genes the number of insertions and reads are determined by checking the position of the genes and counting all transposons and reads that fall within the range of the gene.
 
-The data is stored in multiple files
+The results are stored in multiple files
+
 - .bed file
 - .wig file
 - _pergene.txt file
 - _peressential.txt file
+- _pergene_insertions.txt file
+- _peressential_insertions.txt file
 
 The .bed file (Browser Extensible Data) is used for storing the locations of the insertions and the number of reads.
 The different columns in the file are separated by spaces.
-The first column indicates the chromosome number (e.g. `chrI`), the second and third column the start and end position respectively, the fourth column includes a dummy variable (this is needed to comply the standard layout of the bed format) and the fifth column is the number of reads.
-For the number of the reads, the equation 20*reads+100 is used that linearly scales the values to enhance the contrast (e.g. 4 reads is represented as 180).
+The first column indicates the chromosome number (e.g. `chrI`), the second and third column the start and end position of the insertion respectively, the fourth column includes a dummy variable (this is needed to comply the standard layout of the bed format) and the fifth column is the number of reads.
+For the number of the reads, the equation 20*reads+100 is used that linearly scales the values to enhance the contrast during plotting (e.g. 4 reads is represented as 180).
 
 The .wig file (Wiggle) contains similar information as the .bed file, but the layout is different.
 This file contains two columns separated by a space where the first column represents the location of the insertion and the second column the number of reads (the actual number of reads, thus not the using the equation as used in the .bed file).
 A difference between the .bed file and the .wig file is that in the in .wig file the insertions with different orientations are summed.
 In the .bed file a distinction is made between reads that come from transposons with different orientation, but this is not done in the .wig file.
 
-Finally two more file are created that include the number of insertions and reads per gene.
+Two files are created, with the extension _pergene.txt or _peressential.txt, that include the number of insertions and reads per gene.
 This includes all genes (or only all annotated essential genes in case of _peressential.txt).
 These files contain three tab separated columns where in the first column the gene name is given (standard name is, e.g. Cdc42 or Bem1), the second column contains the number of insertions within the gene and the third column includes the number of reads.
+
+Finally, two more files are created with the extension _pergene_insertions.txt and _peressential_insertions.txt, that include the location of all genes (or all essential genes) together with the locations of all transposon insertions that fall within the genomic region of the gene.
+These files consist of six columns where the first indicates the gene name, the second till fourth column indicate the chromosome number and start and end position of the gene, respectively, the fifth column contains a list of all insertion locations of the transposon within the gene and the sixth column contains a list of the number of reads for each insertion.
+
+All files that stored at the same location where the .bam file is stored.
 
 # Bibliography
 
