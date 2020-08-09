@@ -1,5 +1,5 @@
 ---
-title: " Software installation guide for whole genome sequencing and transposon mapping"
+title: "Introduction to the Virtual Machine for SATAY analysis"
 output: pdf_document
 documentclass: article
 classoption: onecolumn
@@ -95,5 +95,7 @@ The password and user name are stored on the N-drive.
 When turning off, go to the top right corner and click on the sound and battery icon and power off the system.
 
 The default folder structure is given in the following figure.
+Here, orange indicates directories and blue are some of the most important files.
+The green boxes indicate input files that you need to provide yourself.
 
-![ ](./media/Folder_Structure_VM.png)
+![ ](Folder_Structure_VM.png)

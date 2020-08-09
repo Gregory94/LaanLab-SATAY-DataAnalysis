@@ -8,14 +8,13 @@ For more information about this code and the project, see github.com/Gregory94/L
 This code is based on the Matlab code created by the Kornmann lab which is available at: sites.google.com/site/satayusers/
 
 __Author__ = Gregory van Beek. LaanLab, department of Bionanoscience, Delft University of Technology
-__version__ = 1.4
+__version__ = 1.3
 __Date last update__ = 2020-08-07
 
 Version history:
     1.1; Added code for creating two text files for storing insertion locations per gene and per essential gene [2020-07-27]
     1.2; Improved searching algorithm for essential genes [2020-08-06]
     1.3; Load file containing all essential genes so that a search for essential genes in multiple file is not needed anymore. This file is created using Create_EssentialGenes_list.py located in the same directory as this code [2020-08-07]
-    1.4; Fixed bug where the gene position and transposon insertion location did not start at zero for each chromosome, causing confusing values to be stored in the _pergene_insertions.txt and _peressential_insertions.txt files [2020-08-09]
 """
 
 import os, sys
@@ -269,7 +268,7 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 
     # GET POSITION GENES
     gff_path = os.path.join(files_path,'Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    genecoordinates_dict = gene_position(gff_path) #'YAL069W' | ['I', 335, 649], ...
+    genecoordinates_dict = gene_position(gff_path) #'YAL069W' | ['I', 335, 649, '+'], ...
 
 
 
@@ -288,12 +287,11 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
     aliases_designation_dict = gene_aliases(names_path)[0] #'YMR056C' \ ['AAC1'], ...
 
 
-
     del (gff_path, gene, genes, name, essential_path)
 
 
 
-#%% CONCATENATE ALL CHROMOSOMES
+#%% CONCATENATE ALL CHROMOSOMES (NEEDED TO GET THE NUMBER OF TRANSPOSONS AND READS PER GENE)
 
     #FOR EACH INSERTION LOCATION, ADD THE LENGTH OF ALL PREVIOUS CHROMOSOMES.
     ll = 0
@@ -480,7 +478,7 @@ def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesf
 
 
     del (essential, gene_chrom, tncoordinates, essential_alias, peressentialinsertionsfile)
-
+    
 #%% ADD INSERTIONS AT SAME LOCATION BUT WITH DIFFERENT ORIENTATIONS TOGETHER (FOR STORING IN WIG-FILE)
     wigfile = bamfile+'.wig'
     print('Writing wig file at: ', wigfile)
