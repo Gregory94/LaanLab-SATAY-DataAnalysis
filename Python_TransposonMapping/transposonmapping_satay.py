@@ -9,7 +9,7 @@ This code is based on the Matlab code created by the Kornmann lab which is avail
 
 __Author__ = Gregory van Beek. LaanLab, department of Bionanoscience, Delft University of Technology
 __version__ = 1.4
-__Date last update__ = 2020-08-07
+__Date last update__ = 2020-08-09
 
 Version history:
     1.1; Added code for creating two text files for storing insertion locations per gene and per essential gene [2020-07-27]
@@ -30,12 +30,12 @@ from chromosome_and_gene_positions import chromosomename_roman_to_arabic, gene_p
 from gene_names import gene_aliases
 
 
-# bam_arg = sys.argv[1]
+bam_arg = sys.argv[1]
 
 
 
 #%%
-def transposonmapper(bamfile=None, gfffile=None, essentialfiles=None, genenamesfile=None):
+def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenamesfile=None):
     '''
     This function is created for analysis of SATAY data using the species Saccharomyces Cerevisiae.
     It outputs the following files that store information regarding the location of all insertions:
