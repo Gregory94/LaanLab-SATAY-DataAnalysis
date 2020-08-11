@@ -84,7 +84,7 @@ def list_gene_names(gene_information_file = None):
 def gene_aliases(gene_information_file = None):
     '''Create three dictionaries containing aliases for genes
     Input is the path to 'Protein_Names.txt' file downloaded from https://www.uniprot.org/docs/yeast.
-    If no input is given the file is automatically searched for at r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'.
+    If no input is given the file is automatically searched for at thisscriptlocation/../Data_Files/Yeast_Protein_Names.txt.
     Output is three dictionaries:
     aliases_designation_dict = gene aliases for common names (e.g. Bem1 and Sro1)
     aliases_sgd_dict = gene aliases for the search names in SGD (e.g. Bem1 and S000000404)
