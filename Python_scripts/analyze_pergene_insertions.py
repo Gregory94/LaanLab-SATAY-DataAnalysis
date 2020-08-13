@@ -36,6 +36,8 @@ def tninserts_analysis():
     nonessential_position_dict: only for nonessential genes.
     nonessential_inserts_dict: only for nonessential genes.
     nonessential_reads_dict: only for nonessential genes.
+    
+    df: dataframe to store all information for analysis
     '''
 #%% READ FILE AND PUT ALL VALUES IN DICTIONARIES
     filepath = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder\align_out"
@@ -85,9 +87,9 @@ def tninserts_analysis():
                 d.append(geneinserts_list[i] - geneinserts_list[i-1])
             gene_inserts_distance_dict[genename] = d
         elif len(geneinserts_list) == 1:
-            gene_inserts_distance_dict[genename] = np.nan#[0] #only one insert
+            gene_inserts_distance_dict[genename] = [0]#[0] #only one insert
         else:
-            gene_inserts_distance_dict[genename] = np.nan#[-1] #no insert
+            gene_inserts_distance_dict[genename] = [0]#[-1] #no insert
 
 
         genereads_str = line_split[5].strip('[]')
@@ -103,7 +105,7 @@ def tninserts_analysis():
 
 
 
-    del (datafile, lines, line, line_split, genename, gene_chrom, gene_start, gene_end, geneinserts_str, geneinserts_list, genereads_str, genereads_list, i, d, ins, ins_list)
+    del (datafile, lines, line, line_split, genename, gene_chrom, gene_start, gene_end, geneinserts_str, geneinserts_list, genereads_str, genereads_list, i, d, ins, ins_list, l)
     #remains: gene_inserts_dict, gene_position_dict, gene_reads_dict
 
 
@@ -177,11 +179,11 @@ def tninserts_analysis():
 
         N_inserts_list.append(len(gene_inserts_dict.get(gene))) #N_INSERTS_LIST (NUMBER OF INSERTIONS)
 
-        N_inserts_trunc_list.append(len(gene_inserts_trunc_dict.get(gene)))# / (gene_position_dict.get(gene)[2] - gene_position_dict.get(gene)[1])) #N_INSERTS_CENTER_LIST (NUMBER OF INSERTIONS IN THE GENE WHERE THE 10% OF THE GENE LENGTH IS TRUNCATED NORMALIZED TO GENE LENGTH)
+        N_inserts_trunc_list.append(len(gene_inserts_trunc_dict.get(gene))) #N_INSERTS_CENTER_LIST (NUMBER OF INSERTIONS IN THE GENE WHERE THE 10% OF THE GENE LENGTH IS TRUNCATED NORMALIZED TO GENE LENGTH)
 
-        distance_max_inserts_list.append(np.max(gene_inserts_distance_dict.get(gene)) / (gene_position_dict.get(gene)[2] - gene_position_dict.get(gene)[1])) #DISTANCE_MAX_INSERTS_LIST (LARGEST DISTANCE BETWEEN SUBSEQUENT INSERTIONS NORMALIZED TO GENE LENGTH)
+        distance_max_inserts_list.append(np.nanmax(gene_inserts_distance_dict.get(gene)) / (gene_position_dict.get(gene)[2] - gene_position_dict.get(gene)[1])) #DISTANCE_MAX_INSERTS_LIST (LARGEST DISTANCE BETWEEN SUBSEQUENT INSERTIONS NORMALIZED TO GENE LENGTH)
         
-        N_reads_list.append(sum(gene_reads_dict.get(gene))) #N_READS_LIST
+        N_reads_list.append(sum(gene_reads_dict.get(gene))) #N_READS_LIST (TOTAL NUMBER OF READS IN GENE)
 
 
 
@@ -196,18 +198,23 @@ def tninserts_analysis():
     df = pd.DataFrame(allgenes, columns = [column_name for column_name in allgenes])
 
 
-#    del (gene, genename_list, essentiality_list, N_inserts_list, N_inserts_center_list, distance_max_inserts_list, N_reads_list, allgenes)
+    del (gene, genename_list, essentiality_list, N_inserts_list, N_inserts_trunc_list, distance_max_inserts_list, N_reads_list, allgenes)
 
 
 #%%TEST GRAPH
-#    sns.set(style="whitegrid")
-#    vp = sns.violinplot(x='Essentiality',y='Number_Insertions_Truncated_Gene',data=df, cut=0)
-#    boxp = sns.boxplot(x='Essentiality',y='Number_Insertions_Truncated_Gene',data=df)
+    sns.set(style="whitegrid")
+    sns.violinplot(x='Essentiality',y='Number_Insertions_Truncated_Gene',data=df, cut=0)
+    sns.boxplot(x='Essentiality',y='Number_Insertions_Truncated_Gene',data=df)
 
-    bp = sns.barplot(x='Essentiality',y='Max_Insertion_Distance', data=df)
 
-#    vp = sns.violinplot(x='Essentiality',y='Number_Reads', data=df, cut=0)
+    df_select = df[df['Number_Insertions_Full_Gene'] > 1]
+    sns.barplot(x='Essentiality',y='Max_Insertion_Distance', data=df_select)
+    del df_select
 
+
+    df_select = df[df['Number_Reads'] < 10000]
+    sns.boxplot(x='Essentiality',y='Number_Reads', data=df_select)
+    del df_select
 
 
 
