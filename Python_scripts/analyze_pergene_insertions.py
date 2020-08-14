@@ -20,7 +20,6 @@ dirname = os.path.dirname(os.path.abspath('__file__'))
 sys.path.insert(1,os.path.join(dirname,'python_modules'))
 from gene_names import gene_aliases
 
-
 #%%
 def tninserts_analysis():
     '''
@@ -41,10 +40,10 @@ def tninserts_analysis():
     df: dataframe to store all information for analysis
     '''
 #%% READ FILE AND PUT ALL VALUES IN DICTIONARIES. DO NOT CHANGE THIS SECTION.
-#    filepath = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder\align_out"
-#    filename = "ERR1533148_trimmed.sorted.bam_pergene_insertions.txt"
-    filepath = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\WT2_dataset_analysis_temp202008051429_new2"
-    filename = r"E-MTAB-4885.WT2.bam_pergene_insertions.txt"
+    filepath = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder\align_out"
+    filename = "ERR1533148_trimmed.sorted.bam_pergene_insertions.txt"
+#    filepath = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\WT2_dataset_analysis_temp202008051429_new2"
+#    filename = r"E-MTAB-4885.WT2.bam_pergene_insertions.txt"
     datafile = os.path.join(filepath, filename)
 
     with open(datafile) as f:
@@ -238,6 +237,37 @@ def tninserts_analysis():
 #    print('Number of outliers for essential genes is %i' % len(boxplot_stats(df.Number_Reads_Truncated_Gene).pop(0)['fliers']))
     del df_select
 
+
+
+#%% CREATE TEXT FILE FOR NUMBER OF INSERTIONS FOR TRUNCATED GENE
+#    savename = "ERR1533148_WT1_insertions_truncated.txt"
+#    
+#    with open(os.path.join(filepath, savename), 'w') as f:
+#        f.write('Gene_name\tEssentiality\tInsertions_10%_truncated\n')
+#
+#        for gene in gene_inserts_trunc_dict:
+#            if gene in essential_position_dict:
+#               f. write(gene + '\t' + 'True' + '\t' + str(gene_inserts_trunc_dict.get(gene)).strip('[]') + '\n')
+#            else:
+#                f.write(gene + '\t' + 'False' + '\t' + str(gene_inserts_trunc_dict.get(gene)).strip('[]') + '\n')
+#
+#
+#    del (savename, f, gene)
+#
+
+#%% CREATE TEXT FILE FOR NUMBER OF READS FOR TRUNCATED GENE
+#    savename = "ERR1533148_WT1_reads_truncated.txt"
+#    
+#    with open(os.path.join(filepath, savename), 'w') as f:
+#        f.write('Gene_name\tEssentiality\tReads_10%_truncated\n')
+#        
+#        for gene in gene_reads_trunc_dict:
+#                    if gene in essential_position_dict:
+#                       f. write(gene + '\t' + 'True' + '\t' + str(gene_reads_trunc_dict.get(gene)).strip('[]') + '\n')
+#                    else:
+#                        f.write(gene + '\t' + 'False' + '\t' + str(gene_reads_trunc_dict.get(gene)).strip('[]') + '\n')
+#
+#    del (savename, f, gene)
 
 
 #%%
