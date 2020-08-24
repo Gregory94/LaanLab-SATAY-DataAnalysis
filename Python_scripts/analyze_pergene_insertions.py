@@ -13,7 +13,7 @@ import copy
 import pandas as pd
 import seaborn as sns
 import numpy as np
-from matplotlib.cbook import boxplot_stats
+#from matplotlib.cbook import boxplot_stats
 
 
 dirname = os.path.dirname(os.path.abspath('__file__'))
@@ -110,7 +110,7 @@ def tninserts_analysis():
 
 
 
-    del (datafile, lines, line, line_split, genename, gene_chrom, gene_start, gene_end, geneinserts_str, geneinserts_list, genereads_str, genereads_list, i, d, ins, ins_list, l)
+    del (datafile, lines, line, line_split, genename, gene_chrom, gene_start, gene_end, geneinserts_str, geneinserts_list, genereads_str, genereads_list, i, d, ins, ins_list, ins_indx_list, l)
     #remains: gene_inserts_dict, gene_position_dict, gene_reads_dict
 
 
@@ -222,7 +222,7 @@ def tninserts_analysis():
     sns.boxplot(x='Essentiality',y='Number_Insertions_Truncated_Gene',data=df)
 
 
-    #NOT USEFUL (?); LARGEST DISTANCE BETWEEN SUBSEQUENT INSERTIONS FOR EACH GENE. Q: WHAT TO DO WITH CASES WHERE THERE IS ONLY A SINGLE OF NO INSERTIONS? -> IF THOSE SITUATIONS SET TO 0 IT DOES GIVE A CLEAR DISTINCTION BETWEEN ESSENTIALITY.
+    #NOT USEFUL (?); LARGEST DISTANCE BETWEEN SUBSEQUENT INSERTIONS FOR EACH GENE. Q: WHAT TO DO WITH CASES WHERE THERE IS ONLY A SINGLE OF NO INSERTIONS? -> IF THOSE SITUATIONS SET TO 0 IT DOES GIVE A CLEAR DISTINCTION BETWEEN ESSENTIALITY, BUT IS THIS FAIR?
     ax = sns.stripplot(x='Essentiality',y='Max_Insertion_Distance', data=df, alpha=0.23, palette='coolwarm')
     sns.violinplot(x='Essentiality',y='Max_Insertion_Distance', data=df, cut=0, palette=['white'])
     df_select = df[df['Number_Insertions_Full_Gene'] > 1]
