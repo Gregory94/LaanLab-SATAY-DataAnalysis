@@ -11,13 +11,12 @@ This can be used to determine the number of transposon insertions outside the ge
 #%%
 import os, sys
 import numpy as np
-#import matplotlib.pyplot as plt
-#
+import pandas as pd
+
+
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
 sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic
-#from essential_genes_names import list_known_essentials
-#from gene_names import gene_aliases
 from chromosome_names_in_files import chromosome_name_wigfile
 
 
@@ -110,7 +109,7 @@ for line in lines[1:]:
 
 del (f, lines, line, genename, gene_chrom, gene_start, gene_end, geneinserts_list, geneinserts_str, genereads_str, genereads_list)
 
-#%% DETERMINE NUMBER OF TRANSPOSONS IN EACH GENOMIC REGION AVERAGED OVER THE NUMBER OF BASEPAIRS FOR THAT REGION
+#%% DETERMINE THE LOCATION GENOMIC FEATURES IN THE CURRENT CHROMOSOME AND STORE THIS IN A DICTIONARY
 
 start_chr = chromosome_position(gff_file)[1].get(chrom)
 end_chr = chromosome_position(gff_file)[2].get(chrom)
@@ -120,7 +119,7 @@ for bp in range(start_chr, end_chr + 1):
     dna_dict[bp] = 'noncoding'
 
 
-for gene in gene_position_dict:
+for gene in gene_position_dict: #IGNORE GENES THAT END WITH -A AS THESE ARE DUBIOUS (?) 
     for bp in range(gene_position_dict.get(gene)[1]+start_chr, gene_position_dict.get(gene)[2]+start_chr+1):
         dna_dict[bp] = gene
         
@@ -155,16 +154,80 @@ for gene in gene_position_dict:
 #noncoding_dna_bplocations_array = np.delete(noncoding_dna_bplocations_array, del_bp_ind_list)
 
 
-noncoding_dna_bplocations_array = np.zeros((end_chr - start_chr) - len(coding_dna_bplocations_array) + 2, dtype=int)
-counter = 1
-for j in range(start_chr, end_chr+1):
-    if not int(j) in coding_dna_bplocations_array: #SEARCHING IS SLOW
-        noncoding_dna_bplocations_array[counter] = int(j)
-        counter += 1
+#noncoding_dna_bplocations_array = np.zeros((end_chr - start_chr) - len(coding_dna_bplocations_array) + 2, dtype=int)
+#counter = 1
+#for j in range(start_chr, end_chr+1):
+#    if not int(j) in coding_dna_bplocations_array: #SEARCHING IS SLOW
+#        noncoding_dna_bplocations_array[counter] = int(j)
+#        counter += 1
 
 
 
-del (start_chr, end_chr, gene, i, j, coding_dna_bplocations_array, N_bp_in_genes, counter)
+del (gene, bp)
+
+#%% DETERMINE THE NUMBER OF TRANSPOSONS PER BP FOR EACH FEATURE AND STORE RESULTS IN DATAFRAME
+
+dna_df = pd.DataFrame(list(dna_dict.items()), columns=["BP", "Feature"])
+
+
+reads_loc_list = [0] * len(dna_dict) # CONTAINS ALL READS JUST LIKE READS_IN_CHROM_LIST, BUT THIS LIST HAS THE SAME LENGTH AS THE NUMBER OF BP IN THE CHROMOSOME WHERE THE LOCATIONS WITH NO READS ARE FILLED WITH ZEROS
+i = 0
+for ins in insrt_in_chrom_list:
+    reads_loc_list[ins] = reads_in_chrom_list[i]
+    i += 1
+dna_df["Reads"] = reads_loc_list
+
+
+del (i, ins)
+
+#%% CREATE DATAFRAME FOR EACH FEATURE (E.G. NONCODING DNA, GENE, ETC.) IN THE CHROMOSOME AND DETERMINE THE NUMBER OF INSERTIONS AND READS PER FEATURE.
+feature_name_list = []
+f_previous = dna_dict.get(start_chr)
+N_reads = 0
+N_reads_list = []
+N_insrt = 0
+N_insrt_list = []
+N_bp = 0
+N_bp_list = []
+i = 0
+for bp in dna_dict:
+    f_current = dna_dict.get(bp)
+    if f_current == f_previous:
+        N_bp += 1
+        N_reads += reads_loc_list[i]
+        if not reads_loc_list[i] == 0:
+            N_insrt += 1
+    elif f_current != f_previous or (i+start_chr) == end_chr:
+        feature_name_list.append(f_previous)
+        N_reads_list.append(N_reads)
+        N_insrt_list.append(N_insrt)
+        N_bp_list.append(N_bp)
+        N_reads = 0
+        N_insrt = 0
+        N_bp = 0
+        f_previous = f_current
+    i += 1
+
+N_reads_per_bp_list = []
+N_insrt_per_bp_list = []
+for i in range(len(N_reads_list)):
+    N_reads_per_bp_list.append(N_reads_list[i]/N_bp_list[i])
+    N_insrt_per_bp_list.append(N_insrt_list[i]/N_bp_list[i])
+
+all_features = {'Feature': feature_name_list,
+                'Nreads':N_reads_list,
+                'Ninsertions':N_insrt_list,
+                'Nbasepairs':N_bp_list,
+                'Nreadspertn':N_reads_per_bp_list,
+                'Ninsertionspertn':N_insrt_per_bp_list}
+
+dna_df2 = pd.DataFrame(all_features, columns = [column_name for column_name in all_features])
+
+
+
+
+del (feature_name_list, f_previous, f_current, N_reads, N_reads_list, N_insrt, N_insrt_list, N_bp, N_bp_list, bp, i, N_reads_per_bp_list, N_insrt_per_bp_list, all_features)
+
 
 #%% PLOTTING
 
