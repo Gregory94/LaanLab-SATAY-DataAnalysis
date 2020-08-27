@@ -13,6 +13,7 @@ import copy
 import pandas as pd
 import seaborn as sns
 import numpy as np
+import matplotlib.pyplot as plt
 #from matplotlib.cbook import boxplot_stats
 
 
@@ -170,12 +171,19 @@ def tninserts_analysis():
     essentiality_list = []
     N_inserts_list = []
     N_inserts_trunc_list = []
-    N_reads_trunc_list = []
-    distance_max_inserts_list = []
     N_reads_list = []
+    N_reads_trunc_list = []
+    N_reads_per_tn_full_list = []
+    N_reads_per_tn_trunc_list = []
+    distance_max_inserts_list = []
+    gene_id_list = []
+    i = 0
     for gene in gene_position_dict:
         genename_list.append(gene) #GENENAME LIST
-        
+        gene_id_list.append(i)
+        i += 1
+
+
         if gene in essential_position_dict: #ESSENTIALITY_LIST
             essentiality_list.append(True)
         elif gene in nonessential_position_dict:
@@ -183,60 +191,116 @@ def tninserts_analysis():
         else:
             print('WARNING: %s not found.' % gene)
 
-        N_inserts_list.append(len(gene_inserts_dict.get(gene))) #N_INSERTS_LIST (NUMBER OF INSERTIONS)
 
-        N_inserts_trunc_list.append(len(gene_inserts_trunc_dict.get(gene))) #N_INSERTS_CENTER_LIST (NUMBER OF INSERTIONS IN THE GENE WHERE 10% OF THE GENE LENGTH IS TRUNCATED)
-
-        N_reads_trunc_list.append(sum(gene_reads_trunc_dict.get(gene)))
-
-        distance_max_inserts_list.append(np.nanmax(gene_inserts_distance_dict.get(gene)) / (gene_position_dict.get(gene)[2] - gene_position_dict.get(gene)[1])) #DISTANCE_MAX_INSERTS_LIST (LARGEST DISTANCE BETWEEN SUBSEQUENT INSERTIONS NORMALIZED TO GENE LENGTH)
+        l_gene = gene_position_dict.get(gene)[2] - gene_position_dict.get(gene)[1]
         
-        N_reads_list.append(sum(gene_reads_dict.get(gene))) #N_READS_LIST (TOTAL NUMBER OF READS IN GENE)
+
+        N_inserts_list.append(len(gene_inserts_dict.get(gene)) / l_gene) #N_INSERTS_LIST (NUMBER OF INSERTIONS)
+        N_inserts_trunc_list.append(len(gene_inserts_trunc_dict.get(gene)) / l_gene) #N_INSERTS_CENTER_LIST (NUMBER OF INSERTIONS IN THE GENE WHERE 10% OF THE GENE LENGTH IS TRUNCATED)
+
+        N_reads_list.append(sum(gene_reads_dict.get(gene)) / l_gene) #N_READS_LIST (TOTAL NUMBER OF READS IN GENE)
+        N_reads_trunc_list.append(sum(gene_reads_trunc_dict.get(gene)) / l_gene)
+
+        if not len(gene_inserts_dict.get(gene)) == 0:
+            N_reads_per_tn_full_list.append(sum(gene_reads_dict.get(gene)) / len(gene_inserts_dict.get(gene)))
+        else:
+            N_reads_per_tn_full_list.append(0)
+
+        if not gene_inserts_trunc_dict.get(gene) == []:
+            N_reads_per_tn_trunc_list.append(sum(gene_reads_trunc_dict.get(gene)) / len(gene_inserts_trunc_dict.get(gene)))
+        else:
+            N_reads_per_tn_trunc_list.append(0)
+
+        distance_max_inserts_list.append(np.nanmax(gene_inserts_distance_dict.get(gene)) / l_gene) #DISTANCE_MAX_INSERTS_LIST (LARGEST DISTANCE BETWEEN SUBSEQUENT INSERTIONS NORMALIZED TO GENE LENGTH)
 
 
 
     allgenes = {'Gene_Name': genename_list,
+                'Gene_ID': gene_id_list,
                 'Essentiality': essentiality_list,
                 'Number_Insertions_Full_Gene': N_inserts_list,
                 'Number_Insertions_Truncated_Gene': N_inserts_trunc_list,
-                'Max_Insertion_Distance': distance_max_inserts_list,
                 'Number_Reads_Full_Gene': N_reads_list,
-                'Number_Reads_Truncated_Gene': N_reads_trunc_list}
+                'Number_Reads_Truncated_Gene': N_reads_trunc_list,
+                'Reads_per_Transposon_full_Gene': N_reads_per_tn_full_list,
+                'Reads_per_Transposon_Truncated_Gene': N_reads_per_tn_trunc_list,
+                'Max_Insertion_Distance': distance_max_inserts_list}
 
 
     df = pd.DataFrame(allgenes, columns = [column_name for column_name in allgenes])
 
 
-    del (gene, genename_list, essentiality_list, N_inserts_list, N_inserts_trunc_list, distance_max_inserts_list, N_reads_list, N_reads_trunc_list, allgenes)
+    del (gene, genename_list, gene_id_list, i, l_gene, essentiality_list, N_inserts_list, N_inserts_trunc_list, N_reads_per_tn_trunc_list, distance_max_inserts_list, N_reads_per_tn_full_list, N_reads_list, N_reads_trunc_list, allgenes)
 
 
 #%%TEST GRAPH
     sns.set(style="whitegrid")
-    
+
     #POTENTIALLY USEFUL; NUMBER OF INSERTIONS IN THE ENTIRE GENE.
-    sns.boxplot(x='Essentiality',y='Number_Insertions_Full_Gene',data=df)
-    
-    
+    ax1 = sns.boxplot(x='Essentiality',y='Number_Insertions_Full_Gene',data=df)
+    ax1.set_ylim(-0.001,0.04)
+    ax1.set_xlabel('Annotated essential', fontsize=14)
+    ax1.set_ylabel('Number of insertions (normalized to gene length)', fontsize=14)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+
+
     #USEFUL; NUMBER OF INSERTIONS IN THE MIDDLE 80% OF THE GENE (I.E. INSERTIONS IN THE FIRST AND LAST 10% OF THE LENGTH OF THE GENE ARE NOT CONSIDERED)
     sns.violinplot(x='Essentiality',y='Number_Insertions_Truncated_Gene',data=df, cut=0)
-    sns.boxplot(x='Essentiality',y='Number_Insertions_Truncated_Gene',data=df)
+
+    ax2 = sns.boxplot(x='Essentiality',y='Number_Insertions_Truncated_Gene',data=df) #NORMALIZE DATA BY GENE LENGTH
+    ax2.set_ylim(-0.001,0.025)
+    ax2.set_xlabel('Annotated essential', fontsize=14)
+    ax2.set_ylabel('Number of insertions (middle 80% gene) (normalized to gene length)', fontsize=14)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
 
 
     #NOT USEFUL (?); LARGEST DISTANCE BETWEEN SUBSEQUENT INSERTIONS FOR EACH GENE. Q: WHAT TO DO WITH CASES WHERE THERE IS ONLY A SINGLE OF NO INSERTIONS? -> IF THOSE SITUATIONS SET TO 0 IT DOES GIVE A CLEAR DISTINCTION BETWEEN ESSENTIALITY, BUT IS THIS FAIR?
-    ax = sns.stripplot(x='Essentiality',y='Max_Insertion_Distance', data=df, alpha=0.23, palette='coolwarm')
-    sns.violinplot(x='Essentiality',y='Max_Insertion_Distance', data=df, cut=0, palette=['white'])
-    df_select = df[df['Number_Insertions_Full_Gene'] > 1]
-    sns.barplot(x='Essentiality',y='Max_Insertion_Distance', data=df_select)
-    del (df_select, ax)
+#    ax = sns.stripplot(x='Essentiality',y='Max_Insertion_Distance', data=df, alpha=0.23, palette='coolwarm')
+#
+#    sns.violinplot(x='Essentiality',y='Max_Insertion_Distance', data=df, cut=0, palette=['white'])
+#
+#    df_select = df[df['Number_Insertions_Full_Gene'] > 1]
+#    sns.barplot(x='Essentiality',y='Max_Insertion_Distance', data=df_select)
+#    del (df_select, ax)
 
 
     #POTENTIALLY USEFUL; 
     df_select = df[df['Number_Reads_Full_Gene'] < 10000]
-    sns.boxplot(x='Essentiality',y='Number_Reads_Full_Gene', data=df_select)
-    sns.boxplot(x='Essentiality',y='Number_Reads_Truncated_Gene', data=df_select)
-#    print('Number of outliers for essential genes is %i' % len(boxplot_stats(df.Number_Reads_Truncated_Gene).pop(0)['fliers']))
-    del df_select
+    ax3 = sns.boxplot(x='Essentiality',y='Number_Reads_Full_Gene', data=df_select)
+    ax3.set_ylim(-1,800)
+    ax3.set_xlabel('Annotated essential', fontsize=14)
+    ax3.set_ylabel('Number of reads (normalized to gene length)', fontsize=14)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
 
+    ax4 = sns.boxplot(x='Essentiality',y='Number_Reads_Truncated_Gene', data=df_select)
+    ax4.set_ylim(-1,800)
+    ax4.set_xlabel('Annotated essential', fontsize=14)
+    ax4.set_ylabel('Number of reads (middle 80% gene) (normalized to gene length)', fontsize=14)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+
+#    print('Number of outliers for essential genes is %i' % len(boxplot_stats(df.Number_Reads_Truncated_Gene).pop(0)['fliers']))
+
+
+    ax5 = sns.boxplot(x='Essentiality', y='Reads_per_Transposon_Full_Gene', data=df)
+    ax5.set_ylim(-1,100)
+    ax5.set_xlabel('Annotated essential', fontsize=14)
+    ax5.set_ylabel('Number of reads per transposon (per gene)', fontsize=14)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+
+
+    ax6 = sns.boxplot(x='Essentiality', y='Reads_per_Transposon_Truncated_Gene', data=df)
+    ax6.set_ylim(-1,100)
+    ax6.set_xlabel('Annotated essential', fontsize=14)
+    ax6.set_ylabel('Number of reads per transposon (per gene, middle 80%)', fontsize=14)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+
+    del (df_select, ax1, ax2, ax3, ax4, ax5, ax6)
 
 
 #%% CREATE TEXT FILE FOR NUMBER OF INSERTIONS FOR TRUNCATED GENE
@@ -268,6 +332,10 @@ def tninserts_analysis():
 #                        f.write(gene + '\t' + 'False' + '\t' + str(gene_reads_trunc_dict.get(gene)).strip('[]') + '\n')
 #
 #    del (savename, f, gene)
+
+
+#%% CREATE SCATTERPLOT NUMBER OF READS PER GENE
+
 
 
 #%%

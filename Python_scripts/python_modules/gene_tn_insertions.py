@@ -164,4 +164,4 @@ def hit_free_region(gene_name='None',region=None,bed_file=None):
 #%%
 if __name__ == '__main__':
 #    hit_free_region(region=['XI',1000,2000],bed_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed")
-    hit_free_region(gene_name='cdc24',bed_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed")
+    hit_free_region(gene_name='bem1',bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder\align_out\ERR1533148_trimmed.sorted.bam.bed")
