@@ -10,7 +10,7 @@ This can be used to determine the number of transposon insertions outside the ge
 
 #%%
 import os, sys
-import numpy as np
+#import numpy as np
 import pandas as pd
 
 
@@ -22,7 +22,7 @@ from chromosome_names_in_files import chromosome_name_wigfile
 
 #%% USER INPUT AND FILES
 
-region = 'II'
+region = 'XII'
 
 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig"
 
@@ -123,45 +123,7 @@ for gene in gene_position_dict: #IGNORE GENES THAT END WITH -A AS THESE ARE DUBI
     for bp in range(gene_position_dict.get(gene)[1]+start_chr, gene_position_dict.get(gene)[2]+start_chr+1):
         dna_dict[bp] = gene
         
-#coding_dna_bplocations_dict = {}
-#N_bp_in_genes = 0 #needed for preallocating coding_dna_bplocations_array with the right length
-#for gene in gene_position_dict: #GENE_POSITION_DICT ALSO INCLUDES DUBIOUS OPEN READING FRAMES.
-#    coding_dna_bplocations_dict[gene] = list(range(gene_position_dict.get(gene)[1]+start_chr, gene_position_dict.get(gene)[2]+start_chr+1))
-#    N_bp_in_genes += (gene_position_dict.get(gene)[2] - gene_position_dict.get(gene)[1]) + 1
-#
-#coding_dna_bplocations_array = np.zeros(N_bp_in_genes) #contains all unique basepairs at location of gene
-#counter = 0
-#for gene in coding_dna_bplocations_dict:
-#    for i in coding_dna_bplocations_dict.get(gene):
-#        coding_dna_bplocations_array[counter] = int(i)
-#        counter += 1
-#
-#coding_dna_bplocations_array.sort()
-#coding_dna_bplocations_array = np.unique(coding_dna_bplocations_array).astype(int)
-
-
-#ALL LOCATIONS THAT DO NOT OCCUR IN CODING_DNA_BPLOCATIONS_LIST.
-#noncoding_dna_bplocations_array = np.array(range(start_chr, end_chr+1), dtype=int)
-#del_bp_ind_list = [0] * ((end_chr - start_chr) - len(coding_dna_bplocations_array) + 3)
-#i = 0
-#j = 0
-#for v in noncoding_dna_bplocations_array:
-#    if v in coding_dna_bplocations_array:
-#        del_bp_ind_list[j] = i
-#        j += 1
-#    i += 1
-#
-#noncoding_dna_bplocations_array = np.delete(noncoding_dna_bplocations_array, del_bp_ind_list)
-
-
-#noncoding_dna_bplocations_array = np.zeros((end_chr - start_chr) - len(coding_dna_bplocations_array) + 2, dtype=int)
-#counter = 1
-#for j in range(start_chr, end_chr+1):
-#    if not int(j) in coding_dna_bplocations_array: #SEARCHING IS SLOW
-#        noncoding_dna_bplocations_array[counter] = int(j)
-#        counter += 1
-
-
+# GET FEATURES FROM INTERGENIC REGIONS (-> SEE SGD_features.tab IN DATA_FILES IN GITHUB FOLDER)
 
 del (gene, bp)
 
@@ -221,8 +183,8 @@ all_features = {'Feature': feature_name_list,
                 'Nreadspertn':N_reads_per_bp_list,
                 'Ninsertionspertn':N_insrt_per_bp_list}
 
-dna_df2 = pd.DataFrame(all_features, columns = [column_name for column_name in all_features])
-
+dna_df2 = pd.DataFrame(all_features, columns = [column_name for column_name in all_features]) #search for feature using: dna_df2.loc[dna_df2['Feature'] == 'CDC42']
+#CREATE NEW COLUMN WITH ALL DOMAINS OF THE GENE (IF PRESENT) AND ANOTHER COLUMN THAT INCLUDES LISTS OF THE BP POSITIONS OF THESE DOMAINS
 
 
 
@@ -230,5 +192,5 @@ del (feature_name_list, f_previous, f_current, N_reads, N_reads_list, N_insrt, N
 
 
 #%% PLOTTING
-
+#https://stackoverflow.com/questions/46780367/variable-width-barplot-with-seaborn/46796963
 #SEE TRANSPOSONREAD_PROFILE_PLOT.PY; READ_PROFILE FUNCTION

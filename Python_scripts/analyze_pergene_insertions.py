@@ -169,6 +169,8 @@ def tninserts_analysis():
 #%% CREATE DATAFRAME FOR ALL GENES. ADD STATISTICS HERE
     genename_list = []
     essentiality_list = []
+    N_inserts_notnormalized_list = []
+    N_reads_notnormalized_list = []
     N_inserts_list = []
     N_inserts_trunc_list = []
     N_reads_list = []
@@ -193,7 +195,11 @@ def tninserts_analysis():
 
 
         l_gene = gene_position_dict.get(gene)[2] - gene_position_dict.get(gene)[1]
-        
+
+
+        N_inserts_notnormalized_list.append(len(gene_inserts_dict.get(gene)))
+        N_reads_notnormalized_list.append(sum(gene_reads_dict.get(gene)))
+
 
         N_inserts_list.append(len(gene_inserts_dict.get(gene)) / l_gene) #N_INSERTS_LIST (NUMBER OF INSERTIONS)
         N_inserts_trunc_list.append(len(gene_inserts_trunc_dict.get(gene)) / l_gene) #N_INSERTS_CENTER_LIST (NUMBER OF INSERTIONS IN THE GENE WHERE 10% OF THE GENE LENGTH IS TRUNCATED)
@@ -218,6 +224,8 @@ def tninserts_analysis():
     allgenes = {'Gene_Name': genename_list,
                 'Gene_ID': gene_id_list,
                 'Essentiality': essentiality_list,
+                'Insertions_NotNorm_Full_Gene': N_inserts_notnormalized_list,
+                'Reads_NotNorm_Full_Gene': N_reads_notnormalized_list,
                 'Number_Insertions_Full_Gene': N_inserts_list,
                 'Number_Insertions_Truncated_Gene': N_inserts_trunc_list,
                 'Number_Reads_Full_Gene': N_reads_list,
@@ -301,6 +309,82 @@ def tninserts_analysis():
     plt.yticks(fontsize=14)
 
     del (df_select, ax1, ax2, ax3, ax4, ax5, ax6)
+
+#%% CREATE SIMILAR GRAPH AS MCIHEL ET.AL. 217 FIG 1E.
+
+xmax = 100
+Nbins = 300
+textsize = 14
+line_width = 2
+color_nonessential = "#F4A896"
+color_essential = "#358597"
+
+fig = plt.figure(figsize=(19,9))
+grid = plt.GridSpec(10, 1, wspace=0.0, hspace=0.0)
+
+
+ax3 = plt.subplot(grid[0,0])
+line_props3 = dict(color=color_nonessential, alpha=1.0, linewidth=line_width)
+bbox_props3 = dict(color=color_nonessential, alpha=1.0, linewidth=line_width)
+median_props3 = dict(color=color_nonessential, linewidth=line_width)
+flier_props3 = dict(markeredgecolor=color_nonessential, marker="o", markersize=8)
+cap_props3 = dict(color=color_nonessential, linewidth=line_width)
+ax3.boxplot(df[df.Essentiality==False].Insertions_NotNorm_Full_Gene.values, vert=False, whiskerprops=line_props3, boxprops=bbox_props3, flierprops=flier_props3, medianprops=median_props3, capprops=cap_props3, widths=0.9)
+ax3.set_xlim(0,xmax)
+ax3.set_xticklabels([])
+ax3.set_yticklabels([])
+ax3.grid(True, linestyle="--", alpha=0.5)
+
+
+ax4 = plt.subplot(grid[1,0])
+line_props4 = dict(color=color_essential, alpha=1.0, linewidth=line_width)
+bbox_props4 = dict(color=color_essential, alpha=1.0, linewidth=line_width)
+median_props4 = dict(color=color_essential, linewidth=line_width)
+flier_props4 = dict(markeredgecolor=color_essential, marker="o", markersize=8)
+cap_props4 = dict(color=color_essential, linewidth=line_width)
+ax4.boxplot(df[df.Essentiality==True].Insertions_NotNorm_Full_Gene.values, vert=False, whiskerprops=line_props4, boxprops=bbox_props4, flierprops=flier_props4, medianprops=median_props4, capprops=cap_props4, widths=0.9)
+ax4.set_xlim(0,xmax)
+ax4.set_xticklabels([])
+ax4.set_yticklabels([])
+ax4.grid(True, linestyle="--", alpha=0.5)
+
+
+ax1 = plt.subplot(grid[2:6,0])
+h1, binsize, _ = ax1.hist(df[df.Essentiality==False].Insertions_NotNorm_Full_Gene.values, bins=Nbins, color=color_nonessential, label="Not annotated essential")
+ax1.set_xlim(0,xmax)
+ax1.tick_params(labelsize=textsize)
+ymax = ax1.get_ylim()
+ax1.grid(True, linestyle="--", alpha=0.5)
+ax1.set_xticklabels([])
+
+
+ax2 = plt.subplot(grid[6:11,0])
+h2 = ax2.hist(df[df.Essentiality==True].Insertions_NotNorm_Full_Gene.values, bins=binsize, color=color_essential, label="Annotated essential")
+ax2.set_xlim(0,xmax)
+ax2.tick_params(labelsize=textsize)
+ax2.set_ylim(0,ymax[1])
+ax2.grid(True, linestyle="--", alpha=0.5)
+ax2.invert_yaxis()
+
+
+fig.legend(loc="lower right", fontsize=textsize)
+
+
+#FOLLOWING IS FOR SHOWING COMMON AXIS LABELS.
+# add a big axis, hide frame
+fig.add_subplot(111, frameon=False)
+# hide tick and tick label of the big axis
+plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+plt.xlabel("Number of transposon insertions per gene", fontsize=textsize)
+plt.ylabel("Number of genes", fontsize=textsize)
+
+
+plt.tight_layout()
+
+
+del (fig, grid, ax1, ax2, ax3, ax4, xmax, ymax, Nbins, binsize, textsize, color_nonessential,
+     color_essential, line_props3, line_props4, bbox_props3, bbox_props4,
+     median_props3, median_props4, flier_props3, flier_props4, cap_props3, cap_props4)
 
 
 #%% CREATE TEXT FILE FOR NUMBER OF INSERTIONS FOR TRUNCATED GENE

@@ -100,8 +100,8 @@ def chromosome_name_wigfile(wig_file=None):
 
 
 
-    num_arabic = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
-    num_roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
+    num_arabic = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
+    num_roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','M']
     roman_to_arabic_dict = {}
     index_counter = 0
     for rom in num_roman:
@@ -126,7 +126,7 @@ def chromosome_name_wigfile(wig_file=None):
     for line in lines:
         line.strip('\n')
         line_split = line.split(' ')
-        if line_split[0].lower() == chrom_line and chr_counter < 16:
+        if line_split[0].lower() == chrom_line and chr_counter < 17:
             chromosome_name = line_split[1].replace('chrom=chr','').strip('\n')
             chrom_names_dict[chromosome_romannames_list[chr_counter]] = chromosome_name
 #            print('Chromosome ',chromosome_romannames_list[chr_counter], 'is ',chromosome_name)
