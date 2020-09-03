@@ -28,7 +28,7 @@ colorlinks: true
 
 This file discusses the general outline of the experiments and interpretation of experiments using SAturated Transposon Analysis in Yeast (SATAY).
 The introduction explains the purpose of the experiments and what kind of results we expect and how to interpret these results.
-The Methods and File types section explains the different kind of files used during processing and analysis and how to read and use them.
+The Methods and File types section explains the different kind of file types used during processing and analysis and how to read and use them.
 It also explains some custom made software for analyzing the data.
 This software is stored in the [Github page](<https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis>) of the this research.
 The steps needed for the processing and initial analysis of the data is explained in the Data Analysis section.
