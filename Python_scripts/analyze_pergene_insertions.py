@@ -311,9 +311,14 @@ def tninserts_analysis():
     del (df_select, ax1, ax2, ax3, ax4, ax5, ax6)
 
 #%% CREATE SIMILAR GRAPH AS MCIHEL ET.AL. 217 FIG 1E.
+#Insertions_NotNorm_Full_Gene
+#Reads_NotNorm_Full_Gene
+#Number_Insertions_Full_Gene
+#Number_Reads_Full_Gene
+df_select = df#df[df['Number_Reads_Full_Gene'] < 100]
 
-xmax = 100
-Nbins = 300
+xmax = 5#100
+Nbins = 2000
 textsize = 14
 line_width = 2
 color_nonessential = "#F4A896"
@@ -329,7 +334,7 @@ bbox_props3 = dict(color=color_nonessential, alpha=1.0, linewidth=line_width)
 median_props3 = dict(color=color_nonessential, linewidth=line_width)
 flier_props3 = dict(markeredgecolor=color_nonessential, marker="o", markersize=8)
 cap_props3 = dict(color=color_nonessential, linewidth=line_width)
-ax3.boxplot(df[df.Essentiality==False].Insertions_NotNorm_Full_Gene.values, vert=False, whiskerprops=line_props3, boxprops=bbox_props3, flierprops=flier_props3, medianprops=median_props3, capprops=cap_props3, widths=0.9)
+ax3.boxplot(df_select[df_select.Essentiality==False].Number_Insertions_Full_Gene.values, vert=False, whiskerprops=line_props3, boxprops=bbox_props3, flierprops=flier_props3, medianprops=median_props3, capprops=cap_props3, widths=0.9)
 ax3.set_xlim(0,xmax)
 ax3.set_xticklabels([])
 ax3.set_yticklabels([])
@@ -342,7 +347,7 @@ bbox_props4 = dict(color=color_essential, alpha=1.0, linewidth=line_width)
 median_props4 = dict(color=color_essential, linewidth=line_width)
 flier_props4 = dict(markeredgecolor=color_essential, marker="o", markersize=8)
 cap_props4 = dict(color=color_essential, linewidth=line_width)
-ax4.boxplot(df[df.Essentiality==True].Insertions_NotNorm_Full_Gene.values, vert=False, whiskerprops=line_props4, boxprops=bbox_props4, flierprops=flier_props4, medianprops=median_props4, capprops=cap_props4, widths=0.9)
+ax4.boxplot(df_select[df_select.Essentiality==True].Number_Insertions_Full_Gene.values, vert=False, whiskerprops=line_props4, boxprops=bbox_props4, flierprops=flier_props4, medianprops=median_props4, capprops=cap_props4, widths=0.9)
 ax4.set_xlim(0,xmax)
 ax4.set_xticklabels([])
 ax4.set_yticklabels([])
@@ -350,7 +355,7 @@ ax4.grid(True, linestyle="--", alpha=0.5)
 
 
 ax1 = plt.subplot(grid[2:6,0])
-h1, binsize, _ = ax1.hist(df[df.Essentiality==False].Insertions_NotNorm_Full_Gene.values, bins=Nbins, color=color_nonessential, label="Not annotated essential")
+h1, binsize, _ = ax1.hist(df_select[df_select.Essentiality==False].Number_Insertions_Full_Gene.values, bins=Nbins, color=color_nonessential, label="Not annotated essential")
 ax1.set_xlim(0,xmax)
 ax1.tick_params(labelsize=textsize)
 ymax = ax1.get_ylim()
@@ -359,7 +364,7 @@ ax1.set_xticklabels([])
 
 
 ax2 = plt.subplot(grid[6:11,0])
-h2 = ax2.hist(df[df.Essentiality==True].Insertions_NotNorm_Full_Gene.values, bins=binsize, color=color_essential, label="Annotated essential")
+h2 = ax2.hist(df_select[df_select.Essentiality==True].Number_Insertions_Full_Gene.values, bins=binsize, color=color_essential, label="Annotated essential")
 ax2.set_xlim(0,xmax)
 ax2.tick_params(labelsize=textsize)
 ax2.set_ylim(0,ymax[1])
@@ -375,7 +380,7 @@ fig.legend(loc="lower right", fontsize=textsize)
 fig.add_subplot(111, frameon=False)
 # hide tick and tick label of the big axis
 plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
-plt.xlabel("Number of transposon insertions per gene", fontsize=textsize)
+plt.xlabel("Read density per gene", fontsize=textsize)
 plt.ylabel("Number of genes", fontsize=textsize)
 
 

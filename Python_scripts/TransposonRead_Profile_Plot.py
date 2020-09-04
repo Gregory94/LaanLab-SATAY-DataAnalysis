@@ -48,7 +48,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
 #    chrom_index = chromosome_romannames_list.index(chrom)
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
-        bar_width = int(chr_length_dict.get(chrom)/500)
+        bar_width = int(chr_length_dict.get(chrom)/600)
     
     
 #%% GET ALL GENES IN CURRENT CHROMOSOME
@@ -175,8 +175,8 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 
 #%% USED FILES
     gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_1.txt'),
-                            os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_2.txt')]
+    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
     gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 #%%
     #GET CHROMOSOME LENGTHS AND POSITIONS
@@ -194,7 +194,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     chrom = chrom.upper()
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
-        bar_width = int(chr_length_dict.get(chrom)/500)
+        bar_width = int(chr_length_dict.get(chrom)/600)
 #%% GET ALL GENES IN CURRENT CHROMOSOME
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items() if chrom in v]
@@ -319,4 +319,4 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 #%%
 if __name__ == '__main__':
 #    read_profile(chrom='xv',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
-    transposon_profile(chrom='XVI',bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder\align_out\ERR1533148_trimmed.sorted.bam.bed")
+    transposon_profile(chrom='XV',bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder\align_out\ERR1533148_trimmed.sorted.bam.bed")
