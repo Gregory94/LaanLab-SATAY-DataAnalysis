@@ -1,6 +1,6 @@
 '''
 '''
-
+#%%
 def list_gene_names(gene_information_file = None):
     '''Create a list of all known gene names and their aliases as listed on SGD (or as provided as an optional input file)
     Input is a standard file downloaded from https://www.uniprot.org/docs/yeast.
@@ -80,7 +80,7 @@ def list_gene_names(gene_information_file = None):
 
 
 
-
+#%%
 def gene_aliases(gene_information_file = None):
     '''Create three dictionaries containing aliases for genes
     Input is the path to 'Protein_Names.txt' file downloaded from https://www.uniprot.org/docs/yeast.
@@ -139,5 +139,6 @@ def gene_aliases(gene_information_file = None):
 
     return(aliases_designation_dict, aliases_sgd_dict, aliases_swissprot_dict)
 
+#%%
 if __name__ == '__main__':
-    list_gene_names()
+    gene_aliases()

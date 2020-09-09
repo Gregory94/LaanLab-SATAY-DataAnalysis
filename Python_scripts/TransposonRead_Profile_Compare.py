@@ -42,8 +42,8 @@ def transposon_profile(bed_files=None, chrom_user_set=None, bar_width_user_set=N
     #bed_file = r'X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed'
 #%% USED FILES
     gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_1.txt'),
-                            os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_2.txt')]
+    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
     gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 #%% GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
@@ -352,12 +352,12 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
 
 #%%
 if __name__ == '__main__':
-    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment\align_out_matlab\ERR1533143_trimmed.sorted.bam.bed",
-                                  r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment\align_out\ERR1533143_trimmed.sorted.bam.bed"],
-                        chrom_user_set=None,
+    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed",
+                                  r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_w303_LYZE01_1\align_out\ERR1533147_trimmed.sorted.bam.bed"],
+                        chrom_user_set='I',
                         bar_width_user_set=100,
-                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment",
-                        savefigure_name=r"dDPL1_KornmannAlignment_100binwidth_bedfile_compare_matlab_python")
+                        savefigure_path=None,
+                        savefigure_name=None)
 
 #    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment\align_out_matlab\ERR1533143_trimmed.sorted.bam.wig",
 #                             r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\ERR1533143_dDPL1\dDPL1_My_Alignment\align_out\ERR1533143_trimmed.sorted.bam.wig"],

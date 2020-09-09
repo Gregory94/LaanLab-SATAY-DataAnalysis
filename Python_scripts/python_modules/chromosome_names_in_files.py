@@ -59,7 +59,7 @@ def chromosome_name_bedfile(bed_file=None):
     while stop_loop is False:
         line = lines[line_counter]
         chrom_name_current = line.split(' ')[0].replace('chr','')
-        if not chrom_name_current.startswith('track') and not chrom_name_current.startswith('M') and not chrom_name_current.startswith('ref|NC_001224|') and chr_counter < 16: #SKIP HEADER AND MITOCHRONDRIAL CHROMOSOMES #and not chrom_name_current.startswith('M')
+        if not chrom_name_current.startswith('track') and not chrom_name_current.startswith('M') and not chrom_name_current.startswith('LYZE01000017.1') and chr_counter < 16: #SKIP HEADER AND MITOCHRONDRIAL CHROMOSOMES #and not chrom_name_current.startswith('M')
             if chrom_name_current != chrom_name_in_bed:
                 chrom_names_dict[chromosome_romannames_list[chr_counter]] = chrom_name_current
                 chrom_name_in_bed = chrom_name_current
@@ -71,7 +71,7 @@ def chromosome_name_bedfile(bed_file=None):
 
                 chr_counter += 1
 
-        elif chrom_name_current.startswith('M') or chrom_name_current.startswith('ref|NC_001224|'):
+        elif chrom_name_current.startswith('M') or chrom_name_current.startswith('LYZE01000017.1'):
             chrom_end_line_dict[chromosome_romannames_list[-1]] = line_counter-1 #GET THE END INDEX IN THE BED FILE FOR THE FINAL CHROMOSOME
             stop_loop = True
                 
@@ -145,5 +145,5 @@ def chromosome_name_wigfile(wig_file=None):
 
 #%%
 if __name__ == '__main__':
-#    chromosome_name_bedfile(bed_file=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885.WT2.bam_python.bed")
-    chromosome_name_wigfile(wig_file=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\E-MTAB-4885.WT2.bam_python.wig")
+    chromosome_name_bedfile(bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_w303_LYZE01_1\align_out\ERR1533147_trimmed.sorted.bam.bed")
+#    chromosome_name_wigfile(wig_file=r"C:\Users\gregoryvanbeek\Desktop\Python_matlab_differences\E-MTAB-4885_WT2\E-MTAB-4885.WT2.bam_python.wig")

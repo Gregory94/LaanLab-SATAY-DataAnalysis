@@ -319,4 +319,4 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 #%%
 if __name__ == '__main__':
 #    read_profile(chrom='xv',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
-    transposon_profile(chrom='XV',bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder\align_out\ERR1533148_trimmed.sorted.bam.bed")
+    transposon_profile(chrom='III',bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_w303_LYZE01_1\align_out\ERR1533147_trimmed.sorted.bam.bed")
