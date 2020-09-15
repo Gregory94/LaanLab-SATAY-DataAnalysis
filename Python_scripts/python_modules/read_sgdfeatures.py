@@ -42,6 +42,10 @@ def sgd_features(filepath=None):
     feature_ars_dict = {}
     feature_telomere_dict = {}
     feature_centromere_dict = {}
+    feature_Xelement_dict = {}
+    feature_ncrna_dict = {}
+    feature_ets_dict = {}
+    feature_its_dict = {}
     for line in lines:
         l = line.strip('\n').split('\t')
         if not l[1] in feature_list:
@@ -57,10 +61,20 @@ def sgd_features(filepath=None):
                 feature_telomere_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
             elif l[1] == 'centromere':
                 feature_centromere_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'X_element':
+                feature_Xelement_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'ncRNA_gene':
+                feature_ncrna_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'external_transcribed_spacer_region':
+                feature_ets_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'internal_transcribed_spacer_region':
+                feature_its_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
 
     del (lines, f, arabic_to_roman_dict, line, l, chromosome)
 
-    return(feature_orf_dict, feature_ars_dict, feature_telomere_dict, feature_centromere_dict)
+    return(feature_orf_dict, feature_ars_dict, feature_telomere_dict,
+           feature_centromere_dict, feature_Xelement_dict, feature_ncrna_dict,
+           feature_ets_dict, feature_its_dict)
 
 #%%
 if __name__ == '_main__':
