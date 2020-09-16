@@ -42,8 +42,8 @@ def transposon_profile(bed_files=None, chrom_user_set=None, bar_width_user_set=N
     #bed_file = r'X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed'
 #%% USED FILES
     gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_1.txt'),
-                            os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_2.txt')]
+    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
     gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 #%% GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
@@ -149,7 +149,7 @@ def transposon_profile(bed_files=None, chrom_user_set=None, bar_width_user_set=N
     
         ax1.set_axisbelow(True)
         ax1.grid(True)
-        ax1.set_ylabel('Tranposon count Dataset 1', fontsize=font_size)
+        ax1.set_ylabel('Aboslute insertion count WT2', fontsize=font_size)
         ax1.set_xlim(0,chr_length_dict.get(chrom))
         ax1.set_ylim(0,max_ylim)
     
@@ -168,7 +168,7 @@ def transposon_profile(bed_files=None, chrom_user_set=None, bar_width_user_set=N
     
         ax2.set_axisbelow(True)
         ax2.grid(True)
-        ax2.set_ylabel('Transposon count Dataset 2', fontsize=font_size)
+        ax2.set_ylabel(r'Absolute insertion count $\Delta$Dpl1', fontsize=font_size)
         ax2.set_xlabel('Basepair position on chromosome '+chrom, fontsize=font_size)
         ax2.set_ylim(0,max_ylim)
         ax2.set_xlim(0,chr_length_dict.get(chrom))
@@ -202,8 +202,8 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
 
 #%% USED FILES
     gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_1.txt'),
-                            os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_2.txt')]
+    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
     gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 
 #%% GET CHROMOSOME LENGTHS AND POSITIONS
@@ -313,7 +313,7 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
         ax1.set_yscale('log')
         ax1.set_axisbelow(True)
         ax1.grid(True)
-        ax1.set_ylabel('Trimmmed1', fontsize=font_size)#('Read count (log_10) Dataset 1', fontsize=font_size)
+        ax1.set_ylabel('Aboslute read count WT2', fontsize=font_size)#('Read count (log_10) Dataset 1', fontsize=font_size)
         ax1.set_xticklabels([])
         ax1.set_xlim(0,chr_length_dict.get(chrom))
         ax1.set_ylim(0.5,max_ylim)
@@ -334,7 +334,7 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
         ax2.set_yscale('log')
         ax2.set_axisbelow(True)
         ax2.grid(True)
-        ax2.set_ylabel('Trimmed2', fontsize=font_size)#('Read count (log_10) Dataset 2', fontsize=font_size)
+        ax2.set_ylabel(r'Absolute read count $\Delta$Dpl1', fontsize=font_size)#('Read count (log_10) Dataset 2', fontsize=font_size)
         ax2.set_xlabel('Basepair position on chromosome '+chrom, fontsize=font_size)
         ax2.set_xlim(0,chr_length_dict.get(chrom))
         ax2.set_ylim(0.5,max_ylim)
@@ -352,26 +352,17 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
 
 #%%
 if __name__ == '__main__':
-#    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned1\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed",
-#                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned2\Cerevisiae_WT2_Michel2017_trimmed2.bam.bed"],
-#                        chrom_user_set=None,
+#    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.bed",
+#                                  r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.bed"],
+#                        chrom_user_set='VII',
 #                        bar_width_user_set=None,
-#                        savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Compare1-2",
-#                        savefigure_name=r'Cerevisiae_WT2_Michel2017_TnCompare_trimmed1-trimmed2')
+#                        savefigure_path=None,
+#                        savefigure_name=None)
 
-#    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned1\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig",
-#                                  r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Aligned2\Cerevisiae_WT2_Michel2017_trimmed2.bam.wig"],
-#                            chrom_user_set=None,
-#                            bar_width_user_set=None,
-#                            savefigure_path=r"C:\Users\gregoryvanbeek\Desktop\Cerevisiae_WT2_Seqdata_Michel2017\Cerevisiae_WT2_Seqdara_Michel2017_CompareBBDukTrimq\Cerevisiae_WT2_Michel2017_Compare1-2",
-#                            savefigure_name=r'Cerevisiae_WT2_Michel2017_ReadCompare_trimmed1-trimmed2')
+    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig",
+                                  r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"],
+                            chrom_user_set="VII",
+                            bar_width_user_set=None,
+                        savefigure_path=None,
+                        savefigure_name=None)
 
-    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed",
-                                  r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed2.bam.bed"],
-                            chrom_user_set='i',
-                            bar_width_user_set=None)
-
-#    read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig",
-#                                  r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed2.bam.wig"],
-#                            chrom_user_set='i',
-#                            bar_width_user_set=None)

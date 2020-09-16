@@ -24,76 +24,71 @@ cref: true
 crossref: true
 colorlinks: true
 ---
+
+*__Author__: Gregory van Beek*
+
+*Laanlab for Bionanoscience, Delft University of Technology*
+
+*__Date__: 04-09-2020*
+
+**!File under construction!**
+
 # Summary
 
-This file discusses the general outline of the experiments and interpretation of experiments using SAturated Transposon Analysis in Yeast (SATAY).
-The introduction explains the purpose of the experiments and what kind of results we expect and how to interpret these results.
+Here the general outline of the experimental methods and interpretation of the results using SAturated Transposon Analysis in Yeast (SATAY) is discussed.
+The introduction explains the purpose of the experiments and what kind of results are expected and how to interpret these results.
 The Methods and File types section explains the different kind of files used during processing and analysis and how to read and use them.
 It also explains some custom made software for analyzing the data.
-This software is stored in the [Github page](<https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis>) of the this research.
-The steps needed for the processing and initial analysis of the data is explained in the Data Analysis section.
-This includes a detailed step-by-step tutorial on how to use the different software packages and what steps need to be taken for the processing to go from the raw sequencing reads to the location of all the transposon insertion and the number of reads at each location.
+This software is stored in the [Github page](<https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis>).
+For processing the data, a workflow is created using different software tools.
+A detailed step-by-step tutorial on how to use the different software packages and what steps need to be taken for the processing to go from the raw sequencing reads to the location of all the transposon insertion and the number of reads at each location in included at the end.
 
 # Introduction
 
-About 20% of the genes in wild type *Saccharomyces Cerevisiae* are essential, meaning that they cannot be deleted without crippling the cell to such an extent that it either cannot survive (lethality) or multiply
-(sterility).
-(Non)-essentiality of genes is not constant over different genetic backgrounds, but genes can gain or lose essentiality when other genes are mutated.
-Moreover, it is expected that the interactions between genes changes in mutants (changes in the interaction map).
-This raises a number of questions:
+About 20% of the genes in wild type *Saccharomyces Cerevisiae* are essential, meaning that they are required for vital cellular functions and thus cannot be deleted without crippling the cell to such an extent that it either cannot survive (lethality) or proliferate (sterility).
+Essentiality of genes is not constant between different genetic backgrounds.
+The underlying mechanism for this change in essentiality is a reorganization of the genetic interaction network.
+For wild type (WT) cells, an extensive interaction network [already exists](https://thecellmap.org/), although still incomplete [Costanzo et.al. 2016].
+But for mutants, such an interaction map is not yet available and therefore the question how exactly the interaction network changes after perturbing one of more genes remains unanswered.
+With a new experimental technique in yeast we can measure the essentiality for all genes in different genetic backgrounds.
+Using these results we aim to create an interaction network for multiple backgrounds and with this information we want to create a machine learning algorithm that can predict how the network changes for other backgrounds (see for current progress [the github page for machine learning](<https://github.com/leilaicruz/machine-learning-for-yeast>)).
 
-- *If there exists a relation between genes which gain or lose essentiality after mutations and the changes in the interaction map?*
-
-- If a gene x gains or loses essentiality after a mutation in gene y, does the essentiality of gene y also changes if a mutation in gene x is provoked?
-
-- After a mutation that reduces the fitness of a population of cells, the population is sometimes able to increase its fitness by mutating other genes (e.g. dBem1 eventually result in mutations in Bem3).
-Can these mutations, that are initiated by cells themselves, be predicted based on the interaction maps (i.e. predict survival of the fittest)?
-
-- If a gene x is suppressed, it will possibly change the essentiality of another gene.
-It is expected that most changes in essentiality will occur in the same subnetwork of the mutated gene.
-If a gene y is suppressed that is part of the same network as gene x, does this invoke similar changes in this subnetwork?
-In other words, are there common changes in the subnetwork when a random change is made within this subnetwork?
-
-- Are there relations between the changes in the interaction network after a mutation and the Genetic Ontology (GO-)terms of changed genes?
-
-To check the essentiality of genes, SATAY (SAturated Transposon Analysis in Yeast) experiments will be performed on different genetic backgrounds [Michel et.al., 2017] [Segal et.al., 2018].
-This uses transposons to inhibit genes and it allows to compare the effects of this inhibition on the fitness of the cells (see for example the [galaxyproject website](<https://galaxyproject.github.io/training-material/topics/genome-annotation/tutorials/tnseq/tutorial.html>) which explains it in the context of bacteria, but the same principles hold for yeast cells).
-Transposons are small pieces of DNA that can integrate in a random location in the genome.
-When the insertion happens at the location of a gene, this gene will be inhibited (i.e. it can still be transcribed, but typically it cannot be translated into a functional protein).
-
+To check the essentiality of genes a technique called transposon sequencing is applied that has been used in bacteria many times before (e.g. [galaxyproject website](<https://galaxyproject.github.io/training-material/topics/genome-annotation/tutorials/tnseq/tutorial.html>)).
+We use an adapted version of this technique that first has been used in *Schizoaccharomyces Pombe* [Guo et.al. 2013] and has recently been applied in *Saccharomyces Cerevisiae* [Michel et.al. 2017] [Segal et.al., 2018].
+Transposon sequencing for *S. Cerevisiae* is called SAturated Transposon Analysis in Yeast (SATAY), which uses transposons (small pieces of mobile DNA) that can insert in genes and thereby inhibit the gene function (i.e. it can still be transcribed, but typically it cannot be translated into a functional protein).
 After a transposon is randomly inserted in the DNA, the growth of the cell is checked.
-If the cell cannot produce offspring, the transposon has likely been inserted in an essential gene or genomic region.
+If the cell cannot proliferate, the transposon has likely been inserted in a critical genomic region causing a significant decrease in the fitness.
 This is done for many cells at the same time.
-All the cells are let to grow after insertion and the cells that have a transposon inserted in an essential part of their DNA (therefore having a low fitness) will, after some time, be outcompeted by the cells with an insertion in a non-essential part of the DNA (cells with a relatively high fitness).
-By means of sequencing, the location of the transposon insertion can be checked and related to a specific gene.
-Since the cells that have an essential part of the genome blocked do not occur in the population, those cells are not sequenced and hence the location of the transposon in these cells are missing in the sequencing results.
+After transposon insertion, the cells are grown and those that have a transposon inserted at a location that causes a significant decrease in their fitness occur less often in population compared with cells with a higher fitness.
+The DNA of all cells is extracted and, by means of sequencing, the location of the transposon insertion can be determined.
+Transposons inserted in a vital genomic region will be absent in the sequencing results and regions that important, but not vital, will have less insertions compared with the regions that do not significantly decrease the fitness of the cells.
 Thus, when the sequencing results of all the cells are aligned to a reference genome, some genomic locations are missing in the sequencing results.
 These missing locations corresponds to potentially essential genomic regions.
-The genome of all cells (called the library) is saturated when all possible insertion sites have at least one insertion of a transposon.
+The genome of all cells (called the library) is saturated when all possible genomic regions are covered by transposons.
 In that case all regions of the DNA are checked for their essentiality.
 
 ## Essentiality
 
-Essentiality of genes are defined as its deletion is determental to cell in the form that either the cell cannot grow anymore and dies, or the cell cannot give rise to offspring.
+A gene is essential when its function is absolutely required for some vital cellular function.
 Essentiality can be grouped in two categories, namely type I and type II [Chen et.al. 2016].
 Type I essential genes are genes, when inhibited, show a loss-of-function that can only be rescued (or masked) when the lost function is recovered by a gain-of-function mechanism.
 Typically these genes are important for some indispensable core function in the cell (e.g. Cdc42 in *S. Cerevisiae* that is type I essential for cell polarity).
 Type II essential genes are the ones that look essential upon inhibition, but the effects of its inhibition can be rescued or masked by the deletion of (an)other gene(s).
 These genes are therefore not actually essential, but when inhibiting the genes some toxic side effects are provoked that are deleterious for the cells.
 
-The idea is that the essentiality of genes (both type I and type II), may change between different genetic backgrounds.
-For changes in essentiality four cases are considered:
+Essentiality of genes (both type I and type II), may change between different genetic backgrounds due to a reorganization of the genetic interaction map.
+For changes in essentiality in different genetic backgrounds, four cases are considered:
 
-1. A gene is **essential** in WT and remains **essential** in the
-    mutant.
+1. a gene is **essential** in WT and remains **essential** in the
+    mutant,
 
-2. A gene is **non-essential** in WT and remains **non-essential** in
-    the mutant.
+2. a gene is **non-essential** in WT and remains **non-essential** in
+    the mutant,
 
-3. A gene is **essential** in WT and becomes **non-essential** in the
-    mutant.
+3. a gene is **essential** in WT and becomes **non-essential** in the
+    mutant,
 
-4. A gene is **non-essential** in WT and becomes **essential** in the
+4. a gene is **non-essential** in WT and becomes **essential** in the
     mutant.
 
 An example is given in the figure below, where an interaction map is
@@ -102,41 +97,45 @@ both the essentiality and the interactions are changed.
 
 ![Example interaction network for a WT cell and a mutant with essential and non-essential genes.](./media/example_interaction_network.png)
 
-Situation 1 and 3 are expected to be the trickiest since those ones are difficult to validate.
-To check the synthetic lethality in cells, a double mutation needs to be made where one mutation makes the genetic background and the second mutation should confirm whether the second mutated gene is actually essential or not.
-This is typically made by sporulating the two mutants, but deleting a gene that is already essential in wild type prevents the cell from growing or dividing and can therefore not be sporulated with the mutant to create the double deletion.
-Therefore, these double mutants are hard or impossible to make.
-
-Another point to be aware of is that some genes might be essential in specific growth conditions (see also the subsection).
+It is important to remember that some genes might be essential only in specific growth conditions (see also the next subsection).
 For example, cells that are grown in an environment that is rich of a specific nutrient, the gene(s) that are requried for the digestion of this nutrient might be essential in this condition.
 The SATAY experiments will therefore show that these genes are intolerant for transposon insertions.
-However, when the cells are grown in another growth condition where mainly other nutrients are present, the same genes might now not be essential and therefore also be more tolerent to transposon insertions in that region.
-It is suggested to compare the results of experiments with cells from the same genetic background grown in different conditions with each other to rule out conditions specific results.
+However, when the cells are grown in another growth condition where other nutrients are present, the same genes might now not be essential and therefore also be more tolerent to transposon insertions.
+It is [suggested](https://galaxyproject.github.io/training-material/topics/genome-annotation/tutorials/tnseq/tutorial.html#:~:text=Transposon%20insertion%20sequencing%20is%20a,can%20relocate%20within%20the%20genome.) to compare the results of experiments with cells from the same genetic background grown in different conditions with each other to rule out conditions specific results.
 
-For wild-type (and some mutated) yeast, the interaction network is already made based on previous research [thecellmap.org](<thecellmap.org>).
-We want to check the essentiality of all genes in different mutants and compare this with both wild type cells and with each other.
-The goal is to make an overview of the changes in the essentiality of the genes and the interaction network between the proteins.
-With this we aim to eventually be able to predict the synthetic lethality of multiple mutations based on the interaction maps of the individual mutations.
-Currently the idea is to use machine learning that uses the results from the transposon sequencing experiments, the interaction map of genes and possibly GO-terms (see for current progress [the github page for machine learning](<https://github.com/leilaicruz/machine-learning-for-yeast>).)
+Because it is not straightforward to label a gene as either essential of non-essential, instead it might be better to define essentiality as continuous variable instead as a boolean.
+Essentiality will then be a value between 0 and 1 where an essentiality of 0 indicates that the gene is not essential, hence deleting this gene does not have any influence on the cells fitness, and a value of 1 indicates an critical gene that after deleting the cell cannot survive and/or proliferate.
+This can be determined by measuring the relative number of transposons.
 
 ## Interpreting Transposon Counts & Reads
 
 Once cells have a transposon inserted somewhere in the DNA, the cells are let to grow so they can potentially generate a few new generations.
 A cell with a tranposon inserted in an essential part of its DNA grows very slowly or might not grow at all (due to its decreased fitness).
-Since the sequencing starts only at the location of a transposon insertion (see experimental methods section), it can be concluded that roughly each read from the sequencing corresponds with a transposon insertion (roughly mainly because transposon inserted in essential genes can generate no reads).
-Cells with a transposon inserted in an essential genomic region, will not have divided and therefore will not have a contribution to the sequencing reads.
-When the reads are aligned to a reference sequence and the number of reads are mapped against the genome, empty regions indicate possible essential genes.
+Since the sequencing starts only at the location of a transposon insertion (see experimental methods section), the location where each read maps in the reference genome corresponds with the location where the transposon has been inserted.
+Cells with a transposon inserted in an essential genomic region, will not have divided and therefore does not contribute to the sequencing reads.
+When the sequencing reads are aligned to a reference genome, missing regions in the alignment might correspond with essential parts.
 Negative selection can thus be found by looking for empty regions in the reads mapping.
-When a transposon is inserted in a non-essential genomic region, these cells can still divide and give rise to offspring and after sequencing the non-essential regions will be represented by relatively many reads.
+When a transposon is inserted in a non-essential genomic region, these cells can still divide and proliferate and after sequencing the non-essential regions will be represented by relatively many reads.
 
 During processing the genes can be analyzed using the number of transposon insertions per gene (or region) or the number of reads per gene.
-Reads per gene, instead of transposons per gene, might be a good measure for positive selection since it is more sensitive (bigger difference in number of reads between essential and non-essential genes), but also tends to be nosier.
+Reads per gene, instead of transposons per gene, might be a good measure for positive selection since locations can be distinquished that have more reads then expected (e.g. more reads relative to the background).
+It is also more sensitive (bigger difference in number of reads between essential and non-essential genes), but also tends to be nosier.
 Transposons per gene is less noisy, but is also less sensitive since the number of transposons inserted in a gene does not change in subsequent generations of a particular cell.
 Therefore it is hard to tell the fitness of cells when a transposon is inserted a non-essential region solely based on the number of transposon insertions.
 
+For each gene, a survival probability can be defined which tells the chances a cell will survive without this gene.
+The survival probability *S* is determined as
+
+$$S = \frac{tn/BPInGene}{tn/BPInBackground}$$
+
+where the number of transposons per basepair in background can be determined as the average over all neutral DNA regions (i.e. no CDS, ARS, telomeres, centromeres, terminators etc.).
+However, the background is not constant over the entire genome.
+Instead some locations are more likely to have insertions compared to other regions (e.g. see figure 1 in Michel et.al. 2017).
+To estimate the background number of insertions only the local neutral regions need to be considered.
+
 Ideally only the transposons inserted in non-essential genomic regions will have reads (since only these cells can create a colony before sequencing), creating a clear difference between the essential and non-essential genes.
 However, sometimes non-essential genes also have few or no transposon insertion sites.
-According to [Michel et.al.](https://elifesciences.org/articles/23570) this can have 3 main reasons.
+According to [Michel et.al.](https://elifesciences.org/articles/23570) this can have 4 main reasons.
 
 1. During alignment of the reads, the reads that represent repeated DNA sequences are discarded, since there is no unique way of fitting
  them in the completed sequence.
@@ -148,11 +147,11 @@ According to [Michel et.al.](https://elifesciences.org/articles/23570) this can 
  Some dubious ORF might overlap with essential proteins, so although these ORF themselves are not essential, the overlapping part is and therefore they do not show any transposons.
 
 3. Some genes are essential only in specific conditions.
- For example, genes that are involved in galactose metabolism are typically not essential, as inhibition of these genes block the cell’s ability to digest galactose, but it can still survive on other nutrition’s.
+ For example, genes that are involved in galactose metabolism are typically not essential, as inhibition of these genes block the cell’s ability to digest galactose, but it can still survive on other nutritions.
  In lab conditions however, the cells are typically grown in galactose rich media, and inhibiting the genes for galactose metabolism cause starvation of the cells.
 
 4. A gene might not be essential, but its deletion might cripple the cell so that the growth rate decreases significantly.
- When the cells are grown, the more healthy cells grow much faster and, after some time, occur more frequently in the population than these crippled cells and therefore these cells might not generate many reads or no reads at all.
+ When the cells are grown, the more healthy cells grow much faster and, after some time, occur more frequently in the population than these crippled cells.
  In the processing, it might therefore look as if these genes are essential, but in fact they are not.
  The cells just grow very slowly.
 
@@ -174,29 +173,35 @@ Because of the reasons mentioned before, not a simple binary conclusion can be m
 Instead, a gene with little reads *might* be essential, but to be sure the results from other experiments need to be implemented as well, for example where the cells were grown in a different growth conditions.
 Therefore, SATAY analysis only says something about the relative fitness of cells where a specific gene is inhibited in the current growth conditions.
 
+## Genetic interaction Maps
+
+...
+
 # Methods and File types
 
 Many essential genes in wild type cells are already known and published.
-The results from our SATAY experiments we can verify using the known essential genes and check how well they fit with the number of reads in each gene.
-Also, we can use a similar approach as was performed by the Kornmann lab [Michel et.al. 2017] using wild type cells (see also [the SATAY users website](<https://sites.google.com/site/satayusers/>)).
-Comparison of our results with those obtained by the Kornmann lab might confirm the quality of our experimental and analysis methods.
-Once our experimental method is verified, we want to compare the differences in essentiality of genes in wild type with different mutants (e.g. dBem1, dBem2, dBem3 and dNrp1).
+The results from SATAY experiments can be verified using the known essential genes.
+A protocol for SATAY is introduced by the Kornmann lab [Michel et.al. 2017] using wild type cells (see also [the SATAY users website](<https://sites.google.com/site/satayusers/>)).
 For fast processing of many experimental results, a tool needs to be developed that automatically converts the raw sequencing data to a list of the number of transposons and reads for each gene, and potentially list some of their properties (e.g. essentiality, GO-terms, interactions etc.).
+This section discusses briefly a simplified protocol for SATAY and the analysis.
 
 ## Experimental method summary
 
-The process of SATAY starts with inserting a plasmid in the cells that contains a transposase (TPase) and the transposon (MiniDs) flanked on both sides by adenine (ADE).
-The transposon has a specific, known, sequence that codes for the transposase that cuts the transposon from the plasmid (or DNA) to (another part of) the DNA.
-
-![Simplified example for the transposon insertion plasmid.](./media/Plasmid_transposon.png)
+SATAY uses two kinds of transposable elements found in maize, the activator transposable element (Ac) and the dissociation transposable element (Ds).
+Ac is autonomous, meaning that it can express the transposase that is needed to cut loose the transposon.
+Ds is nonautonomous and cannot express the transposase and thus it needs the Ac for transposition.
+In yeast cells, the Ds is used (called MiniDs) that is inserted in the [Ade2 gene](https://www.yeastgenome.org/locus/S000005654/go) and thereby disrupting this gene.
+The cells are induced to express the transposase Ac that cuts out the Ds and repairs the Ade2 gene.
+Only cells in which the Ade2 gene is repaired are able to form colonies again.
+The excised Ds transposon reinserts randomly in the DNA.
+However, since the original location of the Ds transposon is the Ade2 gene, the genomic locations around this Ade2 are more likely to have the transposon reinserted compared with other genomic regions (e.g. see figure 1 in Michel et.al. 2017).
+All cells are then put in media where only cells grow that have a repaired Ade2 gene, so that only the cells where the transposon is not excised from the Ade2 are diluted since they are outcompeted by the cells that have their transposons excised.
 
 (See next figure for the following section).
-The MiniDs transposon is cut loose from the plasmid and randomly inserted in the DNA of the host cell.
-If the transposon is inserted in a gene, the gene can still be transcribed by the ribosomes, but typically cannot be (properly)
-translated in a functional protein.
+If the excised Ds transposon is inserted in a gene, then this gene can still be transcribed by the ribosomes, but typically cannot be (properly) translated in a functional protein.
 The genomic DNA (with the transposon) is cut in pieces for sequencing using enzymes, for example DpnII.
 This cuts the DNA in many small pieces (e.g. each 75bp long) and it always cuts the transposon in two parts (i.e. digestion of the DNA).
-Each of the two halves of the cut transposon, together with the part of the gene where the transposon is inserted in, is ligated meaning that it is folded in a circle.
+Each of the two halves of the cut transposon, together with the part of the gene where the transposon is inserted in, is ligated meaning that it is folded in a circle (circularization).
 A part of the circle is then the half transposon and the rest of the circle is a part of the gene where the transposon is inserted in.
 Using PCR and primers, this can then be unfolded by cutting the circle at the halved transposon.
 The part of the gene is then between the transposon quarters.
@@ -215,9 +220,9 @@ All contigs should be assembled to form (a large part of) the target genome.
 
 The sequence assembly problem can be described as: *Given a set of sequences, find the minimal length string containing all members of the set as substrings*.
 
-The reads from the sequencing can be single-end or paired-end, which indicates how the sequencing is performed.
-In paired-end sequencing, the reads are sequenced from both directions, making the assembly easier and more reliable, but results in twice as many reads as single-end reads.
-The reason of the more reliable results has to do with ambiguous reads that might occur in the single-end sequencing.
+The reads from the sequencing can be single-read or paired-end, which indicates how the sequencing is performed.
+In paired-end sequencing, the reads are sequenced from both directions, making the assembly easier and more reliable, but results in twice as many reads as single-read reads.
+The reason of the more reliable results has to do with ambiguous reads that might occur in the single-read sequencing.
 Here, a read can be assigned to two different locations on the reference genome (and have the same alignment score).
 In these cases, it cannot be determined where the read should actually be aligned (hence its position is ambiguous).
 In paired-end sequencing, each DNA fragment has primers on both ends, meaning that the sequencing can start in both the 5’-3’ direction and in the 3’-5’ direction.
@@ -388,31 +393,27 @@ See for example [phred score conversion table](<https://drive5.com/usearch/manua
 
 ## Determine essentiality based on transposon counts
 
-Using the number of transposons and reads, it can be determined which genes are potentially essential and which are not.
-To check this method, the transposon count for wild type cells are determined.
-Currently, genes that are taken as essential are the annotated essentials based on previous research (see files located in `X:\tnw\BN\LL\Shared\Gregory\Gene_Database\`).
+Using the number of transposons and reads, the essentiality can be determined.
+Currently, genes that are taken as essential are the annotated essentials based on previous research (e.g. see the [Github page of this research](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Cerevisiae_AllEssentialGenes_List.txt)).
 
 ### Distribution number of insertions and reads compared with essential and non-essential genes
 
-(*See `statistics_pergene.py`*)
+(*The figures in this section are created using `analyze_pergene_insertions.py` and `statistics_pergene.py`*)
 
-Ideally, the number of transposon insertions of all essential genes are small and the number of insertions in non-essential genes are is large so that there is a clear distinction can be made.
+Ideally, the number of transposon insertions of all essential genes are small and the number of insertions in non-essential genes is large so that there a boundary can be defined that seperates essential from non-essential genes.
 However, this is not always so clear.
 For example, the distribution of transposons in WT cells in the data from Michel et. al. looks like this:
 
-![Reads and transposon density after processing as discussed in Michel et.al. 2017.](./media/Tn_Reads_Pergene_BenoitAnalysis.png)
-
-In this figure, both the reads and the transposon counts are normalized with respect to the length of each gene (hence the graph represents the read density and transposon density).
+In these figures, both the reads and the transposon counts are normalized with respect to the length of each gene (hence the graph represents the read density and transposon density).
 High transposon counts only occurs for non-essential genes, and therefore when a high transposon count is seen, it can be assigned nonessential with reasonable certainty.
 However, when the transposon count is low the there is a significant overlap between the two distributions and therefore there is no certainty whether this gene is essential or not (see also the section about 'Interpreting Transposon Counts & Reads').
 
 The data is also sensitive to postprocessing.
-It is expected that the trimming of the sequences is an important step.
-The graph below shows the same data as in the previous graph, but with different processing as is done by Michel et. al..
-This has a significant influence on the results and as a consequence, no distinction can be made between essential and nonessential genes based on the transposon counts.
-Significant attention needs to be given to the postprocessing of the data.
+It is expected that the trimming of the sequences is one of the important steps.
+When similar graphs are made using different processing steps on the same dataset, the distribution of the transposon and read density can look significantly different.
 
-![Reads and transposon density after processing.](./media/Tn_Reads_Pergene_MyAnalysis.png)
+![Transposon density after processing as discussed in Michel et.al. 2017.](./media/TnPerGeneNorm_BenoitAnalysis_AnalyzePerGeneInsertions.png)
+![Read density after processing as discussed in Michel et.al. 2017.](./media/ReadPerGeneNorm_BenoitAnalysis_AnalyzePerGeneInsertions.png)
 
 ### Profile plot for number of reads
 
@@ -420,19 +421,19 @@ Significant attention needs to be given to the postprocessing of the data.
 
 To create a visual overview where the insertions are and how many reads there are for each insertion, a profile plot is created for each chromosome.
 
-![Read profile plot for chromosome XV (note the y-axis is in logarithmic scale).](./media/Read_ProfilePlot_chrxv.png)
+![Transposon profile plot for chromosome XV](./media/Tn_ProfilePlot_chrxv.png)
 
 The bars indicate the absolute number of reads for all insertions located in the bars (bar width is 545bp).
 The colored background indicate the location of genes, where green are the annotated essential genes and red the non-essential genes.
 In general, the essential genes have no or little reads whereas the non-essential genes have many reads.
-Note that at location 564476 the ADE2 gene is located that has significant more reads than any other location in the genome, which has to do the way the plasmid is designed (see Michel et.al. 2017).
+Note that at location 564476 the Ade2 gene is located that has significant more reads than any other location in the genome,(see section 'Experimental method summary').
 The examples used here are from a dataset discussed in the paper by Michel et.al. 2017 which used centromeric plasmids where the transposons are excised from.
 The transposons tend to reinsert in the chromosome near the chromosomal pericentromeric region causing those regions to have about 20% more insertions compared to other chromosomal regions.
 
 This figure gives a rough overview that allows for identifying how well the data fits the expectation.
 Also an alternative version of this plot is made (`TransposonRead_Profile_Compare.py`) that makes a similar plot for two datasets at the same time, allowing the comparison of the two datasets with each other and with the expectation.
 
-![Comparison of the same datasets, but with different processing steps. Shown here is the transposon count for the two files including the absolute difference between the two datasets show in blue. Note also here that some regions has a higher likelihood of bearing transposons compared to the surrounding regions.](./media/Cerevisiae_Michel2017_WT2_Compare_chromIX.png)
+![Read profile plot for chromosome XV (note the y-axis is in logarithmic scale).](./media/Read_ProfilePlot_chrxv.png)
 
 ### Profile plot number of reads per individual genes
 
@@ -454,37 +455,15 @@ This is chosen because if now a bar is empty in a gene than this is not a coinci
 
 These plots can be used for checking if a gene has transposon free regions which might indicate that this gene is essential.
 
-# Data analysis steps
-
-For data analysis, the following steps need to be taken:
-
-1. Process data and represent this in a standardized way that can be easily processed.
-
-2. Put the genes in an overview for comparison with other backgrounds.
-      - Make visual overview of the results (e.g. the number of insertions and reads per gene).
-      - Compare the genes of different genetic backgrounds using a Venn-diagram
-
-3. Obtain the interactions of the different genes to create an
-    interaction map (use thecellmap.org)
-
-4. Look for possible relations between the genes and their
-    interactions.
-
-5. Use these relations to obtain training for machine learning.
-
-First, the main focus will be step 1 of the analysis (see next section).
-
-# Step 1 data analysis; From raw data to essential protein overview
+# Data analysis; From raw sequencing data to number of insertions and reads per genomic region
 
 SATAY experiments need to be sequenced which results in a FASTQ file.
 The sequence reads from this file needs to be aligned to create a SAM file (and/or the compressed binary equivalent BAM file).
 Using the BAM file, the number of transposons can be determined for each insertion location.
 
-For guides and manuals of the software discussed below, see the folder
+For guides and manuals of the software discussed below, see [the Github page for this project](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/master/docs).
 
-`M:\\tnw\\bn\\ll\\Shared\\Gregory\\Software\\Guides & Manuals`.
-
-Raw data (.FASTQ file) discussed in the paper of Michel et.al. 2017 can be found at [<https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-4885/samples/>].
+For testing, the raw data (.FASTQ files) discussed in the paper of Michel et.al. 2017 is used and can be found [here](<https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-4885/samples/>).
 
 ## Workflow
 
@@ -788,12 +767,12 @@ If not sure, check if the .fastq file contains, for example, an exclamation mark
 In case of SE, a single output file needs to be specified.
 Needs to have the same extension as the input file (e.g. .fastq) [required];
 
-- `ILLUMINACLIP:TruSeq3-SE.fa:2:15` or `ILLUMINACLIP:TruSeq3-PE.fa:2:30:10` (for Single End reads or Paired End reads respectively). This cuts the adapter and other Illumina specific sequences from the reads.
+- `ILLUMINACLIP:TruSeq3-SE.fa:2:30:10` or `ILLUMINACLIP:TruSeq3-PE.fa:2:30:10` (for Single End reads or Paired End reads respectively). This cuts the adapter and other Illumina specific sequences from the reads.
 The first parameter after `:` indicates a FASTA file (this should be located in the same folder as the sequencing data).
-The second paramter indicates the Seed Mismatches which indicates the maximum mismatch count that still allows for a full match to be performed.
-The third parameter (for SE, fourth parameter for PE) is the Simple Clip Threshold which specifies how accurate the match between the adapter and the read.
+The second parameter is the Seed Mismatches which indicates the maximum mismatch count that still allows for a full match to be performed.
 The third parameter for PE sets the Palindrome Clip Threshold specifies how accurate the match between the two 'adapter
-ligated' reads must be for PE palindrome read alignment.
+ligated' reads must be for PE palindrome read alignment (Works only for PE, but needs to be set for SE as well).
+The fourth parameter is the Simple Clip Threshold which specifies how accurate the match between the adapter and the read.
 
 A number of adapters are stored in the ‘adapters’ folder at the location where the trimmomatic program is saved.
 In case of MiSeq sequencing, the TruSeq3 adapter file is advised.
@@ -809,7 +788,7 @@ A path to another folder with the adapter files yields an error. [optional] [<ht
 
 - `SLIDINGWINDOW` Sliding window trimming which cuts out sequences witin the window and all the subsequent basepairs in the read if the average quality score within the window is lower than a certain threshold.
 The window moves from the 5'-end to the 3'-end.
-Note that if the first few reads of a sequence if of low quality, but the remaining of the sequence is of high quality, the entire sequence will be removed just because of the first few bad quality nucleotides.
+Note that if the first few reads of a sequence is of low quality, but the remaining of the sequence is of high quality, the entire sequence will be removed just because of the first few bad quality nucleotides.
 If this sitatuation occurs, it might be useful to first apply the HEADCROP option (see below).
 Parameters should be given as `SLIDINGWINDOW:L_window:Q_min` where `L_window` is the window size (in terms of basepairs) and `Q_min` the average threshold quality. [optional];
 
@@ -932,7 +911,7 @@ Use either `minkmerhits`, `minkmerfraction` or `mincovfraction`, but setting mul
 Basically this indicates how many errors are allowed between a read and and an adapter sequence to still count as an exact match.
 Typically does not need to be set any higher than 1, unless the reads are of very low quality.
 Note that high values of hdist also requires much more memory in the computer.
-13. `restrictleft` and `restrictright`. Only look for kmers left or right number bases.
+13. `restrictleft` and `restrictright`. Only look for kmers in the left or right number bases.
 14. `tpe` and `tbo`: This is only relevant for paired-end reads.
 `tpe` cuts both the forward and the reverse read to the same length and `tbo` trims the reads if they match any adapter sequence while considering the overlap between two paired reads.
 
@@ -1089,265 +1068,79 @@ Further analysis is done in windows, meaning that the sorted .bam files needs to
 
 Next, the data analysis is performed using custom made codes in Matlab in Windows.
 
-### 5. Determining transposon insertions: Matlab (Code from Benoit [Michel et. al. 2017])
+### 5. Determining transposon insertions: Python or Matlab (Matlab code from Kornmann lab [Michel et. al. 2017])
 
-Before the data can be used as an input for the Matlab code provided by the Kornmann lab, it needs to be copied from the shared folder to the data folder using the command:
+After creating the .bam file, the location of the transposon insertions and the number of reads per insertion needs to be determined.
+For this, no standard software is available, instead a [custom made python script is used](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Python_TransposonMapping/transposonmapping_satay.py).
+This python script is heavily based on the [Matlab script created by the Kornmann lab](<https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script>) as described in the paper by Michel et.al., 2017.
 
-**`mv "${path_sharedfolder}/"* ${path_align_out}`**
+The goal of this software is to create an overview of all insertion locations in the genome with the number of reads at those locations and to determine the number of insertions and reads for each gene.
 
-The Matlab code is provided by Benoit (see the [website](https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script)) and is based on the [paper by Michel et. al.](<https://elifesciences.org/articles/23570>).
-Running the code requires the user to select a .bam  or .sorted.bam file (or .ordered.bam which is similar to the .sorted.bam).
-If the .bam file is chosen or there is no .bam.bai (bam index-)file present in the same folder, the script will automatically generate the .sorted.bam and a .bam.bai file.
-In the same folder as the bam file the Matlab variables ‘yeastGFF.mat’ and ‘names.mat’ should be present (which can be found on the [website cited above](https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script)).
-The script will generate a number of files (some of them are explained below):
+In order to run the python script in Linux, go to the location where the script is stored and enter the command
 
-1. .sorted.bam (if not present already)
+`python3 transposonmapping_satay.py /location/to/file.bam`
 
-2. .bam.bai (if not present already)
+The python script loads a .bam file together with its .bam.bai index file (the .bam.bai script is required).
+For this it requires the [pysam](<https://pysam.readthedocs.io/en/latest/api.html>) package which partly relies on the SAMTools software, hence this is only available on Linux (or Mac) systems (also when running the python on its own, so without the workflow, this python script will only work in Linux or Mac).
+Additional files required for the python script to work are (see also `N:\tnw\BN\LL\Shared\VirtualMachines\`):
 
-3. .sorted.bam.linearindex
+- [Yeast_Protein_Names.txt](<https://www.uniprot.org/docs/yeast>); includes all names for each gene including any aliases and different naming conventions.
+- Saccharomyces_cerevisiae.R64-1-1.99.gff3; includes for each gene the location in the genome.
+- Cerevisiae_AllEssentialGenes_List.txt; This file is a combination of the essential genes found in [Cerevisiae_EssentialGenes_List_1](<https://rdrr.io/bioc/SLGI/man/essglist.html>)and [Cerevisiae_EssentialGenes_list_2](<http://www.essentialgene.org/>).
 
-4. .sorted.bam.mat (used as a backup of the matlab script results)
+The python scripts starts with loading the .bam file using pysam and determining some properties of the file, like the lengths and names of the chromosomes as used in the file and the number of mapped reads.
+After that, the script loops over all reads in each chromosome and gets the insertion location, orientation and length of the reads.
+The orientation of the reads are given by a flag, which typically is either 0 (forward orientation) or 16 (reverse orientation).
+The position of the reads is corrected if it is in reverse orientation.
+The most important results are stored in the variables `tncoordinates_array` (which stores the exact location of each read) and `readnumb_array` which stores the number of reads for each of the insertions.
+To count the number of reads, it is assumed that all insertions that are within two basepairs of each other belong together and hence the reads of those insertions are all summed up.
+This is to allow for small uncertainties during sequencing and alignment.
+The position of the total number of reads are determined by averaging the locations of the summed reads.
+When taking the sum of multiple reads, the highest read count is discarded (e.g. when the following number of reads are summed, [3,7,14], the value 14 is discarded and thus the total number of reads of those three insertions is 3+7=10 reads).
+This is orignally considered in the Matlab code by the Kornmann lab to reduce noise in the read data.
+See [the discussion on the SATAY user forum](<https://groups.google.com/forum/#!category-topic/satayusers/bioinformatics/uaTpKsmgU6Q>) for a more detailed explaination.
 
-5. .sorted.bam_pergene.txt (contains information about transposons and reads for individual genes)
+Next, all the essential genes are retrieved from the additional files that were loaded in the beginning.
+Then, the chromosomes are concatenated into one large genome, so that the numbering of the basepair positions does not start at 0 for each chromosome, but rather continues counting upwards for the subsequent chromosomes.
+Finally, for all genes the number of insertions and reads are determined by checking the position of the genes and counting all transposons and reads that fall within the range of the gene.
 
-6. .sorted.bam.bed (contains information about the location and the number of reads per transposon insertion)
+The data is stored in multiple files
 
-7. .sorted.bam.wig (contains information about the location and the number of reads per transposon insertion)
+- .bed
+- .wig
+- _pergene.txt
+- _pergene_insertions.txt
+- _peressential.txt
+- _peressential_insertions.txt
 
-The line numbers below correspond to the original, unaltered code.
+The .bed file (Browser Extensible Data) is used for storing the locations of the insertions and the number of reads.
+The different columns in the file are separated by spaces.
+The first column indicates the chromosome number (e.g. `chrI`), the second and third column the start and end position respectively, the fourth column includes a dummy variable (this is needed to comply the standard layout of the bed format) and the fifth column is the number of reads.
+For the number of the reads, the equation 20*reads+100 is used that linearly scales the values to enhance the contrast (e.g. 4 reads is represented as 180).
 
-[line1-13] After loading the .BAM file, the ‘baminfo’ command is used
-to collect the properties for the sequencing data. These include (among
-others) [<https://nl.mathworks.com/help/bioinfo/ref/baminfo.html>]:
+The .wig file (Wiggle) contains similar information as the .bed file, but the layout is different.
+This file contains two columns separated by a space where the first column represents the location of the insertion and the second column the number of reads (the actual number of reads, thus not the using the equation as used in the .bed file).
+A difference between the .bed file and the .wig file is that in the in .wig file the insertions with different orientations are summed.
+In the .bed file a distinction is made between reads that come from transposons with different orientation, but this is not done in the .wig file.
 
-- `SequenceDictionary`: Includes the number of basepairs per
-    chromosome.
-
-- `ScannedDictionary`: Which chromosomes are read (typically 16 and
-    the mitochondrial chromosome).
-
-- `ScannedDictionaryCount`: Number of reads aligned to each reference
-    sequence.
-
-[line22-79] Then, a for-loop over all the chromosomes starts (17 in
-total, 16 chromosomes and a mitochondrial chromosome). The for-loop
-starts with a BioMap command which gets the columns of the SAM-file. The
-size of the columns corresponds with the number of reads aligned to each
-reference sequence (see also the ‘baminfo’ field `ScannedDictionaryCount`). The collected information is:
-
-- `SequenceDictionary`: Chromosome number where the reads are
-    collected for (given in roman numerals or ‘Mito’ for mitochondrial).
-    (QNAME)
-
-- `Reference`: Chromosome number that is used as reference sequence.
-    (RNAME)
-
-- `Signature`: CIGAR string. (CIGAR)
-
-- `Start`: Start position of the first matched basepair given in terms
-    of position number of the reference sequence. (POS)?
-
-- `MappingQuality`: Value indicating the quality of the mapping. When
-    60, the mapping has the smallest chance to be wrong. (MAPQ)
-
-- `Flag`: Flag of the read. (FLAG)
-
-- `MatePosition`: (PNEXT)?
-
-- `Quality`: Quality score given in FASTQ format. Each ASCII symbol
-    represents an error probability for a base pair in a read. See
-    [<https://drive5.com/usearch/manual/quality_score.html>] for a
-    conversion table. (QUAL)
-
-- `Sequence`: Nucleotide sequence of the read. Length should math the
-    length of the corresponding ‘Quality’ score. (SEQ)
-
-- `Header`: Associated header for each read sequence.
-
-- `Nseqs`: Integer indicating the number of read sequences for the
-    current chromosome.
-
-- `Name`: empty
-
-(Note: Similar information can be obtained using the ‘bamread’ command
-(although his is slower than ‘BioMap’), which gives a structure element
-with fields for each piece of information. This can be accessed using:
-`bb = bamread(file,infobam.SequenceDictionary(kk).SequenceName,\[1
-infobam.SequenceDictionary(kk).SequenceLength\]))`
-`bb(x).’FIELD’ %where x is a row (i.e. a specific read) and FIELD
-is the string of the field.`)
-
-After extracting the information from the SAM-file (using the ‘BioMap’
-command), the starting site is defined for each read. This is depended
-on the orientation of the read sequence. If this is normal orientation
-it has flag=0, if it is in reverse orientation it has flag=16. If the
-read sequence is in reverse orientation, the length of the read sequence
-(‘readlength’ variable) needs to be added to the starting site (‘start’
-variable). The corrected starting sites of all reads are saved in a new
-variable (‘start2’). Note that this changes the order of which the reads
-are stored. To correct this, the variables ‘start2’ and ‘flag2’ are
-sorted in ascending order.
-
-Now, all the reads in the current chromosome are processed. Data is
-stored in the ‘’tncoordinates’ variable. This consists of three numbers;
-the chromosome number (‘kk’), start position on the chromosome
-(‘start2’) and the flag (‘flag2’). All reads that have the same
-starting position and the same flag (i.e. the same reading orientation)
-are stored as a single row in the ‘tncoordinates’ variable (for this the
-average starting position is taken). This results in an array where each
-row indicates a new starting position and the reading orientation. The
-number of measurements that were averaged for a read is stored in the
-variable ‘readnumb’. This is important later in the program for
-determining the transposons.
-
-This is repeated for each chromosome due to the initial for-loop. The
-‘tnnumber’ variable stores the number of unique starting positions and
-flags for each chromosome (this does not seem to be used anywhere else
-in the program).
-
-[line94-120] After getting the needed information from the SAM-file,
-the data needs to be compared with the literature. For this yeastGFF.mat
-is used (provided by Benoit et. al.) that loads the variable ‘gff’. This
-includes all genes (from SGD) and the essential genes (from YeastMine).
-(Note that a similar list can be downloaded from the SGD website as a
-text file). The file is formatted as a matrix with in each row a DNA
-element (e.g. genes) and each column represent a different piece of
-information about that element. The used columns are:
-
-1. Chromosome number (represented as roman numerals)
-
-2. Data source (either SGD, YeastMine or landmark. Represented as a
-    string)
-
-3. Type of the DNA element, e.g. gene. The first element of a
-    chromosome is always the ‘omosome’, which is the entire chromosome
-    (Represented as a string)
-
-4. Start coordinates (in terms of base pairs. Represented as an
-    integer)
-
-5. End coordinates (in terms of base pairs. Represented as an integer)
-
-6. A score value. Always a ‘.’ Represented as a string indicating a
-    dummy value.
-
-7. Reading direction (+ for forward reading (5’-3’), - for reverse
-    reading (3’-5’), ‘.’ If reading direction is undetermined.
-    Represented as a string)
-
-8. Always a ‘.’ Except when the element is a Coding DNA Sequence (CDS),
-    when this column become a ‘0’. A CDS always follows a gene in the
-    list and the value indicates how many basepairs should be removed
-    from the beginning of this feature in order to reach the first codon
-    in the next base (Represented as a string)
-
-9. Other information and notes (Represented as a string)
-
-From the ‘gff’ variable, all the genes are searched and stored in the
-variable ‘features.genes’ (as a struct element). The same thing is done
-for the essential genes by searching for genes from the ‘YeastMine’
-library and these are stored in ‘features.essential’ (as a struct
-element). This results in three variables:
-
-- `features`: struct element that includes the fields ‘genes’ and
-    ‘essential’ that include numbers representing in which rows of the
-    ‘gff’ variable the (essential) gene can be found (note that the
-    essential genes are indicated by ‘ORF’ from ’Yeastmine’ in the ‘gff’
-    variable).
-
-- `genes`: struct element storing the start and end coordinates (in
-    basepairs) and the chromosome number where the gene is found.
-
-- `essential`: struct element. Same as ‘genes’, but then for essential
-    genes as found by the ‘YeastMine’ database.
-
-This can be extended with other features (e.g. rRNA, see commented out
-sections in the code).
-
-[line124-160] Next all the data is stored as if all the chromosomes
-are put next to each other. In the `tncoordinates` variable, for each
-chromosome the counting of the basepairs starts at 1. The goal of this
-section is to continue counting such that the first basepair number of a
-chromosome continues from the last basepair number of the previous
-chromosome (i.e. the second chromosome is put after the first, the third
-chromosome is put after the second etc., to create one very long
-chromosome spanning the entire DNA). The first chromosome is skipped
-(i.e. the for-loop starts at 2) because these basepairs does not need to
-be added to a previous chromosome. This is repeated for the start and
-end coordinates of the (essential) genes.
-
-[line162-200] Now the number of transposons is determined which is
-done by looking at the number of reads per gene. First, all the reads
-are found that have a start position between the start and end position
-of the known genes. The indices of those reads are stored in the
-variable ‘xx’. In the first for-loop of the program (see lines 22-79)
-the reads (or measurements) that had the same starting position and flag
-where averaged and represented as a single read. To get the total number
-of reads per gene the number of measurements that were used for
-averaging the reads corresponding to the indices in ‘xx’ are summed (the
-value stored in the variable ‘readnumb’). This is repeated for all genes
-and the essential genes using a for-loop. The maximum value is
-subtracted as a feature to suppress noise or unmeaningful data (see a
-more detailed explanation the discussion by Galih in the forum of Benoit [<https://groups.google.com/forum/#!category-topic/satayusers/bioinformatics/uaTpKsmgU6Q>]).
-
-[line226-227] Next all variables in the Matlab workspace are saved
-using the same name as the .bam file, but now with the .mat extension.
-The program so far does not need to be ran all over again but loading
-the .mat file loads all the variables.
-
-Next a number of files are generated (.bed, .txt and .wig).
-
-[line238-256] A .bed file is generated that can be used for
-visualization of the read counts per insertion site. This contains
-the information stored in the ‘tncoordinates’ variable. This includes
-the chromosome number and the start position of the reads. The end
-position of the reads is taken as the start position +1 (The end
-position is chosen like this just to visualize the transposon insertion
-site). The third column is just a dummy variable and can be ignored. As
-the reads were averaged if multiple reads shared the same location on
-the genome, the total number of reads is taken from the ‘readnumb’
-variable and is stored in the fourth column of the file using the
-equation 100+readnumb(i)\*20 (e.g. a value of 4 in `readnumb` is stored as 180 in the .bed file).
-
-In general a .bed file can contain 12 columns, but only the first three
-columns are obligatory. These are the chromosome number, start position
-and end position (in terms of basepairs), respectively. More information
-can be added as is described in the links below. If a column is filled,
-then all the previous columns need to be filled as well. If this
-information is not present or wanted, the columns can be filled with a
-dummy character (typically a dot is used) [<https://bedtools.readthedocs.io/en/latest/content/general-usage.html>] [<https://learn.gencore.bio.nyu.edu/ngs-file-formats/bed-format/>].
-
-[line238-256] Next a text file is generated for storing information
-about the transposon counts per gene. This is therefore a summation of
-all the transposons that have an insertion site within the gene. (To
-check a value in this file, look up the location of a gene present in
-this file. Next look how many transposon are located within the range
-spanned by the gene using the .bed file). To create this the names.mat
-file is needed to create a list of gene names present in the first
-column. The transposon count is taken from the `tnpergene` variable and
-is stored in the second column of the file. The third is the number of
-reads per gene which is taken from the `readpergene` variable (which is
-calculated by `readnumb-max(readnumb)` where the `readnumb` variable is
-used for keeping track of the number of reads that were used to average
-the reads).
-
-[line260-299] Creating a .wig file. This indicates the transposon
-insertion sites (in terms of basepairs, starting counting from 1 for
-each new chromosome). The file consists of two columns. The first column
-represent the insertion site for each transposons and the second column
-is the number of reads in total at that location. The
-information is similar to that found in the .bed file, but here the
-read count is the actual count (and thus not used the equation
-100+transposon_count*20 as is done in the .bed file).
+Finally four more file are created that include the number of insertions and reads per gene.
+Files that end with the _insertions.txt are similar to the files without this extension, but include a list of the exact location (in terms of bp) of all insertions within the gene.
+The files include all genes (or only all annotated essential genes in case of _peressential.txt and _peressential_insertions.txt).
+In case of _pergene.txt and _peressential.txt, these files contain three tab separated columns where in the first column the gene name is given (standard name is, e.g. Cdc42 or Bem1), the second column contains the number of insertions within the gene and the third column includes the number of reads.
+In case of the _insertions.txt files, they consist of six columns where the first represent the gene name, the second the chromosome where the gene is located and the third and fourth the start and end position of the gene, respectively.
+The fifth column includes a list of all insertion locations within the gene and the sixth column represents the number of reads for all insertions shown in the fifth column.
 
 # Bibliography
 
 Chen, P., Wang, D., Chen, H., Zhou, Z., & He, X. (2016). The nonessentiality of essential genes in yeast provides therapeutic insights into a human disease. Genome research, 26(10), 1355-1362.
 
+Costanzo, M., VanderSluis, B., Koch, E. N., Baryshnikova, A., Pons, C., Tan, G., ... & Pelechano, V. (2016). A global genetic interaction network maps a wiring diagram of cellular function. Science, 353(6306).
+
 Del Fabbro, C., Scalabrin, S., Morgante, M., & Giorgi, F. M. (2013). An extensive evaluation of read trimming effects on Illumina NGS data analysis. PloS one, 8(12).
 
 Delhomme, N., Mähler, N., Schiffthaler, B., Sundell, D., Mannepperuma, C., & Hvidsten, T. R. (2014). Guidelines for RNA-Seq data analysis. Epigenesys protocol, 67, 1-24.
+
+Guo, Y., Park, J. M., Cui, B., Humes, E., Gangadharan, S., Hung, S., ... & Levin, H. L. (2013). Integration profiling of gene function with dense maps of transposon integration. Genetics, 195(2), 599-609.
 
 MacManes, M. D. (2014). On the optimal trimming of high-throughput mRNA sequence data. Frontiers in genetics, 5, 13.
 
@@ -1358,8 +1151,6 @@ Pfeifer, S. P. (2017). From next-generation resequencing reads to a high-quality
 Segal, E. S., Gritsenko, V., Levitan, A., Yadav, B., Dror, N., Steenwyk, J. L., ... & Kunze, R. (2018). Gene essentiality analyzed by in vivo transposon mutagenesis and machine learning in a stable haploid isolate of Candida albicans. MBio, 9(5), e02048-18.
 
 Usaj, M., Tan, Y., Wang, W., VanderSluis, B., Zou, A., Myers, C. L., ... & Boone, C. (2017). TheCellMap. org: A web-accessible database for visualizing and mining the global yeast genetic interaction network. G3: Genes, Genomes, Genetics, 7(5), 1539-1549
-
-\pagebreak
 
 > ***"I want to be a healer, and love all things that grow and are not barren"***
 > - J.R.R. Tolkien

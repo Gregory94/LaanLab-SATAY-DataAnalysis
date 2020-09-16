@@ -4538,7 +4538,7 @@ TFB3; RIG2                                                                 YDR46
 TFB4                                                                       YPR056W             Q12004     TFB4_YEAST  S000006260   338 (3) 16 
 TFB5                                                                       YDR079C-A           Q3E7C1     TFB5_YEAST  S000007603    72 (3)  4 
 TFC1                                                                       YBR123C             P32367     TFC1_YEAST  S000000327   649      2 
-TFC3; TSV115                                                               YAL001C             P34111     TFC3_YEAST  S000000001  1160 (3)  1 
+TFC3; FUN24; TSV115                                                        YAL001C             P34111     TFC3_YEAST  S000000001  1160 (3)  1 
 TFC4; PCF1                                                                 YGR047C             P33339     TFC4_YEAST  S000003279  1025 (3)  7 
 TFC6                                                                       YDR362C             Q06339     TFC6_YEAST  S000002770   672 (3)  4 
 TFC7                                                                       YOR110W             Q12415     TFC7_YEAST  S000005636   435 (3) 15 
