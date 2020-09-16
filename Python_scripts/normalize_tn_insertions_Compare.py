@@ -4,9 +4,10 @@ Created on Wed Aug 26 12:02:44 2020
 
 @author: gregoryvanbeek
 
-This scripts takes a user defined genomic region (i.e. chromosome number, region or gene) and determines the number of transposon insertions in the genomic features (i.e. genes, nc-DNA etc.).
-This can be used to determine the number of transposon insertions outside the genes to use this for normalization of the number of transposons in the genes.
-When adding features, follow the #ADD comments in this file.
+This file can be found at https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/Python_scripts/normalize_tn_insertions_Compare.py
+
+This script is based on 'normalize_tn_insertions.py which can be found at:
+    https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/Python_scripts/normalize_tn_insertions.py
 """
 
 #%%
@@ -25,14 +26,21 @@ from read_sgdfeatures import sgd_features
 
 
 #%%
-def dna_features(region, wig_file_list, pergene_insertions_file_list):
-    '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
-    Output is a barplot indicating the number of transposons per genomic region.
+def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
+    '''This function inputs two wig files and two pergene_insertions files created using transposonmapping_satay.py.
+    The The two files are compared with each other in terms of number of insertions per basepair per genomic region.
+    Output is a barplot indicating the relative difference in number of transposon insertions per basepair per genomic region.
+    This is determined as the the number of insertions per basepair in the first file - the number of insertions per basepair in the second file divided by the maximum number of insertions per basepair in the first file.
     A genomic region is here defined as a gene (separated as annotated essential and not essential), telomere, centromere, ars etc.
-    This can be used for identifying neutral regions (i.e. genomic regions that, if inhibited, do not influence the fitness of the cells).
-    This function can be used for normalizing the transposon insertions per gene using the neutral regions.
+    
+    TO USE THIS SCRIPT:
+        Change the input file paths in the last lines of this code.
+        Change the input files in the next section (to get the files, check https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/dev_Gregory/Python_scripts/Data_Files)
+        Make sure that the imported modules (previous section) are all present in a folder called 'python_modules' that is at the same location as where this script is saved (see https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/dev_Gregory/Python_scripts/python_modules).
+        
+        All information that is used to create the plots in this script are saved in the dataframe variable 'dna_df2'.
     '''
-#%% USER INPUT AND FILES
+#%% INPUT FILES
     essentials_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
 
     gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
@@ -289,7 +297,7 @@ def dna_features(region, wig_file_list, pergene_insertions_file_list):
     essential_color = "#00F28E"
     nonessential_color = "#F20064"
     codingdna_color = '#00918f'
-    textcolor = "#003231"
+#    textcolor = "#003231"
     textsize = 14
 
 
@@ -381,7 +389,7 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features(region = "VII",
+    dna_df2 = dna_features_compare(region = "XIII",
                  wig_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig",
                              r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"],
                  pergene_insertions_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt",
