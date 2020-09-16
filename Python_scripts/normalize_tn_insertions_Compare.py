@@ -32,6 +32,8 @@ def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
     Output is a barplot indicating the relative difference in number of transposon insertions per basepair per genomic region.
     This is determined as the the number of insertions per basepair in the first file - the number of insertions per basepair in the second file divided by the maximum number of insertions per basepair in the first file.
     A genomic region is here defined as a gene (separated as annotated essential and not essential), telomere, centromere, ars etc.
+    The width of the bars correspond to the width of the genomic region.
+    
     
     TO USE THIS SCRIPT:
         Change the input file paths in the last lines of this code.
@@ -389,7 +391,7 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features_compare(region = "XIII",
+    dna_df2 = dna_features_compare(region = "VIII",
                  wig_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig",
                              r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"],
                  pergene_insertions_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt",
