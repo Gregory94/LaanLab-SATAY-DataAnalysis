@@ -43,7 +43,7 @@ def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
         All information that is used to create the plots in this script are saved in the dataframe variable 'dna_df2'.
     '''
 #%% INPUT FILES
-    essentials_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
+    essentials_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
 
     gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 
