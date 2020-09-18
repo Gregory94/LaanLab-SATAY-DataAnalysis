@@ -353,7 +353,8 @@ def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
     ax.xaxis.get_offset_text().set_fontsize(textsize)
     ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize)
     ax.set_ylabel("Relative difference insertions per bp per region",fontsize=textsize)
-    ax.set_title(r"(WT2 - $\Delta$Dpl1) / max(WT2)", fontsize=textsize)
+#    ax.set_title(r"(WT2 - $\Delta$Dpl1) / max(WT2)", fontsize=textsize)
+    ax.set_title(r"(WT2 - WT1 / max(WT2)", fontsize=textsize)
     legend_noncoding = mpatches.Patch(color=noncoding_color, label="Noncoding DNA")
     legend_essential = mpatches.Patch(color=essential_color, label="Annotated essential genes")
     legend_nonessential = mpatches.Patch(color=nonessential_color, label="Non-essential genes")
@@ -393,9 +394,9 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 if __name__ == '__main__':
     dna_df2 = dna_features_compare(region = "VIII",
                  wig_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig",
-                             r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"],
+                             r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"],
                  pergene_insertions_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt",
-                                            r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"])
+                                            r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"])
 
 
 

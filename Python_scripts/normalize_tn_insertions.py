@@ -12,6 +12,7 @@ When adding features, follow the #ADD comments in this file.
 #%%
 import os, sys
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
@@ -26,12 +27,15 @@ from read_sgdfeatures import sgd_features
 
 
 #%% TEMP
-#region = "V"
+#region = "VIII"
 #wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig"
 #pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt"
+#variable="reads"
+#normalize = True
 #%%
-def dna_features(region, wig_file, pergene_insertions_file):
+def dna_features(region, wig_file, pergene_insertions_file, variable="insertions", normalize=False):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
+    Optional is to define with data is displayed, which can be either "insertions" or "reads".
     Output is a barplot indicating the number of transposons per genomic region.
     A genomic region is here defined as a gene (separated as annotated essential and not essential), telomere, centromere, ars etc.
     This can be used for identifying neutral regions (i.e. genomic regions that, if inhibited, do not influence the fitness of the cells).
@@ -214,11 +218,15 @@ def dna_features(region, wig_file, pergene_insertions_file):
     N_insrt_list = []
     N_bp = 1
     N_bp_list = []
+    f_start = 0
+    f_end = 0
+    f_pos_list = []
     i = 0
     for bp in dna_dict:
         f_current = dna_dict.get(bp)[0]
         if f_current == f_previous:
             f_type = dna_dict.get(bp)[1]
+            f_end += 1
             N_bp += 1
             N_reads += reads_loc_list[i]
             if not reads_loc_list[i] == 0:
@@ -231,6 +239,9 @@ def dna_features(region, wig_file, pergene_insertions_file):
             N_reads = 0
             N_insrt = 0
             N_bp = 1
+            f_pos_list.append([f_start, f_end+f_start])
+            f_start = f_start + f_end + 1
+            f_end = 0
             f_previous = f_current
         i += 1
 
@@ -275,39 +286,89 @@ def dna_features(region, wig_file, pergene_insertions_file):
 
     all_features = {'Feature': feature_name_list,
                     'Essentiality': essentiality_list,
-                    'Nreads':N_reads_list,
-                    'Ninsertions':N_insrt_list,
+                    'position': f_pos_list,
                     'Nbasepairs':N_bp_list,
-                    'Nreadspertn':N_reads_per_bp_list,
-                    'Ninsertionspertn':N_insrt_per_bp_list}
+                    'Ninsertions':N_insrt_list,
+                    'Nreads':N_reads_list,
+                    'Ninsertionspertn':N_insrt_per_bp_list,
+                    'Nreadspertn':N_reads_per_bp_list}
 
     dna_df2 = pd.DataFrame(all_features, columns = [column_name for column_name in all_features]) #search for feature using: dna_df2.loc[dna_df2['Feature'] == 'CDC42']
     #CREATE NEW COLUMN WITH ALL DOMAINS OF THE GENE (IF PRESENT) AND ANOTHER COLUMN THAT INCLUDES LISTS OF THE BP POSITIONS OF THESE DOMAINS
 
 
-    del (feature_NameAndType_list, feature_name_list, feature_name, f_type, f_previous, f_current, N_reads, N_reads_list, N_insrt, N_insrt_list, N_bp, N_bp_list, bp, i, N_reads_per_bp_list, N_insrt_per_bp_list, all_features)
+    del (feature_NameAndType_list, feature_name_list, feature_name, f_type, f_previous, f_start, f_end, f_pos_list, f_current, N_reads, N_reads_list, N_insrt, N_insrt_list, N_bp, N_bp_list, bp, i, N_reads_per_bp_list, N_insrt_per_bp_list, all_features)
 
 
-    #%% CREATE BAR PLOT
+
+#%% NORMALIZE USING WINDOWS
+
+    if normalize == True:
+        print("Before normalization: Mean = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadspertn"]), np.std(dna_df2["Nreadspertn"])))
+
+        # DETERMINE MEANS FOR THE NUMBER OF READS/BP IN THE NONCODING REGIONS WITHIN EACH WINDOW.
+        window_edge_list = [82500, 243500, len_chr]
+        
+        reads_list = []
+        window_start_index = 0
+        mean_per_window_list = []
+        for edge in window_edge_list:
+            for index, row in dna_df2.iterrows():
+                if row["Feature"] == "noncoding":
+                    if row["position"][0] >= window_start_index and row["position"][0] < edge:
+                        reads_list.append(row["Nreadspertn"])
+                    elif row["position"][0] > edge:
+                        mean_per_window_list.append(np.mean(reads_list))
+                        reads_list = [] #reset list for next window
+                        reads_list.append(row["Nreadspertn"]) #add current read
+                        window_start_index = edge
+                        break
+        mean_per_window_list.append(np.mean(reads_list)) #get mean for reads in last window
+    
+        del (edge, index, row, reads_list, window_start_index)
+    
+    
+        # NORMALIZE ALL REGIONS WITHIN THE WINDOWS WITH THEIR RESPECTIVE VALUES STORED IN MEAN_PER_WINDOW_LIST.
+        window_start_index = 0
+        i = 0
+        for edge in window_edge_list:
+            for index, row in dna_df2.iterrows():
+                if row["position"][0] >= window_start_index and row["position"][0] < edge:
+                    dna_df2.at[index, "Nreadspertn"] = row["Nreadspertn"]/mean_per_window_list[i]
+                elif row["position"][0] > edge:
+                    window_start_index = edge
+                    i += 1
+                    break
+
+        del (window_edge_list, edge, window_start_index ,i, index, row, mean_per_window_list)
+        print("After normalization: Mean = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadspertn"]), np.std(dna_df2["Nreadspertn"])))
+
+
+        max_readspertn = dna_df2["Nreadspertn"].max()
+        dna_df2["Nreadspertn"] /= max_readspertn
+
+        del (max_readspertn)
+
+#%% CREATE BAR PLOT
     noncoding_color = "#003231"
     essential_color = "#00F28E"
     nonessential_color = "#F20064"
     codingdna_color = '#00918f'
     textcolor = "#003231"
     textsize = 14
-    
-    
-    
+
+
+
     feature_middle_pos_list = []
     sum_bp = 0
     for x in dna_df2['Nbasepairs']:
         feature_middle_pos_list.append(x/2 + sum_bp)
         sum_bp += x
     del (x, sum_bp)
-    
+
     feature_width_list = list(dna_df2['Nbasepairs'])
-    
-    
+
+
     barcolor_list = []
     for feature in dna_df2['Feature']:
         if feature == 'noncoding':
@@ -319,22 +380,30 @@ def dna_features(region, wig_file, pergene_insertions_file):
         elif dna_df2.loc[dna_df2['Feature'] == feature]['Essentiality'].iloc[0] == None:
             barcolor_list.append(codingdna_color)
     del (feature)
-    
-    
-    
-    
+
+
+
+
     ###PLOTTING
     fig = plt.figure(figsize=(19,9))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.01)
-    
-    
+
+
     ax = plt.subplot(grid[0:19,0])
-    ax.bar(feature_middle_pos_list, list(dna_df2['Ninsertionspertn']), feature_width_list, color=barcolor_list)
+    if variable == "insertions":
+        ax.bar(feature_middle_pos_list, list(dna_df2['Ninsertionspertn']), feature_width_list, color=barcolor_list)
+#        ax.set_ylim(0, max(dna_df2['Ninsertionspertn']) + 0.1*max(dna_df2['Ninsertionspertn']))
+        ax.set_ylabel("Transposons/bp per region", fontsize=textsize, color=textcolor)
+    elif variable == "reads":
+        ax.bar(feature_middle_pos_list, list(dna_df2['Nreadspertn']), feature_width_list, color=barcolor_list)
+#        ax.set_ylim(0, max(dna_df2['Nreadspertn']) + 0.1*max(dna_df2['Nreadspertn']))
+        ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
+
     if region_start != None and region_end != None and region_start < len_chr and region_end < len_chr:
         ax.set_xlim(region_start, region_end)
     else:
         ax.set_xlim(0, len_chr)
-    ax.set_ylim(0, max(dna_df2['Ninsertionspertn']) + 0.1*max(dna_df2['Ninsertionspertn']))
+
     ax.grid(linestyle='-', alpha=1.0)
     ax.tick_params(labelsize=textsize)
 #    ax.set_xticklabels([])
@@ -342,7 +411,6 @@ def dna_features(region, wig_file, pergene_insertions_file):
     ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
     ax.xaxis.get_offset_text().set_fontsize(textsize)
     ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize, color=textcolor, labelpad=10)
-    ax.set_ylabel("Transposons/bp per region", fontsize=textsize, color=textcolor)
     legend_noncoding = mpatches.Patch(color=noncoding_color, label="Noncoding DNA")
     legend_essential = mpatches.Patch(color=essential_color, label="Annotated essential genes")
     legend_nonessential = mpatches.Patch(color=nonessential_color, label="Non-essential genes")
@@ -351,8 +419,8 @@ def dna_features(region, wig_file, pergene_insertions_file):
     for text in leg.get_texts():
         text.set_color(textcolor)
     del text
-    
-    
+
+
     axc = plt.subplot(grid[19,0])
     ess_start_pos_list = []
     ness_start_pos_list = []
@@ -367,6 +435,8 @@ def dna_features(region, wig_file, pergene_insertions_file):
             axc.axvspan(l,l+width,facecolor=essential_color,alpha=0.3)
         elif dna_df2.loc[counter][1] == False and not dna_df2.loc[counter][0] == 'noncoding':
             axc.axvspan(l,l+width,facecolor=nonessential_color,alpha=0.3)
+        elif dna_df2.loc[counter][1] == None and not dna_df2.loc[counter][0] == 'noncoding':
+            axc.axvspan(l,l+width,facecolor=codingdna_color,alpha=0.5)
         l += width
         counter += 1
     if region_start != None and region_end != None and region_start < len_chr and region_end < len_chr:
@@ -388,7 +458,7 @@ def dna_features(region, wig_file, pergene_insertions_file):
         left=False,        # ticks along the bottom edge are off
         right=False,       # ticks along the top edge are off
         labelleft=False)   # labels along the bottom edge are off
-    
+
 #    #FOLLOWING IS FOR SHOWING COMMON AXIS LABELS.
 #    # add a big axis, hide frame
 #    fig.add_subplot(111, frameon=False)
@@ -396,11 +466,14 @@ def dna_features(region, wig_file, pergene_insertions_file):
 #    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
 #    plt.xlabel("bp position in chromosome " + chrom, fontsize=textsize)
 #    plt.ylabel("Transposons/bp per region", fontsize=textsize)
-    
-    
-    
+
+
+
     del (ess_start_pos_list, ness_start_pos_list, ess_end_pos_list, ness_end_pos_list, l, counter, width)
 
+
+#%% RETURN STATEMENT
+    return(dna_df2)
 
 
 
@@ -422,7 +495,8 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
             if dna_dict[bp] == ['noncoding', None]:
                 dna_dict[bp] = [feat, feature_type]
             else:
-                print('Bp %i is already occupied by %s' % (bp, str(dna_dict.get(bp))))
+#                print('Bp %i is already occupied by %s' % (bp, str(dna_dict.get(bp))))
+                pass
 
 
     return(dna_dict)
@@ -430,9 +504,11 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_features(region = "VII",#["IX", 390000,439850],
-                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig",
-                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt")
+    dna_df2 = dna_features(region = "VIII",#["IX", 390000,439850],
+                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
+                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
+                 variable="reads",
+                 normalize=True)
 #                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig",
 #                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt")
 
