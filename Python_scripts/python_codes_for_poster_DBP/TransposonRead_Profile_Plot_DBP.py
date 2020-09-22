@@ -49,7 +49,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     chrom = chrom.upper()
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
-        bar_width = int(chr_length_dict.get(chrom)/600)
+        bar_width = int(chr_length_dict.get(chrom)/500)
 #%% GET ALL GENES IN CURRENT CHROMOSOME
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items() if chrom in v]
@@ -124,47 +124,115 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
                 allreadscounts_binnedlist.append(sum_values)
                 sum_values = 0
             val_counter += 1
-            
         allinsertionsites_list = np.linspace(0,chr_length_dict.get(chrom),int(chr_length_dict.get(chrom)/bar_width)+1)
 
+
 #%%
-# =============================================================================
-#USE alltransposoncounts_binnedlist FOR NORMALIZING allreadscounts_binnedlist WITH THE AMOUNT OF TRANSPOSONS IN EACH BIN.
-#     allreadscounts_binnedlist_np = np.array(allreadscounts_binnedlist, dtype=np.float)
-#     alltransposoncounts_binnedlist_np = np.array(alltransposoncounts_binnedlist, dtype=np.float)
-#     allreadscounts_binnedlist_np_norm = list(allreadscounts_binnedlist_np/alltransposoncounts_binnedlist_np)
-#     allreadscounts_binnedlist_np_norm = np.where(allreadscounts_binnedlist_np_norm==np.inf,0,allreadscounts_binnedlist_np_norm)
-# =============================================================================
+    window_edge_list = np.linspace(0, len(allreadscounts_binnedlist), 10).tolist()
+
+    reads_list = []
+    window_start_index = 0
+    mean_per_window_list = []
+    for edge in window_edge_list[1:]:
+        i = 0
+        for read in allreadscounts_binnedlist:
+            if window_start_index <= i < edge:
+                reads_list.append(read)
+            elif i >= edge:
+                mean_per_window_list.append(np.mean(reads_list))
+                reads_list = [] #reset list for next window
+                reads_list.append(read) #add current read
+                window_start_index = edge
+                break
+            i += 1
+    mean_per_window_list.append(np.mean(reads_list)) #get mean for reads in last window
+
+
+
+    window_start_index = 0
+    j = 0 #counter for mean_per_window_list
+    i = 0
+    for edge in window_edge_list[1:]:
+        for read in allreadscounts_binnedlist:
+            if window_start_index <= i < edge:
+                allreadscounts_binnedlist[i] = allreadscounts_binnedlist[i] / mean_per_window_list[j]
+            elif i >= edge:
+                j += 1
+                break
+            i += 1
+
+
+    allreadscounts_binnedlist_max = max(allreadscounts_binnedlist)
+    allreadscounts_binnedlist /= allreadscounts_binnedlist_max
+
 #%%
 
     print('Plotting chromosome ', chrom, '...')
     print('bar width for plotting is ',bar_width)
 
-    plt.figure(figsize=(19,9))
-    grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
+    plt.figure(figsize=(17,6))
+    grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
+    
+    binsize = bar_width
+    ax = plt.subplot(grid[0:19,0])
 
     textsize = 20
 
-    binsize = bar_width
-    ax = plt.subplot(grid[0,0])
+#    for gene in genes_currentchrom_pos_list:
+#        gene_start_pos = int(gene_pos_dict.get(gene)[1])
+#        gene_end_pos = int(gene_pos_dict.get(gene)[2])
+#        if gene in genes_essential_list:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='g',alpha=0.3)
+#            ax.text(gene_start_pos,max(allreadscounts_binnedlist),gene_alias_list.get(gene)[0], rotation=45)
+#        else:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='r',alpha=0.3)
+    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color="#00918f")
+#    ax.set_yscale('log')
+#    ax.set_axisbelow(True)
+#    ax.grid(True)
+#    ax.set_xlim(0,chr_length_dict.get(chrom))
+#    ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=textsize)
+#    ax.set_ylabel('Read count (log_10)', fontsize=textsize)
+##    ax.set_title('Read profile for chromosome '+chrom)
+#    plt.tight_layout()
+    ax.set_axisbelow(True)
+    ax.grid(True)
+    ax.set_xlim(0,chr_length_dict.get(chrom))
+    ax.tick_params(labelsize=textsize)
+    ax.tick_params(axis='x', which='major', pad=30)
+    ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+    ax.xaxis.get_offset_text().set_fontsize(textsize)
+    ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize, labelpad=10)
+    ax.set_ylabel('Fitness level', fontsize=textsize)
+    ax.set_ylim(0.0,1.0)
+#    ax.set_title('Transposon profile for chromosome '+chrom)
+
+
+    axc = plt.subplot(grid[19,0])
     for gene in genes_currentchrom_pos_list:
         gene_start_pos = int(gene_pos_dict.get(gene)[1])
         gene_end_pos = int(gene_pos_dict.get(gene)[2])
         if gene in genes_essential_list:
-            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='g',alpha=0.3)
-            ax.text(gene_start_pos,max(allreadscounts_binnedlist),gene_alias_list.get(gene)[0], rotation=45)
+            axc.axvspan(gene_start_pos,gene_end_pos,facecolor="#00F28E",alpha=0.8)
+#            ax.text(gene_start_pos,max(alltransposoncounts_binnedlist),gene_alias_list.get(gene)[0], rotation=90, fontsize=18)
         else:
-            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='r',alpha=0.3)
-    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color=[0.0,0.0,0.0,0.8])
-    ax.set_yscale('log')
-    ax.set_axisbelow(True)
-    ax.grid(True)
-    ax.set_xlim(0,chr_length_dict.get(chrom))
-    ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=textsize)
-    ax.set_ylabel('Read count (log_10)', fontsize=textsize)
-#    ax.set_title('Read profile for chromosome '+chrom)
-    plt.tight_layout()
+            axc.axvspan(gene_start_pos,gene_end_pos,facecolor="#F20064",alpha=0.8)    
+    axc.set_xlim(0,chr_length_dict.get(chrom))
+    axc.tick_params(
+        axis='x',          # changes apply to the x-axis
+        which='both',      # both major and minor ticks are affected
+        bottom=False,      # ticks along the bottom edge are off
+        top=False,         # ticks along the top edge are off
+        labelbottom=False) # labels along the bottom edge are off
 
+    axc.tick_params(
+        axis='y',          # changes apply to the y-axis
+        which='both',      # both major and minor ticks are affected
+        left=False,        # ticks along the bottom edge are off
+        right=False,       # ticks along the top edge are off
+        labelleft=False)   # labels along the bottom edge are off
+
+    plt.show()
 
 
 #%%    
@@ -175,4 +243,4 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 
 #%%
 if __name__ == '__main__':
-    read_profile(chrom='xv',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
+    read_profile(chrom='ix',wig_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig")
