@@ -353,7 +353,8 @@ def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
     ax.xaxis.get_offset_text().set_fontsize(textsize)
     ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize)
     ax.set_ylabel("Relative difference insertions per bp per region",fontsize=textsize)
-    ax.set_title(r"(WT2 - $\Delta$Dpl1) / max(WT2)", fontsize=textsize)
+#    ax.set_title(r"(WT2 - $\Delta$Dpl1) / max(WT2)", fontsize=textsize)
+    ax.set_title(r"(WT2 - WT1 / max(WT2)", fontsize=textsize)
     legend_noncoding = mpatches.Patch(color=noncoding_color, label="Noncoding DNA")
     legend_essential = mpatches.Patch(color=essential_color, label="Annotated essential genes")
     legend_nonessential = mpatches.Patch(color=nonessential_color, label="Non-essential genes")
@@ -392,11 +393,19 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 #%% executing the function
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     dna_df2 = dna_features_compare(region = "III",
                  wig_file_list = [r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\wt1_KornmannLab_20200812\ERR1533148_trimmed.sorted.bam.wig",
                              r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\dDpl1_KornmannLab_20200803\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"],
                  pergene_insertions_file_list = [r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\wt1_KornmannLab_20200812\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt",
                                             r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\dDpl1_KornmannLab_20200803\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"])
+=======
+    dna_df2 = dna_features_compare(region = "VIII",
+                 wig_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig",
+                             r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"],
+                 pergene_insertions_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt",
+                                            r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"])
+>>>>>>> 45dad1c4f93756d74aa008dc8c863c549363fd95
 
 
 

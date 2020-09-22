@@ -132,9 +132,9 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     print('bar width for plotting is ',bar_width)
     
     textsize = 20
-    textcolor = "#003231"
+    textcolor = "#000000"
 
-    plt.figure(figsize=(19,9))
+    plt.figure(figsize=(17,6))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
     
     binsize = bar_width
