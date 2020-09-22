@@ -134,7 +134,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     textsize = 20
     textcolor = "#000000"
 
-    plt.figure(figsize=(17,6))
+    plt.figure(figsize=(19,9))#(17,6))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
     
     binsize = bar_width
@@ -309,43 +309,99 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 # =============================================================================
 #%%
 
+#    print('Plotting chromosome ', chrom, '...')
+#    print('bar width for plotting is ',bar_width)
+#
+#    plt.figure(figsize=(19,9))
+#    grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
+#
+#    textsize = 20
+#
+#    binsize = bar_width
+#    ax = plt.subplot(grid[0,0])
+#    for gene in genes_currentchrom_pos_list:
+#        gene_start_pos = int(gene_pos_dict.get(gene)[1])
+#        gene_end_pos = int(gene_pos_dict.get(gene)[2])
+#        if gene in genes_essential_list:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='g',alpha=0.3)
+#            ax.text(gene_start_pos,max(allreadscounts_binnedlist),gene_alias_list.get(gene)[0], rotation=45)
+#        else:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='r',alpha=0.3)
+#    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color=[0.0,0.0,0.0,0.8])
+#    ax.set_yscale('log')
+#    ax.set_axisbelow(True)
+#    ax.grid(True)
+#    ax.set_xlim(0,chr_length_dict.get(chrom))
+#    ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=textsize)
+#    ax.set_ylabel('Read count (log_10)', fontsize=textsize)
+##    ax.set_title('Read profile for chromosome '+chrom)
+#    plt.tight_layout()
+
+
+#%% PLOTTING
     print('Plotting chromosome ', chrom, '...')
     print('bar width for plotting is ',bar_width)
-
-    plt.figure(figsize=(19,9))
-    grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
-
+    
     textsize = 20
+    textcolor = "#000000"
 
+    plt.figure(figsize=(17,6))
+    grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
+    
     binsize = bar_width
-    ax = plt.subplot(grid[0,0])
+    ax = plt.subplot(grid[0:19,0])
+#    for gene in genes_currentchrom_pos_list:
+#        gene_start_pos = int(gene_pos_dict.get(gene)[1])
+#        gene_end_pos = int(gene_pos_dict.get(gene)[2])
+#        if gene in genes_essential_list:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#BBE6AA",alpha=1.0)
+##            ax.text(gene_start_pos,max(alltransposoncounts_binnedlist),gene_alias_list.get(gene)[0], rotation=90, fontsize=18)
+#        else:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#F6A089",alpha=1.0)
+    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color="#00918f")
+    ax.tick_params(axis='both', which='major', labelsize=textsize)
+    ax.set_axisbelow(True)
+    ax.grid(True)
+    ax.set_xlim(0,chr_length_dict.get(chrom))
+#    ax.set_yscale('log')
+    ax.tick_params(axis='x', which='major', pad=30)
+    ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+    ax.xaxis.get_offset_text().set_fontsize(textsize)
+    ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize, color=textcolor, labelpad=10)
+    ax.set_ylabel('Read count', fontsize=textsize, color=textcolor)
+#    ax.set_title('Transposon profile for chromosome '+chrom)
+
+
+    axc = plt.subplot(grid[19,0])
     for gene in genes_currentchrom_pos_list:
         gene_start_pos = int(gene_pos_dict.get(gene)[1])
         gene_end_pos = int(gene_pos_dict.get(gene)[2])
         if gene in genes_essential_list:
-            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='g',alpha=0.3)
-            ax.text(gene_start_pos,max(allreadscounts_binnedlist),gene_alias_list.get(gene)[0], rotation=45)
+            axc.axvspan(gene_start_pos,gene_end_pos,facecolor="#00F28E",alpha=0.8)
+#            ax.text(gene_start_pos,max(alltransposoncounts_binnedlist),gene_alias_list.get(gene)[0], rotation=90, fontsize=18)
         else:
-            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='r',alpha=0.3)
-    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color=[0.0,0.0,0.0,0.8])
-    ax.set_yscale('log')
-    ax.set_axisbelow(True)
-    ax.grid(True)
-    ax.set_xlim(0,chr_length_dict.get(chrom))
-    ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=textsize)
-    ax.set_ylabel('Read count (log_10)', fontsize=textsize)
-#    ax.set_title('Read profile for chromosome '+chrom)
-    plt.tight_layout()
+            axc.axvspan(gene_start_pos,gene_end_pos,facecolor="#F20064",alpha=0.8)    
+    axc.set_xlim(0,chr_length_dict.get(chrom))
+    axc.tick_params(
+        axis='x',          # changes apply to the x-axis
+        which='both',      # both major and minor ticks are affected
+        bottom=False,      # ticks along the bottom edge are off
+        top=False,         # ticks along the top edge are off
+        labelbottom=False) # labels along the bottom edge are off
 
+    axc.tick_params(
+        axis='y',          # changes apply to the y-axis
+        which='both',      # both major and minor ticks are affected
+        left=False,        # ticks along the bottom edge are off
+        right=False,       # ticks along the top edge are off
+        labelleft=False)   # labels along the bottom edge are off
 
-
-#%%    
-
+    plt.show()
 
 
 
 
 #%%
 if __name__ == '__main__':
-#    read_profile(chrom='xv',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
-    transposon_profile(chrom='IX', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
+    read_profile(chrom='IX',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
+#    transposon_profile(chrom='IX', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
