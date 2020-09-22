@@ -213,6 +213,14 @@ corr_with_a_row_pd['corr-values-group']=pd.cut(df['corr-values'], bins=5,labels=
 # %% [markdown]
 # ### See this https://towardsdatascience.com/visualising-stocks-correlations-with-networkx-88f2ee25362e
 
+# %% Categoryzing new genes and existing genes that the algorithm give
+
+for i in np.arange(0,len(corr_with_a_row_pd)):
+    if corr_with_a_row_pd.loc[i,'type']== corr_with_a_row_pd.loc[i,'corr-values-group']:
+        corr_with_a_row_pd.loc[i,'genes-classified']=corr_with_a_row_pd.loc[i,'genes']
+    else:
+        corr_with_a_row_pd.loc[i,'genes-classified']=corr_with_a_row_pd.loc[i,'genes'] + '-new'
+
 
 # %% Plot to see how close is the type and the correlation values
 
@@ -232,7 +240,7 @@ import matplotlib.pyplot as plt
  
 # Build your graph
 
-G_estimated=nx.from_pandas_edgelist(df=corr_with_a_row_pd[corr_with_a_row_pd['interactor']==1],source='corr-values-group',target='genes')
+G_estimated=nx.from_pandas_edgelist(df=corr_with_a_row_pd[corr_with_a_row_pd['interactor']==1],source='corr-values-group',target='genes-classified')
 
 # degree of the plot
 d_estimated = nx.degree(G_estimated)
@@ -252,7 +260,7 @@ for node in G_estimated:
 plt.figure(figsize=(5,5))
 nx.draw(G_estimated,pos=nx.spring_layout(G_estimated), with_labels=True,node_color=color_map, node_size=tuple([x**3 for x in node_sizes_estimated]), edge_color='black', linewidths=1, font_size=10);
 
-plt.savefig('corr-based-net-dpl1-test.png',dpi=300,format='png',transparent=True)
+plt.savefig('corr-based-net-dpl1-test.png',dpi=300,format='png',transparent=False)
 
 
 
