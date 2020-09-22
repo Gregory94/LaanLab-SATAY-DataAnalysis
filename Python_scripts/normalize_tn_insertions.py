@@ -39,7 +39,7 @@ def dna_features(region, wig_file, pergene_insertions_file):
     '''
 #%% USER INPUT AND FILES
 #for region in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XI', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
-    essentials_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
+    essentials_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
 
     gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 
@@ -430,12 +430,9 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_features(region = "VII",#["IX", 390000,439850],
-                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig",
-                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt")
-#                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig",
-#                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt")
-
+    
+    dna_features(region = "II", wig_file = r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\wt1_KornmannLab_20200812\ERR1533148_trimmed.sorted.bam.wig",
+                 pergene_insertions_file = r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\wt1_KornmannLab_20200812\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt")
 
 
 

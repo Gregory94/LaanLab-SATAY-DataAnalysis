@@ -364,7 +364,7 @@ def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
 #%% RETURN STATEMENT
     return(dna_df2)
     
-#%%
+#%% Feature position function
 
 def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None):
     
@@ -389,13 +389,14 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
     return(dna_dict)
 
 
-#%%
+#%% executing the function
+
 if __name__ == '__main__':
-    dna_df2 = dna_features_compare(region = "VIII",
-                 wig_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig",
-                             r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"],
-                 pergene_insertions_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt",
-                                            r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"])
+    dna_df2 = dna_features_compare(region = "III",
+                 wig_file_list = [r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\wt1_KornmannLab_20200812\ERR1533148_trimmed.sorted.bam.wig",
+                             r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\dDpl1_KornmannLab_20200803\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"],
+                 pergene_insertions_file_list = [r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\wt1_KornmannLab_20200812\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt",
+                                            r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\dDpl1_KornmannLab_20200803\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"])
 
 
 
