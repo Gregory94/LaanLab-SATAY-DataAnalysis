@@ -132,9 +132,9 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     print('bar width for plotting is ',bar_width)
     
     textsize = 20
-    textcolor = "#003231"
+    textcolor = "#000000"
 
-    plt.figure(figsize=(19,9))
+    plt.figure(figsize=(17,6))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
     
     binsize = bar_width
@@ -348,4 +348,4 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 #%%
 if __name__ == '__main__':
 #    read_profile(chrom='xv',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
-    transposon_profile(chrom='IX', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
+    transposon_profile(chrom='II', bar_width=None, bed_file=r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\wt1_KornmannLab_20200812\ERR1533148_trimmed.sorted.bam.bed")
