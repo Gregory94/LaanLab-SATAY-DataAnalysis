@@ -10,10 +10,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sb
-sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_modules')
+
+file_dirname = os.path.dirname(os.path.abspath('__file__'))
+sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
 from chromosome_and_gene_positions import gene_position
 from gene_names import gene_aliases
-from chromosome_names_in_files import chromosome_props_bedfile
+from chromosome_names_in_files import chromosome_name_bedfile
 import statistics_perchromosome
 
 #%%
@@ -26,11 +28,12 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
     The output is a bar plot where the number of reads divided by the number of transposons.
     '''
 #%% USED FILES
-    gff_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3"
-    gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
+    gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
+
 #%%SAVE FILES
     if savefigure == True:
-        save_figure_path = r'X:\tnw\BN\LL\Shared\Gregory\Python\Python Figures\gene_reads_figures'
+        save_figure_path = file_dirname
 #%% GET START AND END POSITION OF GENE
     if gene_name.upper() == 'HOLOCUS' or gene_name == 'HO-LOCUS':
         gene_pos = ['IV',46271,48031]
@@ -78,7 +81,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
 
 #%% GET POSITION FOR THE CHROMOSOMES IN THE BED FILE
 
-    chrom_start_line_dict, chrom_end_line_dict= chromosome_props_bedfile(lines)[1:3]
+    chrom_start_line_dict, chrom_end_line_dict= chromosome_name_bedfile(lines)[1:3]
 
 #%% GET ALL READS WITHIN THE GENE
     insertion_list = []
@@ -176,6 +179,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
     if insertion_list != []:
         print('')
         print('Percentage of coverage is %.2f' % coverage_percentage)
+        print('Largest area without insertions is %.0f' % max_empty_region)
         print('')
         print('Mean transposon insertion frequency in gene is %.2f, %.2f ' % (insertion_avgperiodicity, insertion_stdperiodicity))
         print('Mean transposon insertion frequency in chromosome is %.2f, %.2f' % (insertion_chromosome_avgperiodicity, insertion_chromosome_stdperiodicity))
@@ -333,4 +337,4 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
 if __name__ == '__main__':
 #    gene_reads(region=['I',1,4000],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
 #    gene_reads(region=['IV',46271,48031],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed", savefigure=True)
-    gene_reads(gene_name='bem1',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed", savefigure=False)
+    gene_reads(gene_name='bem1',bed_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed", savefigure=False)

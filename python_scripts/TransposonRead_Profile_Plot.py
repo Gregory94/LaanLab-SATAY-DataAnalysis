@@ -6,10 +6,12 @@ The background of the barplots are color coded. A red area indicates a gene that
 Both functions require the modules chromosome_and_gene_positions.py, essential_genes_names.py and gene_names.py including the required files for the functions (see the help in these functions).
 """
 #%%
-import sys
+import os, sys
 import numpy as np
 import matplotlib.pyplot as plt
-sys.path.insert(1,r'C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\python_modules')
+
+file_dirname = os.path.dirname(os.path.abspath('__file__'))
+sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from essential_genes_names import list_known_essentials
 from gene_names import gene_aliases
@@ -28,10 +30,10 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     '''
     #bed_file = r'X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed'
 #%% USED FILES
-    gff_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3"
-    essential_genes_files = [r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt',
-                            r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt']
-    gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
+    gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
+    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 #%% GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
     
@@ -46,7 +48,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
 #    chrom_index = chromosome_romannames_list.index(chrom)
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
-        bar_width = int(chr_length_dict.get(chrom)/500)
+        bar_width = int(chr_length_dict.get(chrom)/400)
     
     
 #%% GET ALL GENES IN CURRENT CHROMOSOME
@@ -128,29 +130,61 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
 #%% PLOTTING
     print('Plotting chromosome ', chrom, '...')
     print('bar width for plotting is ',bar_width)
+    
+    textsize = 20
+    textcolor = "#000000"
+
+    plt.figure(figsize=(19,9))#(17,6))
+    grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
+    
     binsize = bar_width
-    fig,ax = plt.subplots()
+    ax = plt.subplot(grid[0:19,0])
+#    for gene in genes_currentchrom_pos_list:
+#        gene_start_pos = int(gene_pos_dict.get(gene)[1])
+#        gene_end_pos = int(gene_pos_dict.get(gene)[2])
+#        if gene in genes_essential_list:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#BBE6AA",alpha=1.0)
+##            ax.text(gene_start_pos,max(alltransposoncounts_binnedlist),gene_alias_list.get(gene)[0], rotation=90, fontsize=18)
+#        else:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#F6A089",alpha=1.0)
+    ax.bar(allinsertionsites_list,alltransposoncounts_binnedlist,width=binsize,color="#00918f")
+    ax.tick_params(axis='both', which='major', labelsize=textsize)
+    ax.set_axisbelow(True)
+    ax.grid(True)
+    ax.set_xlim(0,chr_length_dict.get(chrom))
+    ax.tick_params(axis='x', which='major', pad=30)
+    ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+    ax.xaxis.get_offset_text().set_fontsize(textsize)
+    ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize, color=textcolor, labelpad=10)
+    ax.set_ylabel('Tranposon count', fontsize=textsize, color=textcolor)
+#    ax.set_title('Transposon profile for chromosome '+chrom)
+
+
+    axc = plt.subplot(grid[19,0])
     for gene in genes_currentchrom_pos_list:
         gene_start_pos = int(gene_pos_dict.get(gene)[1])
         gene_end_pos = int(gene_pos_dict.get(gene)[2])
         if gene in genes_essential_list:
-            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='g',alpha=0.3)
-            ax.text(gene_start_pos,max(alltransposoncounts_binnedlist),gene_alias_list.get(gene)[0], rotation=45)
+            axc.axvspan(gene_start_pos,gene_end_pos,facecolor="#00F28E",alpha=0.8)
+#            ax.text(gene_start_pos,max(alltransposoncounts_binnedlist),gene_alias_list.get(gene)[0], rotation=90, fontsize=18)
         else:
-            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='r',alpha=0.3)
-    ax.bar(allinsertionsites_list,alltransposoncounts_binnedlist,width=binsize,color=(0.0,0.0,0.0,0.8))
-#    ax.set_yscale('log')
-    ax.set_axisbelow(True)
-    ax.grid(True)
-    ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=12)
-    ax.set_ylabel('Tranposon count', fontsize=12)
-#    ax.set_title('Transposon profile for chromosome '+chrom)
+            axc.axvspan(gene_start_pos,gene_end_pos,facecolor="#F20064",alpha=0.8)    
+    axc.set_xlim(0,chr_length_dict.get(chrom))
+    axc.tick_params(
+        axis='x',          # changes apply to the x-axis
+        which='both',      # both major and minor ticks are affected
+        bottom=False,      # ticks along the bottom edge are off
+        top=False,         # ticks along the top edge are off
+        labelbottom=False) # labels along the bottom edge are off
+
+    axc.tick_params(
+        axis='y',          # changes apply to the y-axis
+        which='both',      # both major and minor ticks are affected
+        left=False,        # ticks along the bottom edge are off
+        right=False,       # ticks along the top edge are off
+        labelleft=False)   # labels along the bottom edge are off
+
     plt.show()
-
-
-
-
-
 
 
 
@@ -167,10 +201,10 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     '''
 
 #%% USED FILES
-    gff_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Saccharomyces_cerevisiae.R64-1-1.99.gff3"
-    essential_genes_files = [r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt',
-                            r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt']
-    gene_information_file = r'X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt'
+    gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
+    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 #%%
     #GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
@@ -183,11 +217,11 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
         chromosomenames_list.append(roman)
         
 #%%
-#    for chrom in chromosomenames_list:
-    chrom_index = chromosomenames_list.index(chrom)
+#    chrom_index = chromosomenames_list.index(chrom)
+    chrom = chrom.upper()
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
-        bar_width = int(chr_length_dict.get(chrom)/500)
+        bar_width = int(chr_length_dict.get(chrom)/600)
 #%% GET ALL GENES IN CURRENT CHROMOSOME
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items() if chrom in v]
@@ -275,38 +309,99 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 # =============================================================================
 #%%
 
+#    print('Plotting chromosome ', chrom, '...')
+#    print('bar width for plotting is ',bar_width)
+#
+#    plt.figure(figsize=(19,9))
+#    grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
+#
+#    textsize = 20
+#
+#    binsize = bar_width
+#    ax = plt.subplot(grid[0,0])
+#    for gene in genes_currentchrom_pos_list:
+#        gene_start_pos = int(gene_pos_dict.get(gene)[1])
+#        gene_end_pos = int(gene_pos_dict.get(gene)[2])
+#        if gene in genes_essential_list:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='g',alpha=0.3)
+#            ax.text(gene_start_pos,max(allreadscounts_binnedlist),gene_alias_list.get(gene)[0], rotation=45)
+#        else:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='r',alpha=0.3)
+#    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color=[0.0,0.0,0.0,0.8])
+#    ax.set_yscale('log')
+#    ax.set_axisbelow(True)
+#    ax.grid(True)
+#    ax.set_xlim(0,chr_length_dict.get(chrom))
+#    ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=textsize)
+#    ax.set_ylabel('Read count (log_10)', fontsize=textsize)
+##    ax.set_title('Read profile for chromosome '+chrom)
+#    plt.tight_layout()
+
+
+#%% PLOTTING
     print('Plotting chromosome ', chrom, '...')
     print('bar width for plotting is ',bar_width)
+    
+    textsize = 20
+    textcolor = "#000000"
+
+    plt.figure(figsize=(17,6))
+    grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
+    
     binsize = bar_width
-    fig,ax = plt.subplots()
+    ax = plt.subplot(grid[0:19,0])
+#    for gene in genes_currentchrom_pos_list:
+#        gene_start_pos = int(gene_pos_dict.get(gene)[1])
+#        gene_end_pos = int(gene_pos_dict.get(gene)[2])
+#        if gene in genes_essential_list:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#BBE6AA",alpha=1.0)
+##            ax.text(gene_start_pos,max(alltransposoncounts_binnedlist),gene_alias_list.get(gene)[0], rotation=90, fontsize=18)
+#        else:
+#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#F6A089",alpha=1.0)
+    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color="#00918f")
+    ax.tick_params(axis='both', which='major', labelsize=textsize)
+    ax.set_axisbelow(True)
+    ax.grid(True)
+    ax.set_xlim(0,chr_length_dict.get(chrom))
+#    ax.set_yscale('log')
+    ax.tick_params(axis='x', which='major', pad=30)
+    ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+    ax.xaxis.get_offset_text().set_fontsize(textsize)
+    ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize, color=textcolor, labelpad=10)
+    ax.set_ylabel('Read count', fontsize=textsize, color=textcolor)
+#    ax.set_title('Transposon profile for chromosome '+chrom)
+
+
+    axc = plt.subplot(grid[19,0])
     for gene in genes_currentchrom_pos_list:
         gene_start_pos = int(gene_pos_dict.get(gene)[1])
         gene_end_pos = int(gene_pos_dict.get(gene)[2])
         if gene in genes_essential_list:
-            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='g',alpha=0.3)
-            ax.text(gene_start_pos,max(allreadscounts_binnedlist),gene_alias_list.get(gene)[0], rotation=45)
+            axc.axvspan(gene_start_pos,gene_end_pos,facecolor="#00F28E",alpha=0.8)
+#            ax.text(gene_start_pos,max(alltransposoncounts_binnedlist),gene_alias_list.get(gene)[0], rotation=90, fontsize=18)
         else:
-            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='r',alpha=0.3)
-    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color=[0.0,0.0,0.0,0.8])
-    ax.set_yscale('log')
-    ax.set_axisbelow(True)
-    ax.grid(True)
-    ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=12)
-    ax.set_ylabel('Read count (log_10)', fontsize=12)
-#    ax.set_title('Read profile for chromosome '+chrom)
+            axc.axvspan(gene_start_pos,gene_end_pos,facecolor="#F20064",alpha=0.8)    
+    axc.set_xlim(0,chr_length_dict.get(chrom))
+    axc.tick_params(
+        axis='x',          # changes apply to the x-axis
+        which='both',      # both major and minor ticks are affected
+        bottom=False,      # ticks along the bottom edge are off
+        top=False,         # ticks along the top edge are off
+        labelbottom=False) # labels along the bottom edge are off
+
+    axc.tick_params(
+        axis='y',          # changes apply to the y-axis
+        which='both',      # both major and minor ticks are affected
+        left=False,        # ticks along the bottom edge are off
+        right=False,       # ticks along the top edge are off
+        labelleft=False)   # labels along the bottom edge are off
+
     plt.show()
-
-
-
-#%%    
-
 
 
 
 
 #%%
 if __name__ == '__main__':
-#    read_profile(chrom='XVI',wig_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.wig")
-#    transposon_profile(chrom='VI',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_Trimmed_Aligned\Cerevisiae_WT1_Michel2017_Trimmed_Aligned.sorted.bam.bed")
-    read_profile(chrom='VI',wig_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.wig")
-#    transposon_profile(chrom='VI',bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
+    read_profile(chrom='IX',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
+#    transposon_profile(chrom='IX', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")

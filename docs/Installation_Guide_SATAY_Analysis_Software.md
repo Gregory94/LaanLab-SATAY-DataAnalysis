@@ -239,7 +239,11 @@ sudo ln -s /path/to/sambamba-0.7.1-linux-static /usr/local/bin
 ```
 
 (where in the last line `/path/to/` needs to be replaced with the actual path.)
+<<<<<<< HEAD
 To run, enter `sambamba` in the terminal.
+=======
+To run, enter `sambamba-0.7.1-linux-static` in the terminal.
+>>>>>>> 02723fc28becaa0428d64ab6978185f5da1aa080
 
 ### 7. IGV (Windows) (optional)
 
@@ -271,7 +275,11 @@ By default, Linux comes with Python already installed.
 In the terminal application, run the command `python --version` or `python3 --version` to see which version is installed.
 If python3 is installed with version 3.6, then this should be updated to python 3.7 or above.
 This can be done using the procedure explained on [this website](https://dev.to/serhatteker/how-to-upgrade-to-python-3-7-on-ubuntu-18-04-18-10-5hab).
+<<<<<<< HEAD
 Running the command `python3.7` should open python 3.7 instead of version 3.6.
+=======
+Running the command with `python3` or `python3.7` should open python 3.7 instead of version 3.6.
+>>>>>>> 02723fc28becaa0428d64ab6978185f5da1aa080
 
 Note that it might happen that the terminal does not launch anymore after upgrading the python version.
 This is something to do with the not properly removing one of the installation packages.

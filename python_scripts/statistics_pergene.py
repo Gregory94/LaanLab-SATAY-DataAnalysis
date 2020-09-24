@@ -16,10 +16,12 @@ def stats_pergene(filepath, filename, normalize=True):
     '''
     
 #%% GET ALL KNOWN ESSENTIAL GENES FROM TWO DIFFERENT FILES AND COMBINE THEM IN ONE LIST
-    essential_genes_files = [r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_1.txt",
-                            r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Cervisiae_EssentialGenes_List_2.txt"]
-    gene_information_file = r"X:\tnw\BN\LL\Shared\Gregory\Gene_Database\Yeast_Protein_Names.txt"
+    file_dirname = os.path.dirname(os.path.abspath('__file__'))
 
+    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'Data_Files','Cervisiae_EssentialGenes_List_2.txt')]
+    
+    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 
 #%% PUT ALL KNOWN ESSENTIAL GENES FROM MULTIPLE FILES IN ONE LIST
     known_essential_gene_list = []
@@ -243,4 +245,4 @@ def stats_pergene(filepath, filename, normalize=True):
 
 #%%
 if __name__ == '__main__':
-    stats_pergene(filepath=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit",filename="E-MTAB-4885.WT1.bam_pergene.txt", normalize=True)
+    stats_pergene(filepath=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing",filename="Cerevisiae_WT2_Michel2017_trimmed1.bam_pergene.txt", normalize=True)
