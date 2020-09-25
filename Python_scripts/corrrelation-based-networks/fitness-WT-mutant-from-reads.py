@@ -147,8 +147,10 @@ values2corr=values2corr.set_index(np.arange(0,len(values2corr)))
 
 
 # %% Row- wise correlation with data from dpl1 
+# - try to do a loop to do different corrwith based on different genes and then average and see the std of the different correlations 
 
-corr_with_a_row=values2corr.corrwith(values2corr.iloc[108,:],axis=1,method='pearson')
+corr_with_a_row=values2corr.corrwith(values2corr.iloc[108,:],axis=1,method='pearson') # random row
+#corr_with_a_row=values2corr.corrwith(values2corr.iloc[interactions_pd[interactions_pd['array-name']=='AIM22'].index,:],axis=1,method='pearson')
 corr_with_a_row_pd=pd.DataFrame(corr_with_a_row,columns=['corr-values'])
 corr_with_a_row_pd.sort_values(by='corr-values',inplace=True)
 
@@ -169,11 +171,13 @@ for i in dpl1_interactors_data.iloc[:,1].unique():
 
     if len(tmp)!=0:
 
-        tmp_2=data_all_interactors[data_all_interactors.iloc[:,1]==i]
-        type_int=tmp_2[data_all_interactors.columns[2]]
+        # tmp_2=data_all_interactors[data_all_interactors.iloc[:,1]==i]
+        # type_int=tmp_2[data_all_interactors.columns[2]]
         
 
         corr_with_a_row_pd.loc[tmp.index,'interactor']=True
+        
+        type_int=dpl1_interactors_data[dpl1_interactors_data.iloc[:,1]==i]['Experiment_Type_(Required) ']
 
         if type_int.value_counts()[:1].index.tolist()== ['Negative Genetic']:
             corr_with_a_row_pd.loc[tmp.index,'type']=-1
@@ -197,7 +201,7 @@ corr_with_a_row_pd.fillna(0,inplace=True)
 
 
 
-# %% Heatmap of correlations
+# Heatmap of correlations
 
 
 plt.figure(figsize=(5,5))
@@ -210,10 +214,9 @@ df=corr_with_a_row_pd.copy()
 corr_with_a_row_pd['corr-values-group']=pd.cut(df['corr-values'], bins=5,labels=np.arange(-1,1.5,0.5), right=False)
 
 
-# %% [markdown]
-# ### See this https://towardsdatascience.com/visualising-stocks-correlations-with-networkx-88f2ee25362e
 
-# %% Categoryzing new genes and existing genes that the algorithm give
+
+#  Categoryzing new genes and existing genes that the algorithm give
 
 for i in np.arange(0,len(corr_with_a_row_pd)):
     if corr_with_a_row_pd.loc[i,'type']== corr_with_a_row_pd.loc[i,'corr-values-group']:
@@ -222,7 +225,7 @@ for i in np.arange(0,len(corr_with_a_row_pd)):
         corr_with_a_row_pd.loc[i,'genes-classified']=corr_with_a_row_pd.loc[i,'genes'] + '-new'
 
 
-# %% Plot to see how close is the type and the correlation values
+# Plot to see how close is the type and the correlation values
 
 plt.subplots(1,1)
 data_dpl1=corr_with_a_row_pd[corr_with_a_row_pd['interactor']==1]
@@ -263,7 +266,42 @@ nx.draw(G_estimated,pos=nx.spring_layout(G_estimated), with_labels=True,node_col
 plt.savefig('corr-based-net-dpl1-test.png',dpi=300,format='png',transparent=False)
 
 
+#%% dendogram
+
+from scipy.cluster import hierarchy
+import matplotlib.pyplot as plt
+
+# ytdist = np.array([662., 877., 255., 412., 996., 295., 468., 268.,
+#                    400., 754., 564., 138., 219., 869., 669.])
+
+#ytdist=np.array(corr_with_a_row_pd['corr-values'])
+
+ytdist=np.array(values2corr['score'][0:10])
+Z = hierarchy.linkage(np.reshape(ytdist, (len(ytdist), 1)))
+plt.figure(figsize=(8,8))
+dn = hierarchy.dendrogram(Z)
+
+# %% 1D heatmap
+import matplotlib.pyplot as plt
+import numpy as np; np.random.seed(1)
+plt.rcParams["figure.figsize"] = 5,2
+
+x = np.linspace(0,len(values2corr['score']))
+x=np.arange(0,len(values2corr['score']))
+# y = np.cumsum(np.random.randn(50))+6
+y=values2corr['score']
+ 
+
+fig, (ax,ax2) = plt.subplots(nrows=2, sharex=True)
+
+#extent = [x[0]-(x[1]-x[0])/2., x[-1]+(x[1]-x[0])/2.,0,1]
+ax.imshow(y[np.newaxis,:], cmap="Blues", aspect='auto',vmin=-1,vmax=2)
+ax.set_yticks([])
+# ax.set_xlim(extent[0], extent[1])
 
 
+ax2.plot(x,y[x],'*')
+ax2.set_ylim([-5,10])
 
-
+plt.tight_layout()
+plt.show()
