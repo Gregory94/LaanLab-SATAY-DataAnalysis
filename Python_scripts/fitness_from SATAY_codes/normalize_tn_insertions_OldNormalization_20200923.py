@@ -27,14 +27,12 @@ from read_sgdfeatures import sgd_features
 
 
 #%% TEMP
-region = "IX"
-wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
-pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
-variable="reads"
-normalize=False
-plotting=True
+#region = "IX"
+#wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
+#pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
+#variable="reads"
 #%%
-def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, plotting=True):
+def dna_features(region, wig_file, pergene_insertions_file, variable="insertions", normalize=False):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
     Optional is to define with data is displayed, which can be either "insertions" or "reads".
     Output is a barplot indicating the number of transposons per genomic region.
@@ -42,7 +40,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     This can be used for identifying neutral regions (i.e. genomic regions that, if inhibited, do not influence the fitness of the cells).
     This function can be used for normalizing the transposon insertions per gene using the neutral regions.
     '''
-#%% FILES
+#%% USER INPUT AND FILES
 #for region in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XI', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
     essentials_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
 
@@ -52,14 +50,13 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     sgd_features_file = os.path.join(file_dirname,'..','Data_Files','SGD_features.tab')
 
-    variable = variable.lower()
 #%% DETERMINE INPUTTED REGION
 
     if type(region) == str:
         if region in chromosomename_roman_to_arabic()[1]:
             chrom = region
-            roi_start = None
-            roi_end = None
+            region_start = None
+            region_end = None
         elif region in list_gene_names(gene_information_file):
             #LOOK UP GENE INFORMATION ...
             pass
@@ -68,8 +65,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     elif type(region) == list: #ADD CODE THAT ONLY TAKES GENES WITHIN SPECIFIED REGION
         chrom = region[0]
-        roi_start = region[1]
-        roi_end = region[2]
+        region_start = region[1]
+        region_end = region[2]
 
 
     del (region)
@@ -152,9 +149,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     for gene in gene_position_dict:
         if gene in feature_orf_dict:
-            if (not gene.endswith("-A") and not feature_orf_dict.get(gene)[1] == 'Verified') and (not gene.endswith("-B") and not feature_orf_dict.get(gene)[1] == 'Verified'):
-                for bp in range(gene_position_dict.get(gene)[1]+start_chr, gene_position_dict.get(gene)[2]+start_chr+1):
-                    dna_dict[bp] = [gene, "Gene; "+feature_orf_dict.get(gene)[1]]
+            for bp in range(gene_position_dict.get(gene)[1]+start_chr, gene_position_dict.get(gene)[2]+start_chr+1):
+                dna_dict[bp] = [gene, "Gene; "+feature_orf_dict.get(gene)[1]]
         else:
             gene_alias = [key for key, val in gene_alias_dict.items() if gene in val][0]
             for bp in range(gene_position_dict.get(gene)[1]+start_chr, gene_position_dict.get(gene)[2]+start_chr+1):
@@ -197,11 +193,16 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
 #%% DETERMINE THE NUMBER OF TRANSPOSONS PER BP FOR EACH FEATURE
 
+##    dna_df = pd.DataFrame(list(dna_dict.items()), columns=["BP", "Feature"])
+#    dna_df = pd.DataFrame.from_dict(dna_dict, orient="index")
+
+
     reads_loc_list = [0] * len(dna_dict) # CONTAINS ALL READS JUST LIKE READS_IN_CHROM_LIST, BUT THIS LIST HAS THE SAME LENGTH AS THE NUMBER OF BP IN THE CHROMOSOME WHERE THE LOCATIONS WITH NO READS ARE FILLED WITH ZEROS
     i = 0
     for ins in insrt_in_chrom_list:
         reads_loc_list[ins] = reads_in_chrom_list[i]
         i += 1
+#    dna_df["Reads"] = reads_loc_list
 
 
     del (i, ins, insrt_in_chrom_list, reads_in_chrom_list)#, dna_df)
@@ -301,169 +302,179 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     del (dna_dict, feature_NameAndType_list, feature_name_list, feature_type_list, feature_name, f_type, f_previous, f_start, f_end, f_pos_list, f_current, N_reads, N_reads_list, N_insrt, N_insrt_list, N_bp, N_bp_list, bp, i, N_reads_per_bp_list, N_insrt_per_bp_list, all_features, essentiality_list, essentials_file)
 
 
+
 #%% NORMALIZE USING WINDOWS
 
-    if normalize == True and variable == "reads": #remove outliers before normalization using: dna_df2.at[273, "Nreadsperbp"] = 0
-
-        # DETERMINE MEANS FOR THE NUMBER OF READS/BP IN THE NONCODING REGIONS WITHIN EACH WINDOW.
-        window_edge_list = np.linspace(0, len_chr, 10).tolist()#[82500, 243500, len_chr]
-
-
-        dna_df2["Nreadsperbp_Norm"] = list(dna_df2["Nreadsperbp"])
-        reads_list = []
-        window_start_index = 0
-        mean_per_window_list = []
-        for edge in window_edge_list[1:]:
-            for index, row in dna_df2.iterrows():
-                if row["Feature"] == "noncoding":
-                    if row["position"][0] >= window_start_index and row["position"][0] < edge:
-                        reads_list.append(row["Nreadsperbp_Norm"])
-                    elif row["position"][0] > edge:
-                        mean_per_window_list.append(np.mean(reads_list))
-                        reads_list = [] #reset list for next window
-                        reads_list.append(row["Nreadsperbp_Norm"]) #add current read
-                        window_start_index = edge
-                        break
-        mean_per_window_list.append(np.mean(reads_list)) #get mean for reads in last window
-
-        del (edge, index, row, reads_list, window_start_index)
-
-
-        # NORMALIZE ALL REGIONS WITHIN THE WINDOWS WITH THEIR RESPECTIVE VALUES STORED IN MEAN_PER_WINDOW_LIST.
-        window_start_index = 0
-        i = 0
-        for edge in window_edge_list[1:]:
-            for index, row in dna_df2.iterrows():
-                if row["position"][0] >= window_start_index and row["position"][0] < edge:
-                    dna_df2.at[index, "Nreadsperbp_Norm"] = row["Nreadsperbp_Norm"]/mean_per_window_list[i]
-                elif row["position"][0] > edge:
-                    window_start_index = edge
-                    i += 1
-                    break
-
-        del (window_edge_list, edge, window_start_index ,i, index, row, mean_per_window_list)
-
-
-        print("Before normalization: Mean reads/bp = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp"]), np.std(dna_df2["Nreadsperbp"])))
-        print("After normalization: Mean reads/bp  = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp_Norm"]), np.std(dna_df2["Nreadsperbp_Norm"])))
-
-
-        max_readspertn = dna_df2["Nreadsperbp_Norm"].max()
-        dna_df2["Nreadsperbp_Norm"] /= max_readspertn
-
-        del (max_readspertn)
-
+#    if normalize == True: #remove outliers before normalization using: dna_df2.at[273, "Nreadsperbp"] = 0
+#
+#        # DETERMINE MEANS FOR THE NUMBER OF READS/BP IN THE NONCODING REGIONS WITHIN EACH WINDOW.
+#        window_edge_list = np.linspace(0, len_chr, 10).tolist()#[82500, 243500, len_chr]
+#
+#
+#        dna_df2["Nreadsperbp_Norm"] = list(dna_df2["Nreadsperbp"])
+#        reads_list = []
+#        window_start_index = 0
+#        mean_per_window_list = []
+#        for edge in window_edge_list[1:]:
+#            for index, row in dna_df2.iterrows():
+#                if row["Feature"] == "noncoding":
+#                    if row["position"][0] >= window_start_index and row["position"][0] < edge:
+#                        reads_list.append(row["Nreadsperbp_Norm"])
+#                    elif row["position"][0] > edge:
+#                        mean_per_window_list.append(np.mean(reads_list))
+#                        reads_list = [] #reset list for next window
+#                        reads_list.append(row["Nreadsperbp_Norm"]) #add current read
+#                        window_start_index = edge
+#                        break
+#        mean_per_window_list.append(np.mean(reads_list)) #get mean for reads in last window
+#
+#        del (edge, index, row, reads_list, window_start_index)
+#
+#
+#        # NORMALIZE ALL REGIONS WITHIN THE WINDOWS WITH THEIR RESPECTIVE VALUES STORED IN MEAN_PER_WINDOW_LIST.
+#        window_start_index = 0
+#        i = 0
+#        for edge in window_edge_list[1:]:
+#            for index, row in dna_df2.iterrows():
+#                if row["position"][0] >= window_start_index and row["position"][0] < edge:
+#                    dna_df2.at[index, "Nreadsperbp_Norm"] = row["Nreadsperbp_Norm"]/mean_per_window_list[i]
+#                elif row["position"][0] > edge:
+#                    window_start_index = edge
+#                    i += 1
+#                    break
+#
+#        del (window_edge_list, edge, window_start_index ,i, index, row, mean_per_window_list)
+#
+#
+#        print("Before normalization: Mean reads/bp = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp"]), np.std(dna_df2["Nreadsperbp"])))
+#        print("After normalization: Mean reads/bp  = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp_Norm"]), np.std(dna_df2["Nreadsperbp_Norm"])))
+#
+#
+#        max_readspertn = dna_df2["Nreadsperbp_Norm"].max()
+#        dna_df2["Nreadsperbp_Norm"] /= max_readspertn
+#
+#        del (max_readspertn)
 
 #%% CREATE BAR PLOT
-    if plotting == True:
-        noncoding_color = "#003231"
-        essential_color = "#00F28E"
-        nonessential_color = "#F20064"
-        codingdna_color = '#00918f'
-        textcolor = "#003231"
-        textsize = 14
-
-
-        feature_middle_pos_list = []
-        sum_bp = 0
-        for x in dna_df2['Nbasepairs']:
-            feature_middle_pos_list.append(x/2 + sum_bp)
-            sum_bp += x
-        del (x, sum_bp)
-
-        feature_width_list = list(dna_df2['Nbasepairs'])
-
-
-        barcolor_list = []
-        for feature in dna_df2['Feature']:
-            if feature == 'noncoding':
-                barcolor_list.append(noncoding_color)
-            elif dna_df2.loc[dna_df2['Feature'] == feature]['Essentiality'].iloc[0] == False:
-                barcolor_list.append(nonessential_color)
-            elif dna_df2.loc[dna_df2['Feature'] == feature]['Essentiality'].iloc[0] == True:
-                barcolor_list.append(essential_color)
-            elif dna_df2.loc[dna_df2['Feature'] == feature]['Essentiality'].iloc[0] == None:
-                barcolor_list.append(codingdna_color)
-        del (feature)
+    noncoding_color = "#003231"
+    essential_color = "#00F28E"
+    nonessential_color = "#F20064"
+    codingdna_color = '#00918f'
+    textcolor = "#003231"
+    textsize = 14
 
 
 
+    feature_middle_pos_list = []
+    sum_bp = 0
+    for x in dna_df2['Nbasepairs']:
+        feature_middle_pos_list.append(x/2 + sum_bp)
+        sum_bp += x
+    del (x, sum_bp)
 
-        ###PLOTTING
-        plt.figure(figsize=(19,9))
-        grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.01)
-
-
-        ax = plt.subplot(grid[0:19,0])
-        if variable == "insertions":
-            ax.bar(feature_middle_pos_list, list(dna_df2['Ninsertionsperbp']), feature_width_list, color=barcolor_list)
-    #        ax.set_ylim(0, max(dna_df2['Ninsertionsperbp']) + 0.1*max(dna_df2['Ninsertionsperbp']))
-            ax.set_ylabel("Transposons/bp per region", fontsize=textsize, color=textcolor)
-        elif variable == "reads":
-            if normalize == False:
-                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp']), feature_width_list, color=barcolor_list)
-                ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
-            elif normalize == True:
-                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_Norm']), feature_width_list, color=barcolor_list)
-                ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
-                ax.set_ylim(0.0, 1.0)
-
-        if roi_start != None and roi_end != None and roi_start < len_chr and roi_end < len_chr:
-            ax.set_xlim(roi_start, roi_end)
-        else:
-            ax.set_xlim(0, len_chr)
-
-        ax.grid(linestyle='-', alpha=1.0)
-        ax.tick_params(labelsize=textsize)
-    #    ax.set_xticklabels([])
-        ax.tick_params(axis='x', which='major', pad=30)
-        ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
-        ax.xaxis.get_offset_text().set_fontsize(textsize)
-        ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize, color=textcolor, labelpad=10)
-        legend_noncoding = mpatches.Patch(color=noncoding_color, label="Noncoding DNA")
-        legend_essential = mpatches.Patch(color=essential_color, label="Annotated essential genes")
-        legend_nonessential = mpatches.Patch(color=nonessential_color, label="Non-essential genes")
-        legend_coding = mpatches.Patch(color=codingdna_color, label="Other genomic regions")
-        leg = ax.legend(handles=[legend_noncoding, legend_essential, legend_nonessential, legend_coding]) #ADD
-        for text in leg.get_texts():
-            text.set_color(textcolor)
-        del text
+    feature_width_list = list(dna_df2['Nbasepairs'])
 
 
-        axc = plt.subplot(grid[19,0])
+    barcolor_list = []
+    for feature in dna_df2['Feature']:
+        if feature == 'noncoding':
+            barcolor_list.append(noncoding_color)
+        elif dna_df2.loc[dna_df2['Feature'] == feature]['Essentiality'].iloc[0] == False:
+            barcolor_list.append(nonessential_color)
+        elif dna_df2.loc[dna_df2['Feature'] == feature]['Essentiality'].iloc[0] == True:
+            barcolor_list.append(essential_color)
+        elif dna_df2.loc[dna_df2['Feature'] == feature]['Essentiality'].iloc[0] == None:
+            barcolor_list.append(codingdna_color)
+    del (feature)
 
-        l = 0
-        counter = 0
-        for width in feature_width_list:
-            if dna_df2.loc[counter][2] == True:
-                axc.axvspan(l,l+width,facecolor=essential_color,alpha=0.3)
-            elif dna_df2.loc[counter][2] == False and not dna_df2.loc[counter][0] == 'noncoding':
-                axc.axvspan(l,l+width,facecolor=nonessential_color,alpha=0.3)
-            elif dna_df2.loc[counter][2] == None and not dna_df2.loc[counter][0] == 'noncoding':
-                axc.axvspan(l,l+width,facecolor=codingdna_color,alpha=0.5)
-            l += width
-            counter += 1
-        if roi_start != None and roi_end != None and roi_start < len_chr and roi_end < len_chr:
-            axc.set_xlim(roi_start, roi_end)
-        else:
-            axc.set_xlim(0, len_chr)
-        axc.tick_params(labelsize=textsize)
-        axc.set_yticklabels([])
-        axc.tick_params(
-            axis='x',          # changes apply to the x-axis
-            which='both',      # both major and minor ticks are affected
-            bottom=False,      # ticks along the bottom edge are off
-            top=False,         # ticks along the top edge are off
-            labelbottom=False) # labels along the bottom edge are off
 
-        axc.tick_params(
-            axis='y',          # changes apply to the y-axis
-            which='both',      # both major and minor ticks are affected
-            left=False,        # ticks along the bottom edge are off
-            right=False,       # ticks along the top edge are off
-            labelleft=False)   # labels along the bottom edge are off
 
-        del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width)
+
+    ###PLOTTING
+    fig = plt.figure(figsize=(19,9))
+    grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.01)
+
+
+    ax = plt.subplot(grid[0:19,0])
+    if variable == "insertions":
+        ax.bar(feature_middle_pos_list, list(dna_df2['Ninsertionsperbp']), feature_width_list, color=barcolor_list)
+#        ax.set_ylim(0, max(dna_df2['Ninsertionsperbp']) + 0.1*max(dna_df2['Ninsertionsperbp']))
+        ax.set_ylabel("Transposons/bp per region", fontsize=textsize, color=textcolor)
+    elif variable == "reads":
+        ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp']), feature_width_list, color=barcolor_list)
+        ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
+
+    if region_start != None and region_end != None and region_start < len_chr and region_end < len_chr:
+        ax.set_xlim(region_start, region_end)
+    else:
+        ax.set_xlim(0, len_chr)
+
+    ax.grid(linestyle='-', alpha=1.0)
+    ax.tick_params(labelsize=textsize)
+#    ax.set_xticklabels([])
+    ax.tick_params(axis='x', which='major', pad=30)
+    ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+    ax.xaxis.get_offset_text().set_fontsize(textsize)
+    ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize, color=textcolor, labelpad=10)
+    legend_noncoding = mpatches.Patch(color=noncoding_color, label="Noncoding DNA")
+    legend_essential = mpatches.Patch(color=essential_color, label="Annotated essential genes")
+    legend_nonessential = mpatches.Patch(color=nonessential_color, label="Non-essential genes")
+    legend_coding = mpatches.Patch(color=codingdna_color, label="Other genomic regions")
+    leg = ax.legend(handles=[legend_noncoding, legend_essential, legend_nonessential, legend_coding]) #ADD
+    for text in leg.get_texts():
+        text.set_color(textcolor)
+    del text
+
+
+    axc = plt.subplot(grid[19,0])
+    ess_start_pos_list = []
+    ness_start_pos_list = []
+    ess_end_pos_list = []
+    ness_end_pos_list = []
+    l = 0
+    counter = 0
+    for width in feature_width_list:
+        if dna_df2.loc[counter][2] == True:
+    #        ess_start_pos_list.append(l)
+    #        ess_end_pos_list.append(l - 1)
+            axc.axvspan(l,l+width,facecolor=essential_color,alpha=0.3)
+        elif dna_df2.loc[counter][2] == False and not dna_df2.loc[counter][0] == 'noncoding':
+            axc.axvspan(l,l+width,facecolor=nonessential_color,alpha=0.3)
+        elif dna_df2.loc[counter][2] == None and not dna_df2.loc[counter][0] == 'noncoding':
+            axc.axvspan(l,l+width,facecolor=codingdna_color,alpha=0.5)
+        l += width
+        counter += 1
+    if region_start != None and region_end != None and region_start < len_chr and region_end < len_chr:
+        axc.set_xlim(region_start, region_end)
+    else:
+        axc.set_xlim(0, len_chr)
+    axc.tick_params(labelsize=textsize)
+    axc.set_yticklabels([])
+    axc.tick_params(
+        axis='x',          # changes apply to the x-axis
+        which='both',      # both major and minor ticks are affected
+        bottom=False,      # ticks along the bottom edge are off
+        top=False,         # ticks along the top edge are off
+        labelbottom=False) # labels along the bottom edge are off
+
+    axc.tick_params(
+        axis='y',          # changes apply to the y-axis
+        which='both',      # both major and minor ticks are affected
+        left=False,        # ticks along the bottom edge are off
+        right=False,       # ticks along the top edge are off
+        labelleft=False)   # labels along the bottom edge are off
+
+#    #FOLLOWING IS FOR SHOWING COMMON AXIS LABELS.
+#    # add a big axis, hide frame
+#    fig.add_subplot(111, frameon=False)
+#    # hide tick and tick label of the big axis
+#    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+#    plt.xlabel("bp position in chromosome " + chrom, fontsize=textsize)
+#    plt.ylabel("Transposons/bp per region", fontsize=textsize)
+
+
+
+    del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, ess_start_pos_list, ness_start_pos_list, ess_end_pos_list, ness_end_pos_list, l, counter, width)
 
 
 #%% RETURN STATEMENT
@@ -498,11 +509,17 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features(region = 'V', #["V", 0, 14790],
+    dna_df2 = dna_features(region = "IX",#["IX", 390000,439850],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-                 normalize=False,
                  variable="reads")
+
+#    dna_df2 = dna_features(region = "IV",
+#                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig",
+#                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt",
+#                 variable="reads",
+#                 normalize=True)
+
 
 
 
