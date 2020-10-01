@@ -152,11 +152,12 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     ax.set_axisbelow(True)
     ax.grid(True)
     ax.set_xlim(0,chr_length_dict.get(chrom))
+    ax.set_ylim(0, 200)
     ax.tick_params(axis='x', which='major', pad=30)
     ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
     ax.xaxis.get_offset_text().set_fontsize(textsize)
     ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize, color=textcolor, labelpad=10)
-    ax.set_ylabel('Transposon count', fontsize=textsize, color=textcolor, labelpad=30)
+    ax.set_ylabel('Transposon count', fontsize=textsize, color=textcolor, labelpad=25)
 #    ax.set_title('Transposon profile for chromosome '+chrom)
 
 

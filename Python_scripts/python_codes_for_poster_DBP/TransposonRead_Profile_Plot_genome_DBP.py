@@ -97,7 +97,7 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
 
 
 
-    plt.figure(figsize=(27.0,3))#1.5))
+    plt.figure(figsize=(19.0,9.0))#(27.0,3))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
 
     textsize = 12
@@ -112,7 +112,7 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
 #                ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#BBE6AA",alpha=0.8)
 #            else:
 #                ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#F6A089",alpha=0.8)
-    ax.bar(allinsertionsites_list,alltransposoncounts_binnedlist,width=binsize,color="#00918f")
+    ax.bar(allinsertionsites_list,alltransposoncounts_binnedlist,width=binsize,color="#333333")#"#00918f")
     ax.grid(False)
     ax.set_xlim(0,l_genome)
 

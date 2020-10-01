@@ -312,7 +312,7 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
         else:
             ax.axvline(x=ins, ymax=0.05, linewidth=1.5, color='k')
         leg_counter += 1
-    ax.legend(fontsize=text_size)
+    ax.legend(fontsize=text_size-2)
 
 
 

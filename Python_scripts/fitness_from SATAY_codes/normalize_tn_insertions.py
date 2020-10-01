@@ -27,14 +27,14 @@ from read_sgdfeatures import sgd_features
 
 
 #%% TEMP
-region = "IX"
-wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
-pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
-variable="reads"
-normalize=False
-plotting=True
+#region = "V"
+#wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
+#pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
+#variable="reads"
+#normalize=False
+#plotting=True
 #%%
-def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, plotting=True):
+def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, plotting=True, verbose=True):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
     Optional is to define with data is displayed, which can be either "insertions" or "reads".
     Output is a barplot indicating the number of transposons per genomic region.
@@ -188,7 +188,10 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
 
     if sorted(orf_position_dict) == sorted(gene_position_dict):
-        print('Everything alright, just ignore me!')
+        if verbose == True:
+            print('Everything alright, just ignore me!')
+        else:
+            pass
     else:
         print('WARNING: Genes in feature_list are not the same as the genes in the gene_position_dict. Please check!')
 
@@ -344,8 +347,9 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         del (window_edge_list, edge, window_start_index ,i, index, row, mean_per_window_list)
 
 
-        print("Before normalization: Mean reads/bp = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp"]), np.std(dna_df2["Nreadsperbp"])))
-        print("After normalization: Mean reads/bp  = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp_Norm"]), np.std(dna_df2["Nreadsperbp_Norm"])))
+        if verbose == True:
+            print("Before normalization: Mean reads/bp = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp"]), np.std(dna_df2["Nreadsperbp"])))
+            print("After normalization: Mean reads/bp  = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp_Norm"]), np.std(dna_df2["Nreadsperbp_Norm"])))
 
 
         max_readspertn = dna_df2["Nreadsperbp_Norm"].max()
@@ -403,6 +407,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             if normalize == False:
                 ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp']), feature_width_list, color=barcolor_list)
                 ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
+                ax.set_ylim(0.0,20.0)
             elif normalize == True:
                 ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_Norm']), feature_width_list, color=barcolor_list)
                 ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
@@ -502,7 +507,8 @@ if __name__ == '__main__':
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
                  normalize=False,
-                 variable="reads")
+                 variable="reads",
+                 plotting=True)
 
 
 
