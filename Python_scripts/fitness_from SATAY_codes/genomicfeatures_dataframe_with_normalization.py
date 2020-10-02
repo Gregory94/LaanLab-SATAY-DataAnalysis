@@ -36,7 +36,7 @@ from mapped_reads import total_mapped_reads
 #plotting=True
 #verbose=True
 #%%
-def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, plotting=True, verbose=True):
+def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, normalization_window_size=10000, plotting=True, verbose=True):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
     Optional is to define with data is displayed, which can be either "insertions" or "reads".
     Output is a barplot indicating the number of transposons per genomic region.
@@ -329,7 +329,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     #CREATE NEW COLUMN WITH ALL DOMAINS OF THE GENE (IF PRESENT) AND ANOTHER COLUMN THAT INCLUDES LISTS OF THE BP POSITIONS OF THESE DOMAINS
 
 
-    read_density_chromosome = sum(N_reads_list)/len_chr
+#    read_density_chromosome = sum(N_reads_list)/len_chr #CONSIDERS ALL REGIONS, NOT ONLY THE NONCODING REGIONS.
 
 
     del (dna_dict, feature_NameAndType_list, feature_name_list, feature_type_list, feature_name, f_type, f_previous, f_start, f_end, f_pos_list, f_current, N_reads, N_reads_list, N_insrt_list, N_reads_central80_list, N_insrt_central80_list, N10percent, N_bp, N_bp_list, bp, i, N_reads_per_bp_list, N_insrt_per_bp_list, all_features, essentiality_list, essentials_file)
@@ -340,17 +340,19 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     if normalize == True and variable == "reads": #remove outliers before normalization using: dna_df2.at[273, "Nreadsperbp"] = 0
 
         # DETERMINE MEANS FOR THE NUMBER OF READS/BP IN THE NONCODING REGIONS WITHIN EACH WINDOW.
-        N = round(len_chr/10000)
+        N = round(len_chr/normalization_window_size)
         window_edge_list = np.linspace(0, len_chr, N, dtype=int).tolist()#[82500, 243500, len_chr]
         window_length = window_edge_list[1] - window_edge_list[0]
 
         total_reads_in_genome = total_mapped_reads(wig_file)
 
 
+        read_density_chromosome = sum([nc[12] for nc in dna_df2.itertuples() if nc[2] == None])
         read_density_windows = []
         window_start = 0
         for window_end in window_edge_list[1:]:
-            read_density_windows.append(sum(reads_loc_list[window_start:window_end+1])/(window_end-window_start))
+            read_density_windows.append(sum([nc[12] for nc in dna_df2.itertuples() if window_start <= nc[4][0] < window_end and nc[2] == None]))
+#            read_density_windows.append(sum(reads_loc_list[window_start:window_end+1])/(window_end-window_start))
             window_start = window_end
 
 
@@ -371,54 +373,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
         dna_df2['Nreadsperbp_central80p_normalized'] = norm_reads_list
 
-#    del (read_density_chromosome, N, window_edge_list, window_length, total_reads_in_genome, read_density_windows, window_start, window_end, index, row, read_density_windows_index)
-
-
-#        dna_df2["Nreadsperbp_Norm"] = list(dna_df2["Nreadsperbp"])
-#        reads_list = []
-#        window_start_index = 0
-#        mean_per_window_list = []
-#        for edge in window_edge_list[1:]:
-#            for index, row in dna_df2.iterrows():
-#                if row["Feature"] == "noncoding":
-#                    if row["position"][0] >= window_start_index and row["position"][0] < edge:
-#                        reads_list.append(row["Nreadsperbp_Norm"])
-#                    elif row["position"][0] > edge:
-#                        mean_per_window_list.append(np.mean(reads_list))
-#                        reads_list = [] #reset list for next window
-#                        reads_list.append(row["Nreadsperbp_Norm"]) #add current read
-#                        window_start_index = edge
-#                        break
-#        mean_per_window_list.append(np.mean(reads_list)) #get mean for reads in last window
-#
-##        del (edge, index, row, reads_list, window_start_index)
-#
-#
-        # NORMALIZE ALL REGIONS WITHIN THE WINDOWS WITH THEIR RESPECTIVE VALUES STORED IN MEAN_PER_WINDOW_LIST.
-#        window_start_index = 0
-#        i = 0
-#        for edge in window_edge_list[1:]:
-#            for index, row in dna_df2.iterrows():
-#                if row["position"][0] >= window_start_index and row["position"][0] < edge:
-#                    dna_df2.at[index, "Nreadsperbp_Norm"] = row["Nreadsperbp_Norm"]/mean_per_window_list[i]
-#                elif row["position"][0] > edge:
-#                    window_start_index = edge
-#                    i += 1
-#                    break
-#
-##        del (window_edge_list, edge, window_start_index ,i, index, row, mean_per_window_list)
-#
-#
-#        if verbose == True:
-#            print("Before normalization: Mean reads/bp = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp"]), np.std(dna_df2["Nreadsperbp"])))
-#            print("After normalization: Mean reads/bp  = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp_Norm"]), np.std(dna_df2["Nreadsperbp_Norm"])))
-#
-#
-#        max_readspertn = dna_df2["Nreadsperbp_Norm"].max()
-#        dna_df2["Nreadsperbp_Norm"] /= max_readspertn
-#
-##        del (max_readspertn)
-
+        del (read_density_chromosome, N, window_edge_list, window_length, total_reads_in_genome, read_density_windows, window_start, window_end, index, row, read_density_windows_index)
 
 #%% CREATE BAR PLOT
     if plotting == True:
@@ -565,11 +520,12 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features(region = 'iii', #["V", 0, 14790],
+    dna_df2 = dna_features(region = 'V', #["V", 0, 14790],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-                 normalize=True,
+                 normalize=False,
                  variable="reads",
+                 normalization_window_size=50000,
                  plotting=True,
                  verbose=True)
 
