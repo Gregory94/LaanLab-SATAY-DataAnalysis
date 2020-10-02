@@ -18,7 +18,7 @@ import matplotlib.patches as mpatches
 
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
+sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic
 from chromosome_names_in_files import chromosome_name_wigfile
 from gene_names import list_gene_names, gene_aliases
@@ -45,11 +45,11 @@ def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
 #%% INPUT FILES
     essentials_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
 
-    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
+    gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
 
-    gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
 
-    sgd_features_file = os.path.join(file_dirname,'Data_Files','SGD_features.tab')
+    sgd_features_file = os.path.join(file_dirname,'..','Data_Files','SGD_features.tab')
 
 #%% DETERMINE INPUTTED REGION
 
@@ -295,10 +295,10 @@ def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
         del (feature_NameAndType_list, feature_name_list, feature_name, f_type, f_previous, f_current, N_reads, N_reads_list, N_insrt, N_insrt_list, N_bp, N_bp_list, bp, i, N_reads_per_bp_list, N_insrt_per_bp_list, all_features)
     
 #%% CREATE BAR PLOT TO SHOW DIFFERENCES BETWEEN THE NUMBER OF INSERTIONS PER BP PER REGION
-    noncoding_color = "#003231"
-    essential_color = "#00F28E"
-    nonessential_color = "#F20064"
-    codingdna_color = '#00918f'
+    noncoding_color = '#00918F'#"#003231"
+    essential_color = '#00918F'#"#00F28E"
+    nonessential_color = '#00918F'#"#F20064"
+    codingdna_color = '#00918F'#'#00918f'
 #    textcolor = "#003231"
     textsize = 14
 
@@ -353,13 +353,13 @@ def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
     ax.xaxis.get_offset_text().set_fontsize(textsize)
     ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize)
     ax.set_ylabel("Relative difference insertions per bp per region",fontsize=textsize)
-#    ax.set_title(r"(WT2 - $\Delta$Dpl1) / max(WT2)", fontsize=textsize)
-    ax.set_title(r"(WT2 - WT1 / max(WT2)", fontsize=textsize)
+    ax.set_title(r"(WT1 - $\Delta$Dpl1) / max(WT1)", fontsize=textsize)
+#    ax.set_title(r"(WT2 - WT1 / max(WT2)", fontsize=textsize)
     legend_noncoding = mpatches.Patch(color=noncoding_color, label="Noncoding DNA")
     legend_essential = mpatches.Patch(color=essential_color, label="Annotated essential genes")
     legend_nonessential = mpatches.Patch(color=nonessential_color, label="Non-essential genes")
     legend_coding = mpatches.Patch(color=codingdna_color, label="Other genomic regions")
-    ax.legend(handles=[legend_noncoding, legend_essential, legend_nonessential, legend_coding]) #ADD
+#    ax.legend(handles=[legend_noncoding, legend_essential, legend_nonessential, legend_coding]) #ADD
     
     
 #%% RETURN STATEMENT
@@ -401,11 +401,18 @@ if __name__ == '__main__':
                                             r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\dDpl1_KornmannLab_20200803\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"])
 =======
     dna_df2 = dna_features_compare(region = "VIII",
+<<<<<<< HEAD
                  wig_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.wig",
                              r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"],
                  pergene_insertions_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam_pergene_insertions.txt",
                                             r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"])
 >>>>>>> 45dad1c4f93756d74aa008dc8c863c549363fd95
+=======
+                 wig_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
+                                  r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"],
+                 pergene_insertions_file_list = [r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
+                                                 r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"])
+>>>>>>> 5183930047024746128f4e376e4177d31be8e315
 
 
 

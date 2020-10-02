@@ -5,11 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
-from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
+sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
+from chromosome_and_gene_positions import chromosome_position, gene_position
 from essential_genes_names import list_known_essentials
-from gene_names import gene_aliases
-from chromosome_names_in_files import chromosome_name_bedfile, chromosome_name_wigfile
+from chromosome_names_in_files import chromosome_name_bedfile
 
 #%%
 def transposon_profile(chrom=None, bar_width=None, bed_file=None):
@@ -24,12 +23,9 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
 
 
 #%%
-    bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed"
-    bar_width=None
-
-    gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
-                            os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
+    gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    essential_genes_files = [os.path.join(file_dirname,'..','Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'..','Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
 
 
 #    counter = 0
@@ -46,15 +42,25 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
         summed_chr_length_dict[c] = summed_chr_length
         summed_chr_length += chr_length_dict.get(c)    
 
-    
+
     l_genome = 0
     for chrom in chrom_list:
         l_genome += int(chr_length_dict.get(chrom))
     print('Genome length: ',l_genome)
     if bar_width == None:
         bar_width = l_genome/1000
-    
-    
+
+
+    middle_chr_position = []
+    c1 = summed_chr_length_dict.get('I')
+    for c in summed_chr_length_dict:
+        if not c == 'I':
+            c2 = summed_chr_length_dict.get(c)
+            middle_chr_position.append(c1 + (c2 - c1)/2)
+            c1 = c2
+    c2 = l_genome
+    middle_chr_position.append(c1 + (c2 - c1)/2)
+
 
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items()]
@@ -91,10 +97,10 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
 
 
 
-    plt.figure(figsize=(17.0,6.0))
+    plt.figure(figsize=(19.0,9.0))#(27.0,3))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
 
-    textsize = 20
+    textsize = 12
     textcolor = "#000000"
     binsize = bar_width
     ax = plt.subplot(grid[0:19,0])
@@ -106,20 +112,23 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
 #                ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#BBE6AA",alpha=0.8)
 #            else:
 #                ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#F6A089",alpha=0.8)
-    ax.bar(allinsertionsites_list,alltransposoncounts_binnedlist,width=binsize,color="#00918f")
+    ax.bar(allinsertionsites_list,alltransposoncounts_binnedlist,width=binsize,color="#333333")#"#00918f")
     ax.grid(False)
     ax.set_xlim(0,l_genome)
 
     for chrom in summed_chr_length_dict:
         ax.axvline(x = summed_chr_length_dict.get(chrom), linestyle='-', color=(0.9,0.9,0.9,1.0))
 
-    ax.tick_params(
-        axis='x',          # changes apply to the x-axis
-        which='both',      # both major and minor ticks are affected
-        bottom=False,      # ticks along the bottom edge are off
-        top=False,         # ticks along the top edge are off
-        labelbottom=False) # labels along the bottom edge are off
-    plt.ylabel('Transposon Count', fontsize=textsize, color=textcolor)
+#    ax.tick_params(
+#        axis='x',          # changes apply to the x-axis
+#        which='both',      # both major and minor ticks are affected
+#        bottom=False,      # ticks along the bottom edge are off
+#        top=False,         # ticks along the top edge are off
+#        labelbottom=False) # labels along the bottom edge are off
+    ax.set_xticks(middle_chr_position)
+    ax.set_xticklabels(chrom_list, fontsize=textsize)
+    ax.tick_params(axis='x', which='major', pad=10)
+    plt.ylabel('Transposon \n Count', fontsize=textsize, color=textcolor, labelpad=30)
     plt.yticks([], [])
 #    ax.axis("off")
 
@@ -155,4 +164,4 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
 
 #%%
 if __name__ == '__main__':
-    transposon_profile(chrom='XV', bar_width=2000, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
+    transposon_profile(bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")

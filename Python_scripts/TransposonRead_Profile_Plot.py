@@ -131,7 +131,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     print('Plotting chromosome ', chrom, '...')
     print('bar width for plotting is ',bar_width)
     
-    textsize = 20
+    textsize = 18
     textcolor = "#000000"
 
     plt.figure(figsize=(19,9))#(17,6))
@@ -152,11 +152,12 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     ax.set_axisbelow(True)
     ax.grid(True)
     ax.set_xlim(0,chr_length_dict.get(chrom))
+    ax.set_ylim(0, 200)
     ax.tick_params(axis='x', which='major', pad=30)
     ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
     ax.xaxis.get_offset_text().set_fontsize(textsize)
     ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize, color=textcolor, labelpad=10)
-    ax.set_ylabel('Tranposon count', fontsize=textsize, color=textcolor)
+    ax.set_ylabel('Transposon count', fontsize=textsize, color=textcolor, labelpad=25)
 #    ax.set_title('Transposon profile for chromosome '+chrom)
 
 
@@ -342,10 +343,10 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     print('Plotting chromosome ', chrom, '...')
     print('bar width for plotting is ',bar_width)
     
-    textsize = 20
+    textsize = 22
     textcolor = "#000000"
 
-    plt.figure(figsize=(17,6))
+    plt.figure(figsize=(17,4))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
     
     binsize = bar_width
@@ -404,9 +405,14 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 #%%
 if __name__ == '__main__':
 <<<<<<< HEAD
+<<<<<<< HEAD
 #    read_profile(chrom='xv',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
     transposon_profile(chrom='II', bar_width=None, bed_file=r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\wt1_KornmannLab_20200812\ERR1533148_trimmed.sorted.bam.bed")
 =======
     read_profile(chrom='IX',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
 #    transposon_profile(chrom='IX', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
 >>>>>>> 02723fc28becaa0428d64ab6978185f5da1aa080
+=======
+#    read_profile(chrom='IX',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
+    transposon_profile(chrom='V', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
+>>>>>>> 5183930047024746128f4e376e4177d31be8e315

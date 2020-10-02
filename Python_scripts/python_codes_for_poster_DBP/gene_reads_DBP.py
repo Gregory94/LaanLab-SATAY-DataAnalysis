@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Thu Sep 24 09:31:54 2020
+
+@author: gregoryvanbeek
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Apr 15 14:10:52 2020
 
 @author: gregoryvanbeek
@@ -12,7 +19,7 @@ import pandas as pd
 import seaborn as sb
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
+sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
 from chromosome_and_gene_positions import gene_position
 from gene_names import gene_aliases
 from chromosome_names_in_files import chromosome_name_bedfile
@@ -28,8 +35,8 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
     The output is a bar plot where the number of reads divided by the number of transposons.
     '''
 #%% USED FILES
-    gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
+    gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
 
 #%%SAVE FILES
     if savefigure == True:
@@ -254,79 +261,88 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
     else:
         print('Plotting reads in range ', gene_start, '..', gene_end, 'in chromosome ', gene_chr, '...')
 
-    text_size = 12
+    text_size = 24
 
-    plt.figure(figsize=(19,9))
+    plt.figure(figsize=(17,7))
     grid = plt.GridSpec(1, 3, wspace=0.4, hspace=0.3)
     
-    ax = plt.subplot(grid[0,:2])
-    ax.bar(insertion_roi_binnedlist,reads_roi_binnedlist,width=bin_width,facecolor=np.array([126.0,164.0,179.0])/255,edgecolor='w')
+    ax = plt.subplot(grid[0,:3])
+    ax.bar(insertion_roi_binnedlist,reads_roi_binnedlist,width=bin_width,facecolor="#00918f",edgecolor='w', label='Reads per transposon')
     ax.set_axisbelow(True)
+    ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+    ax.xaxis.get_offset_text().set_fontsize(text_size)
+    ax.tick_params(axis='both', which='major', labelsize=text_size)
     ax.grid(True)
-    if gene_name != None:
-        ax.set_title(gene_name, fontweight='bold', fontsize=text_size)
-    elif region == ['IV',46271,48031]:
-        ax.set_title('HO-locus', fontweight='bold', fontsize=text_size)
-    else:
-        ax.set_title(str(gene_chr) + str(gene_start) + '-' + str(gene_end))
-    ax.set_xlabel('Basepair position in chromosome '+ gene_chr, fontsize=text_size) 
-    ax.set_ylabel('Read/Tn', fontsize=text_size)
+#    if gene_name != None:
+#        ax.set_title(gene_name, fontweight='bold', fontsize=text_size)
+#    elif region == ['IV',46271,48031]:
+#        ax.set_title('HO-locus', fontweight='bold', fontsize=text_size)
+#    else:
+#        ax.set_title(str(gene_chr) + str(gene_start) + '-' + str(gene_end))
+    ax.set_xlabel('Basepair position for '+ gene_name +' (nonessential gene) on chromosome '+ gene_chr, fontsize=text_size, labelpad=10) 
+    ax.set_ylabel('Reads per transposon \n insertion', fontsize=text_size, labelpad=10)
     ax.set_xlim(gene_start,gene_end)
 
-    if gene_name != None and gene_name != 'HOlocus':
-        if insertion_list != []:
-            textstr = '\n'.join((r'Reading orientation of gene: ' + gene_orien,
-                                r'Transposon coverage = %.2f percent' % (coverage_percentage),
-                                r'Mean transposon insertion frequency in gene is %.2f, %.2f ' % (insertion_avgperiodicity, insertion_stdperiodicity),
-                                r'Mean transposon insertion frequency in chromosome is %.2f, %.2f' % (insertion_chromosome_avgperiodicity, insertion_chromosome_stdperiodicity),
-                                r'Quartiles transposon insertion frequency in gene is %.2f, %.2f, %.2f ' % (insertion_firstquartileperiodicity, insertion_medperiodicity, insertion_thirdquartileperiodicity),
-                                r'Quartiles transposon insertion frequency in chromosome is %.2f, %.2f, %.2f ' % (insertion_chromosome_firstquartileperiodicity, insertion_chromosome_medperiodicity, insertion_chromosome_thirdquartileperiodicity)
-                                ))
-        else:
-            textstr = (r'Reading orientation of gene: ' + gene_orien)
-    else:
-        textstr = '\n'.join((r'Transposon coverage = %.2f percent' % (coverage_percentage),
-                            r'Mean transposon insertion frequency in gene is %.2f, %.2f ' % (insertion_avgperiodicity, insertion_stdperiodicity),
-                            r'Mean transposon insertion frequency in chromosome is %.2f, %.2f' % (insertion_chromosome_avgperiodicity, insertion_chromosome_stdperiodicity),
-                            r'Quartiles transposon insertion frequency in gene is %.2f, %.2f, %.2f ' % (insertion_firstquartileperiodicity, insertion_medperiodicity, insertion_thirdquartileperiodicity),
-                            r'Quartiles transposon insertion frequency in chromosome is %.2f, %.2f, %.2f ' % (insertion_chromosome_firstquartileperiodicity, insertion_chromosome_medperiodicity, insertion_chromosome_thirdquartileperiodicity)
-                            ))
-    props = dict(boxstyle='round', facecolor='grey', alpha=0.8)
-    ax.text(0.05,0.9, textstr, transform=ax.transAxes, fontsize=text_size,
-        verticalalignment='top',horizontalalignment='left', bbox=props)
+#    if gene_name != None and gene_name != 'HOlocus':
+#        if insertion_list != []:
+#            textstr = '\n'.join((r'Reading orientation of gene: ' + gene_orien,
+#                                r'Transposon coverage = %.2f percent' % (coverage_percentage),
+#                                r'Mean transposon insertion frequency in gene is %.2f, %.2f ' % (insertion_avgperiodicity, insertion_stdperiodicity),
+#                                r'Mean transposon insertion frequency in chromosome is %.2f, %.2f' % (insertion_chromosome_avgperiodicity, insertion_chromosome_stdperiodicity),
+#                                r'Quartiles transposon insertion frequency in gene is %.2f, %.2f, %.2f ' % (insertion_firstquartileperiodicity, insertion_medperiodicity, insertion_thirdquartileperiodicity),
+#                                r'Quartiles transposon insertion frequency in chromosome is %.2f, %.2f, %.2f ' % (insertion_chromosome_firstquartileperiodicity, insertion_chromosome_medperiodicity, insertion_chromosome_thirdquartileperiodicity)
+#                                ))
+#        else:
+#            textstr = (r'Reading orientation of gene: ' + gene_orien)
+#    else:
+#        textstr = '\n'.join((r'Transposon coverage = %.2f percent' % (coverage_percentage),
+#                            r'Mean transposon insertion frequency in gene is %.2f, %.2f ' % (insertion_avgperiodicity, insertion_stdperiodicity),
+#                            r'Mean transposon insertion frequency in chromosome is %.2f, %.2f' % (insertion_chromosome_avgperiodicity, insertion_chromosome_stdperiodicity),
+#                            r'Quartiles transposon insertion frequency in gene is %.2f, %.2f, %.2f ' % (insertion_firstquartileperiodicity, insertion_medperiodicity, insertion_thirdquartileperiodicity),
+#                            r'Quartiles transposon insertion frequency in chromosome is %.2f, %.2f, %.2f ' % (insertion_chromosome_firstquartileperiodicity, insertion_chromosome_medperiodicity, insertion_chromosome_thirdquartileperiodicity)
+#                            ))
+#    props = dict(boxstyle='round', facecolor='grey', alpha=0.8)
+#    ax.text(0.05,0.9, textstr, transform=ax.transAxes, fontsize=text_size,
+#        verticalalignment='top',horizontalalignment='left', bbox=props)
 
+    leg_counter = 1
     for ins in insertion_list: #PLOT TICKS ON THE X AXIS TO INDICATE THE EXACT INSERTION LOCATIONS
-        ax.axvline(x=ins, ymax=0.05, linewidth=1, color='k')
+        if leg_counter == 1:
+            ax.axvline(x=ins, ymax=0.05, linewidth=1.5, color='k', label='Transposon insertion')
+        else:
+            ax.axvline(x=ins, ymax=0.05, linewidth=1.5, color='k')
+        leg_counter += 1
+    ax.legend(fontsize=text_size-2)
 
 
 
 # COMPARE DISTRIBUTION OF BASEPAIRS BETWEEN INSERTIONS FOR THE CHROMOSOME AND THE GENE USING VIOLINPLOT
-    plt.subplot(grid[0,2])
-    
-    if gene_name == None:
-        if region == ['IV',46271,48031]:
-            gene_name = 'HOlocus'
-        else:
-            gene_name = str(gene_chr) + str(gene_start) + '-' + str(gene_end)
-    
-    bp_between_tn_insertions_dict = {}
-    bp_between_tn_insertions_dict[gene_chr] = bp_between_tn_insertions
-    
-    df_chr = pd.DataFrame(bp_between_tn_insertions_chr_dict)
-    df = pd.DataFrame(bp_between_tn_insertions_dict)
-    if len(df) !=0:
-        df_concat = pd.concat([df,df_chr], axis=0, ignore_index=True)
-        names_list = ['gene']*len(bp_between_tn_insertions) + ['chromosome']*len(bp_between_tn_insertions_chr_dict.get(gene_chr))
-        df_concat['label'] = names_list
-        xlabel=gene_name+' | '+gene_chr
-        df_concat[xlabel] = ''
-        df_concat.columns = ['bp between tn','label',xlabel]
-
-        sb.set(style="whitegrid", palette="pastel", color_codes=True)
-        sb.violinplot(data=df_concat,x=xlabel, y='bp between tn', hue='label', inner='quartile', scale='width', gridsize=5000, split=True, cut=0, palette={"gene": "g", "chromosome": "r"})
-        plt.ylim(0,max_empty_region+10)
-    else:
-        sb.violinplot(data=df_chr, inner='quartile', orien='v', scale='width', gridsize=5000, cut=0)
+#    plt.subplot(grid[0,2])
+#    
+#    if gene_name == None:
+#        if region == ['IV',46271,48031]:
+#            gene_name = 'HOlocus'
+#        else:
+#            gene_name = str(gene_chr) + str(gene_start) + '-' + str(gene_end)
+#    
+#    bp_between_tn_insertions_dict = {}
+#    bp_between_tn_insertions_dict[gene_chr] = bp_between_tn_insertions
+#    
+#    df_chr = pd.DataFrame(bp_between_tn_insertions_chr_dict)
+#    df = pd.DataFrame(bp_between_tn_insertions_dict)
+#    if len(df) !=0:
+#        df_concat = pd.concat([df,df_chr], axis=0, ignore_index=True)
+#        names_list = ['gene']*len(bp_between_tn_insertions) + ['chromosome']*len(bp_between_tn_insertions_chr_dict.get(gene_chr))
+#        df_concat['label'] = names_list
+#        xlabel=gene_name+' | '+gene_chr
+#        df_concat[xlabel] = ''
+#        df_concat.columns = ['bp between tn','label',xlabel]
+#
+#        sb.set(style="whitegrid", palette="pastel", color_codes=True)
+#        sb.violinplot(data=df_concat,x=xlabel, y='bp between tn', hue='label', inner='quartile', scale='width', gridsize=5000, split=True, cut=0, palette={"gene": "g", "chromosome": "r"})
+#        plt.ylim(0,max_empty_region+10)
+#    else:
+#        sb.violinplot(data=df_chr, inner='quartile', orien='v', scale='width', gridsize=5000, cut=0)
 
     plt.show()
     if savefigure == True:
@@ -337,4 +353,4 @@ def gene_reads(gene_name=None,region=None,bed_file=None,savefigure=False):
 if __name__ == '__main__':
 #    gene_reads(region=['I',1,4000],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed")
 #    gene_reads(region=['IV',46271,48031],bed_file=r"X:\tnw\BN\LL\Shared\Gregory\Sequence_Alignment_TestData\Michel2017_WT1_SeqData\Cerevisiae_WT1_Michel2017_ProcessedByBenoit\E-MTAB-4885.WT1.bam.bed", savefigure=True)
-    gene_reads(gene_name='bem2',bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed", savefigure=False)
+    gene_reads(gene_name='bem2',bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt2_testfolder\align_out\ERR1533148_trimmed.sorted.bam.bed", savefigure=False)

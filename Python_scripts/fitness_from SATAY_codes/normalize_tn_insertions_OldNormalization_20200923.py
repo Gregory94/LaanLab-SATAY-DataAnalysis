@@ -27,11 +27,10 @@ from read_sgdfeatures import sgd_features
 
 
 #%% TEMP
-region = "IX"
-wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
-pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
-variable="reads"
-normalize=True
+#region = "IX"
+#wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
+#pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
+#variable="reads"
 #%%
 def dna_features(region, wig_file, pergene_insertions_file, variable="insertions", normalize=False):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
@@ -306,55 +305,55 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="insertions
 
 #%% NORMALIZE USING WINDOWS
 
-    if normalize == True: #remove outliers before normalization using: dna_df2.at[273, "Nreadsperbp"] = 0
-
-        # DETERMINE MEANS FOR THE NUMBER OF READS/BP IN THE NONCODING REGIONS WITHIN EACH WINDOW.
-        window_edge_list = np.linspace(0, len_chr, 10).tolist()#[82500, 243500, len_chr]
-
-
-        dna_df2["Nreadsperbp_Norm"] = list(dna_df2["Nreadsperbp"])
-        reads_list = []
-        window_start_index = 0
-        mean_per_window_list = []
-        for edge in window_edge_list[1:]:
-            for index, row in dna_df2.iterrows():
-                if row["Feature"] == "noncoding":
-                    if row["position"][0] >= window_start_index and row["position"][0] < edge:
-                        reads_list.append(row["Nreadsperbp_Norm"])
-                    elif row["position"][0] > edge:
-                        mean_per_window_list.append(np.mean(reads_list))
-                        reads_list = [] #reset list for next window
-                        reads_list.append(row["Nreadsperbp_Norm"]) #add current read
-                        window_start_index = edge
-                        break
-        mean_per_window_list.append(np.mean(reads_list)) #get mean for reads in last window
-
-        del (edge, index, row, reads_list, window_start_index)
-
-
-        # NORMALIZE ALL REGIONS WITHIN THE WINDOWS WITH THEIR RESPECTIVE VALUES STORED IN MEAN_PER_WINDOW_LIST.
-        window_start_index = 0
-        i = 0
-        for edge in window_edge_list[1:]:
-            for index, row in dna_df2.iterrows():
-                if row["position"][0] >= window_start_index and row["position"][0] < edge:
-                    dna_df2.at[index, "Nreadsperbp_Norm"] = row["Nreadsperbp_Norm"]/mean_per_window_list[i]
-                elif row["position"][0] > edge:
-                    window_start_index = edge
-                    i += 1
-                    break
-
-        del (window_edge_list, edge, window_start_index ,i, index, row, mean_per_window_list)
-
-
-        print("Before normalization: Mean reads/bp = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp"]), np.std(dna_df2["Nreadsperbp"])))
-        print("After normalization: Mean reads/bp  = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp_Norm"]), np.std(dna_df2["Nreadsperbp_Norm"])))
-
-
-        max_readspertn = dna_df2["Nreadsperbp_Norm"].max()
-        dna_df2["Nreadsperbp_Norm"] /= max_readspertn
-
-        del (max_readspertn)
+#    if normalize == True: #remove outliers before normalization using: dna_df2.at[273, "Nreadsperbp"] = 0
+#
+#        # DETERMINE MEANS FOR THE NUMBER OF READS/BP IN THE NONCODING REGIONS WITHIN EACH WINDOW.
+#        window_edge_list = np.linspace(0, len_chr, 10).tolist()#[82500, 243500, len_chr]
+#
+#
+#        dna_df2["Nreadsperbp_Norm"] = list(dna_df2["Nreadsperbp"])
+#        reads_list = []
+#        window_start_index = 0
+#        mean_per_window_list = []
+#        for edge in window_edge_list[1:]:
+#            for index, row in dna_df2.iterrows():
+#                if row["Feature"] == "noncoding":
+#                    if row["position"][0] >= window_start_index and row["position"][0] < edge:
+#                        reads_list.append(row["Nreadsperbp_Norm"])
+#                    elif row["position"][0] > edge:
+#                        mean_per_window_list.append(np.mean(reads_list))
+#                        reads_list = [] #reset list for next window
+#                        reads_list.append(row["Nreadsperbp_Norm"]) #add current read
+#                        window_start_index = edge
+#                        break
+#        mean_per_window_list.append(np.mean(reads_list)) #get mean for reads in last window
+#
+#        del (edge, index, row, reads_list, window_start_index)
+#
+#
+#        # NORMALIZE ALL REGIONS WITHIN THE WINDOWS WITH THEIR RESPECTIVE VALUES STORED IN MEAN_PER_WINDOW_LIST.
+#        window_start_index = 0
+#        i = 0
+#        for edge in window_edge_list[1:]:
+#            for index, row in dna_df2.iterrows():
+#                if row["position"][0] >= window_start_index and row["position"][0] < edge:
+#                    dna_df2.at[index, "Nreadsperbp_Norm"] = row["Nreadsperbp_Norm"]/mean_per_window_list[i]
+#                elif row["position"][0] > edge:
+#                    window_start_index = edge
+#                    i += 1
+#                    break
+#
+#        del (window_edge_list, edge, window_start_index ,i, index, row, mean_per_window_list)
+#
+#
+#        print("Before normalization: Mean reads/bp = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp"]), np.std(dna_df2["Nreadsperbp"])))
+#        print("After normalization: Mean reads/bp  = %.2f +/- %.2f" % (np.mean(dna_df2["Nreadsperbp_Norm"]), np.std(dna_df2["Nreadsperbp_Norm"])))
+#
+#
+#        max_readspertn = dna_df2["Nreadsperbp_Norm"].max()
+#        dna_df2["Nreadsperbp_Norm"] /= max_readspertn
+#
+#        del (max_readspertn)
 
 #%% CREATE BAR PLOT
     noncoding_color = "#003231"
@@ -402,8 +401,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="insertions
 #        ax.set_ylim(0, max(dna_df2['Ninsertionsperbp']) + 0.1*max(dna_df2['Ninsertionsperbp']))
         ax.set_ylabel("Transposons/bp per region", fontsize=textsize, color=textcolor)
     elif variable == "reads":
-        ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_Norm']), feature_width_list, color=barcolor_list)
-#        ax.set_ylim(0, max(dna_df2['Nreadsperbp_Norm']) + 0.1*max(dna_df2['Nreadsperbp_Norm']))
+        ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp']), feature_width_list, color=barcolor_list)
         ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
 
     if region_start != None and region_end != None and region_start < len_chr and region_end < len_chr:
@@ -519,8 +517,7 @@ if __name__ == '__main__':
     dna_df2 = dna_features(region = "IX",#["IX", 390000,439850],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-                 variable="reads",
-                 normalize=True)
+                 variable="reads")
 
 #    dna_df2 = dna_features(region = "IV",
 #                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig",
