@@ -34,9 +34,10 @@ from mapped_reads import total_mapped_reads
 #normalize=True
 #normalization_window_size = 10000
 #plotting=True
+#savefigure=False
 #verbose=True
 #%%
-def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, normalization_window_size=10000, plotting=True, verbose=True):
+def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, normalization_window_size=10000, plotting=True, savefigure=False, verbose=True):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
     Optional is to define with data is displayed, which can be either "insertions" or "reads".
     Output is a dataframe including major information about all genomic features and optionally a barplot indicating the number of transposons per genomic region.
@@ -394,7 +395,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
         dna_df2['Nreadsperbp_central80p_normalized'] = norm_reads_list
 
-        del (normalization_window_size, norm_reads_list, i, reads_loc_list, read_density_chromosome, N, window_edge_list, window_length, total_reads_in_genome, read_density_windows, window_start, window_end, index, row, read_density_windows_index, read_density)
+        del (norm_reads_list, i, reads_loc_list, read_density_chromosome, N, window_edge_list, window_length, total_reads_in_genome, read_density_windows, window_start, window_end, index, row, read_density_windows_index, read_density)
 
 ########## CREATE BAR PLOT
     if plotting == True:
@@ -506,10 +507,28 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             right=False,       # ticks along the top edge are off
             labelleft=False)   # labels along the bottom edge are off
 
+<<<<<<< HEAD
         del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width)
         
         
 ######### RETURN STATEMENT
+=======
+
+        if savefigure == True:
+            if normalize == True and variable == 'reads':
+                saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_Normalized_with_Windowsize_'+str(normalization_window_size))
+            elif normalize == False and variable == 'reads':
+                saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_NonNormalized')
+            else:
+                saving_name = os.path.join(file_dirname,'GenomicFeaturesInsertions_Barplot_Chrom'+chrom+'_NonNormalized')
+            plt.savefig(saving_name, orientation='landscape', dpi=200)
+
+
+        del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width, normalization_window_size)
+
+
+#%% RETURN STATEMENT
+>>>>>>> d030584131b9e9e32dfdd7943f1357e76ff57194
     return(dna_df2)
 
 
@@ -550,6 +569,7 @@ if __name__ == '__main__':
                  variable="reads",
                  normalization_window_size=10000,
                  plotting=True,
+                 savefigure=True,
                  verbose=True)
 
 
