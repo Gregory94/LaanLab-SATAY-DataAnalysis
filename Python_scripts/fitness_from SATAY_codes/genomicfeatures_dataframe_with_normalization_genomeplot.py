@@ -5,6 +5,7 @@ Created on Fri Oct  2 13:35:59 2020
 @author: gregoryvanbeek
 """
 import os, sys
+import numpy as np
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
 
@@ -37,9 +38,18 @@ feature_position_list = dna_df2['position'].tolist()
 chr_length_dict = chromosome_position()[0]
 chr_length = chr_length_dict.get(region.upper())
 
+bins = np.linspace(0, chr_length, round(chr_length/500), dtype=int).tolist()
 
-
-
-
+b_start = bins[0]
+binned_reads_list = np.ones(len(bins))
+i = 0
+for b_end in bins[1:]:
+    for ind, pos in enumerate(feature_position_list):
+        if b_start < pos[0] < b_end:
+            binned_reads_list[i] += Nreadsperbp_list[ind]
+        else:
+            b_start = b_end
+            break
+        i += 1
 
 
