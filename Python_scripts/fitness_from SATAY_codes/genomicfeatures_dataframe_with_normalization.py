@@ -507,8 +507,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             labelleft=False)   # labels along the bottom edge are off
 
         del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width)
-
-
+        
+        
 ######### RETURN STATEMENT
     return(dna_df2)
 
@@ -540,6 +540,8 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 
 #%%
+chromosomes=['I',"II","III",'IV','V','IV','V','VI','VII','VIII','IX','X',
+             'XI','XII','XIII','XIV','XV','XVI']
 if __name__ == '__main__':
     dna_df2 = dna_features(region = 'iv', #["V", 0, 14790],
                  wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam.wig",
@@ -552,3 +554,50 @@ if __name__ == '__main__':
 
 
 
+#%%
+import time 
+
+t = time.process_time()
+chromosomes=['I',"II","III",'IV','V','VI','VII','VIII','IX','X',
+             'XI','XII','XIII','XIV','XV','XVI']
+
+wig_file=r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam.wig"
+pergene_insertions_file=r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
+
+normalize=[True]
+
+dna_df2=[]
+if __name__ == '__main__':
+    for ch in chromosomes:
+        for norm in normalize:
+            dna_df2.append(dna_features(region = ch, #["V", 0, 14790],
+                     wig_file = wig_file,
+                     pergene_insertions_file = pergene_insertions_file,
+                     normalize=norm,
+                     variable="reads",
+                     normalization_window_size=10000,
+                     plotting=True,
+                     verbose=True))
+            
+            
+normalize=[False]
+
+dna_df2_false=[]
+if __name__ == '__main__':
+    for ch in chromosomes:
+        for norm in normalize:
+            dna_df2_false.append(dna_features(region = ch, #["V", 0, 14790],
+                     wig_file = wig_file,
+                     pergene_insertions_file = pergene_insertions_file,
+                     normalize=norm,
+                     variable="reads",
+                     normalization_window_size=10000,
+                     plotting=True,
+                     verbose=True))
+            
+elapsed_time = time.process_time() - t
+
+print('The elapsed time was',elapsed_time,'seconds')
+#%%
+reads_normalize_pd=pd.concat(dna_df2,keys=chromosomes)      
+reads_non_normalize_pd=pd.concat(dna_df2_false,keys=chromosomes)   
