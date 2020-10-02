@@ -507,13 +507,6 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             right=False,       # ticks along the top edge are off
             labelleft=False)   # labels along the bottom edge are off
 
-<<<<<<< HEAD
-        del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width)
-        
-        
-######### RETURN STATEMENT
-=======
-
         if savefigure == True:
             if normalize == True and variable == 'reads':
                 saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_Normalized_with_Windowsize_'+str(normalization_window_size))
@@ -521,14 +514,12 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
                 saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_NonNormalized')
             else:
                 saving_name = os.path.join(file_dirname,'GenomicFeaturesInsertions_Barplot_Chrom'+chrom+'_NonNormalized')
-            plt.savefig(saving_name, orientation='landscape', dpi=200)
-
-
-        del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width, normalization_window_size)
-
-
-#%% RETURN STATEMENT
->>>>>>> d030584131b9e9e32dfdd7943f1357e76ff57194
+            plt.savefig(saving_name, orientation='landscape', dpi=300)
+            
+        del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width)
+        
+        
+######### RETURN STATEMENT
     return(dna_df2)
 
 
@@ -617,7 +608,7 @@ if __name__ == '__main__':
             
 elapsed_time = time.process_time() - t
 
-print('The elapsed time was',elapsed_time,'seconds')
+print('The elapsed time was',elapsed_time/60,'minutes')
 #%%
 reads_normalize_pd=pd.concat(dna_df2,keys=chromosomes)      
 reads_non_normalize_pd=pd.concat(dna_df2_false,keys=chromosomes)   
