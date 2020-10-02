@@ -4,9 +4,8 @@ Created on Wed Aug 26 12:02:44 2020
 
 @author: gregoryvanbeek
 
-This scripts takes a user defined genomic region (i.e. chromosome number, region or gene) and determines the number of transposon insertions in the genomic features (i.e. genes, nc-DNA etc.).
-This can be used to determine the number of transposon insertions outside the genes to use this for normalization of the number of transposons in the genes.
-When adding features, follow the #ADD comments in this file.
+This scripts takes a user defined genomic region (i.e. chromosome number, region or gene) and creates a dataframe including information about all genomic features in the chromosome (i.e. genes, nc-DNA etc.).
+This can be used to determine the number of reads outside the genes to use this for normalization of the number of reads in the genes.
 """
 
 #%%
@@ -33,16 +32,35 @@ from mapped_reads import total_mapped_reads
 #pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
 #variable="reads"
 #normalize=True
+#normalization_window_size = 50000
 #plotting=True
 #verbose=True
 #%%
 def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, normalization_window_size=10000, plotting=True, verbose=True):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
     Optional is to define with data is displayed, which can be either "insertions" or "reads".
-    Output is a barplot indicating the number of transposons per genomic region.
+    Output is a dataframe including major information about all genomic features and optionally a barplot indicating the number of transposons per genomic region.
     A genomic region is here defined as a gene (separated as annotated essential and not essential), telomere, centromere, ars etc.
     This can be used for identifying neutral regions (i.e. genomic regions that, if inhibited, do not influence the fitness of the cells).
     This function can be used for normalizing the transposon insertions per gene using the neutral regions.
+    
+    Input:
+        - Region: e.g. chromosome number (in roman numeral between I and XVI or a list like ['V', 0, 14790] which creates a barplot between basepair 0 and 14790)
+        - wig_file: wiggle file from the output of transposonmapping.py that is used in the processing workflow.
+        - pergene_insertions_file: text file from the output of transposonsmapping.py
+        - variable: either 'insertions' or 'reads', which determines what is being plotted.
+        - normalize: either True or False. Normalization only works for when variable is 'reads'. The normalized reads are plotted and adds a column to the dataframe.
+        - normalization_window_size: Integer. Normalization relies on windows that corrects for inter chromosomal differences. This determine the size of those windows in terms of basepairs (default=10000)
+        - plotting: Either True or False. Determines whether the barplot has to be created.
+        - Verbose: Either True of False. Determines how much textual feedback is given. When set to False, only warnings will be shown.
+    Output:
+        - dna_df2: Dataframe containing information about the selected chromosome.
+    
+    Required files (see next section):
+        - essentials_file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Cerevisiae_AllEssentialGenes_List.txt
+        - gene_information_file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Yeast_Protein_Names.txt
+        - gff-file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Saccharomyces_cerevisiae.R64-1-1.99.gff3
+        - sgd_features_file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/SGD_features.tab
     '''
 #%% FILES
 #for region in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XI', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
