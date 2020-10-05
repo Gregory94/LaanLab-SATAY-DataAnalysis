@@ -8,30 +8,37 @@ from IPython import get_ipython
 import pandas as pd
 import numpy as np
 import seaborn as sns
-import scipy.optimize as opt
-from sklearn import preprocessing
 from collections import defaultdict
 get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 
 
 # %% Importing information per gene 
-gene_info=pd.read_excel(r'chromosomal-info-per-gene.xlsx')
+gene_info=pd.read_excel(r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\Python_scripts\corrrelation-based-networks\chromosomal-info-per-gene.xlsx')
 
-# %% Importing all annoatetd interactions from SGD
+# %% Importing all annotated interactions from SGD
 data_all_interactors=pd.read_excel(r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\Calculations\data_sgd\interaction-filtered-data.xlsx',header=0)
 
 # %% Reading the  reads and insertions from WT and the mutant 
 import os
-script_dir = os.path.dirname('__file__') #<-- absolute dir the script is in
-rel_path_data_wt="WT_trimmed-sorted-bam.txt"
-rel_path_data_mutant="dDpl1Kan-sorted-bam.txt"
 
+script_dir = os.path.dirname(os.path.abspath('__file__')) #<-- absolute dir the script is in
+rel_path_data_wt="WT-normalize-reads-all-chromosome.xlsx"
+rel_path_data_mutant="dpl1-normalize-reads-all-chromosome.xlsx"
+#%% Reading the datafiles 
 
-abs_path_data_wt = os.path.join(script_dir, rel_path_data_wt)
-abs_path_data_mutant = os.path.join(script_dir, rel_path_data_mutant)
-data_wt = pd.read_csv(abs_path_data_wt, sep="\t", header=0)
-data_mutant = pd.read_csv(abs_path_data_mutant, sep="\t", header=0)
+abs_path_data_wt = os.path.join(script_dir,'Python_scripts','fitness_from SATAY_codes','output_data_files',rel_path_data_wt)
+abs_path_data_mutant = os.path.join(script_dir,'Python_scripts','fitness_from SATAY_codes','output_data_files',rel_path_data_mutant)
+# data_wt = pd.read_csv(abs_path_data_wt, sep="\t", header=0)
+# data_mutant = pd.read_csv(abs_path_data_mutant, sep="\t", header=0)
+data_wt=pd.read_excel(abs_path_data_wt,index_col='Unnamed: 1')
+data_wt.fillna('',inplace=True)
+data_wt.rename(columns={'Unnamed: 0':'chrom'},inplace=True)
+
+data_mutant=pd.read_excel(abs_path_data_mutant,index_col='Unnamed: 1')
+data_mutant.fillna('',inplace=True)
+data_mutant.rename(columns={'Unnamed: 0':'chrom'},inplace=True)
+
 
 
 # %% Functions 
@@ -39,26 +46,26 @@ def reads2fitness (reads_data,type):
     data_reads_normalized=reads_data.copy()
     # Normalization to HO locus:
     if type == 'HO':
-        data_reads_normalized['fitness-'+ type]=reads_data['Number of reads per gene']/(reads_data[reads_data['Gene name']=='HO']['Number of reads per gene'].tolist()[0])
+        data_reads_normalized['fitness-'+ type]=reads_data['Nreadsperbp']/(reads_data[reads_data['Standard_name']=='HO']['Nreadsperbp'].tolist()[0])
     
  
     return data_reads_normalized
 
 def fitness2score(gene_ref,gene_to_know, feature,data_wt,data_mutant_ref):
 
-    info_ref=data_wt[data_wt['Gene name']==gene_ref[0]][feature].tolist()[0]
+    info_ref=data_wt[data_wt['Standard_name']==gene_ref[0]][feature].tolist()[0]
 
 
     interactions=defaultdict(dict)
     for i in np.arange(0,len(gene_to_know)):
-        if len(data_wt[data_wt['Gene name']==gene_to_know[i]][feature].tolist())==0:
+        if len(data_wt[data_wt['Standard_name']==gene_to_know[i]][feature].tolist())==0:
             info_genex=None
         else:
-            info_genex=data_wt[data_wt['Gene name']==gene_to_know[i]][feature].tolist()[0]
-        if len(data_mutant_ref[data_mutant_ref['Gene name']==gene_to_know[i]][feature].tolist())==0:
+            info_genex=data_wt[data_wt['Standard_name']==gene_to_know[i]][feature].tolist()[0]
+        if len(data_mutant_ref[data_mutant_ref['Standard_name']==gene_to_know[i]][feature].tolist())==0:
              info_genex_doublemutant=None
         else:
-            info_genex_doublemutant=data_mutant_ref[data_mutant_ref['Gene name']==gene_to_know[i]][feature].tolist()[0]
+            info_genex_doublemutant=data_mutant_ref[data_mutant_ref['Standard_name']==gene_to_know[i]][feature].tolist()[0]
 
         interactions[i]['background']=gene_ref
         interactions[i]['array-name']=gene_to_know[i]
@@ -97,12 +104,12 @@ axes[0].set_title('WT')
 data=data_mutant_normalized['fitness-HO']
 data_iqr = data[ (data >  np.percentile(data, 25)) & (data <  np.percentile(data, 75)) ]
 
-axes[0].set_ylim([0,2])
+axes[0].set_ylim([0,5])
 sns.boxplot(y='fitness-HO',data=data_mutant_normalized,ax=axes[1],fliersize=0.5,color='white')
 sns.stripplot(y="fitness-HO", color='black',size=2, alpha=0.1, data=data_mutant_normalized,ax=axes[1])
 sns.stripplot(y=data_iqr, color='green', size=2, alpha=0.2,ax=axes[1])
 # axes[1].text(0.2, 0.8, str(np.round(len(data_iqr)/len(data),decimals=1)*100)+'% of the data' , horizontalalignment='center')
-axes[1].set_ylim([0,2])
+axes[1].set_ylim([0,5])
 axes[1].set_title('mutant')
 
 
@@ -117,22 +124,24 @@ interactions_pd.reset_index()
 interactions_pd.dropna(inplace=True)
 interactions_pd=interactions_pd.set_index(np.arange(0,len(interactions_pd)))
 
-
+#%%
+dpl1_fitness=interactions_pd[interactions_pd['array-name']=='DPL1']['fitness-query'].tolist()[0]
 # %% Fitness plot 
+max=5
 fig, axes=plt.subplots(1,1)
 plt.scatter(x=interactions_pd['fitness-array'],y=interactions_pd['fitness-doublemutant'],alpha=0.1)
-plt.xlim([-0.05,1])
+plt.xlim([-0.05,max])
 plt.xlabel('Single mutant fitness-b')
 plt.ylabel('double mutant fitness-ab')
-plt.ylim([-0.05,1])
-x = np.linspace(0, 1)
-plt.plot(x, 0.19*x,linestyle='solid',color='black');
-x_masking = np.linspace(0, 0.19)
+plt.ylim([-0.05,max])
+x = np.linspace(0, max)
+plt.plot(x, dpl1_fitness*x,linestyle='solid',color='black');
+x_masking = np.linspace(0, dpl1_fitness)
 plt.plot(x, x,linestyle='solid',color='black');
-plt.hlines(y=0.19,xmin=0.19,xmax=1)
-plt.fill_between(x=x_masking,y1=0.19*x_masking,y2=x_masking,color='blue',alpha=0.2)
-plt.fill_between(x=np.linspace(0.19,1),y2=0.19,y1=0.19*np.linspace(0.19,1),color='blue',alpha=0.2)
-plt.title('Fitness related to HO locus, dpl1 fitness=0.19')
+plt.hlines(y=dpl1_fitness,xmin=dpl1_fitness,xmax=max)
+plt.fill_between(x=x_masking,y1=dpl1_fitness*x_masking,y2=x_masking,color='blue',alpha=0.2)
+plt.fill_between(x=np.linspace(dpl1_fitness,max),y2=dpl1_fitness,y1=dpl1_fitness*np.linspace(dpl1_fitness,max),color='blue',alpha=0.2)
+plt.title('Fitness related to HO locus, dpl1 fitness='+ str(dpl1_fitness))
 #plt.savefig('dpl1_data_using_reads_normalized_with_HO_as_fitness.png',format='png',dpi=300,transparent=True)
 
 
@@ -149,7 +158,7 @@ values2corr=values2corr.set_index(np.arange(0,len(values2corr)))
 # %% Row- wise correlation with data from dpl1 
 # - try to do a loop to do different corrwith based on different genes and then average and see the std of the different correlations 
 
-corr_with_a_row=values2corr.corrwith(values2corr.iloc[108,:],axis=1,method='pearson') # random row
+corr_with_a_row=values2corr.corrwith(values2corr.iloc[997,:],axis=1,method='pearson') # random row
 #corr_with_a_row=values2corr.corrwith(values2corr.iloc[interactions_pd[interactions_pd['array-name']=='AIM22'].index,:],axis=1,method='pearson')
 corr_with_a_row_pd=pd.DataFrame(corr_with_a_row,columns=['corr-values'])
 corr_with_a_row_pd.sort_values(by='corr-values',inplace=True)

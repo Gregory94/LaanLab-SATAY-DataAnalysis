@@ -592,13 +592,13 @@ if __name__ == '__main__':
 
 #%%
 import time 
+################## mutant ################################
+wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"
+pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"
 
-#wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"
-#pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"
-
-
-wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam.wig"
-pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
+######### WT #################################S
+#wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam.wig"
+#pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
 
 
 t = time.process_time()
@@ -619,7 +619,7 @@ if __name__ == '__main__':
                      variable="reads",
                      normalization_window_size=10000,
                      plotting=True,
-                     savefigure=True,
+                     savefigure=False,
                      verbose=True))
             
             
@@ -635,7 +635,7 @@ if __name__ == '__main__':
                      normalize=norm,
                      variable="reads",
                      normalization_window_size=10000,
-                     savefigure=True,
+                     savefigure=False,
                      plotting=True,
                      verbose=True))
             
