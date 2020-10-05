@@ -356,7 +356,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
 #%% NORMALIZE USING WINDOWS
 
-    if normalize == True and variable == "reads": #remove outliers before normalization using: dna_df2.at[273, "Nreadsperbp"] = 0
+    if normalize == True and variable == "reads":
 
         # DETERMINE MEANS FOR THE NUMBER OF READS/BP IN THE NONCODING REGIONS WITHIN EACH WINDOW.
         N = round(len_chr/normalization_window_size)
@@ -378,24 +378,29 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             window_start = window_end
             i += 1
 
+
         norm_reads_list = []
+        norm_reads_central80p_list = []
         for index, row in dna_df2.iterrows():
             #normalization equation:
                 #normalization for gene = raw read count in middle 80% of feature * (1/gene length) * (10^6/total mapped reads in genome) * (read density in chromosome/read density in window)
                 #normalization for other features = raw read count in entire feature * (1/gene length) * (10^6/total mapped reads in genome) * (read density in chromosome/read density in window)
             #row[8] contains the total number of reads in the central 80% of the gene (or in the entire feature if this is not a gene)
+            #row[7] contains the total number of reads in entire genes and features.
             #row[4] contains the number of basepairs in the current feature
             #row[3] contains the position of the feature
             #row[1] contains feature type
             read_density_windows_index = int(row[3][0]/window_length) #determine which window the current feature belongs to.
             if not row[1] == None and row[1].startswith('Gene'):
-                norm_reads_list.append(row[8] * (1/row[4]) * ((10**6)/(total_reads_in_genome)*0.8) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
+                norm_reads_central80p_list.append(row[8] * (1/row[4]) * ((10**6)/(total_reads_in_genome)*0.8) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
             else:
-                norm_reads_list.append(row[8] * (1/row[4]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
+                norm_reads_central80p_list.append(row[8] * (1/row[4]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
+            norm_reads_list.append(row[7] * (1/row[4]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
 
-        dna_df2['Nreadsperbp_central80p_normalized'] = norm_reads_list
+        dna_df2['Nreadsperbp_normalized'] = norm_reads_list
+        dna_df2['Nreadsperbp_central80p_normalized'] = norm_reads_central80p_list
 
-        del (norm_reads_list, i, reads_loc_list, read_density_chromosome, N, window_edge_list, window_length, total_reads_in_genome, read_density_windows, window_start, window_end, index, row, read_density_windows_index, read_density)
+        del (norm_reads_central80p_list, i, reads_loc_list, read_density_chromosome, N, window_edge_list, window_length, total_reads_in_genome, read_density_windows, window_start, window_end, index, row, read_density_windows_index, read_density)
 
 #%% CREATE BAR PLOT
     if plotting == True:
@@ -404,7 +409,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         nonessential_color = "#F20064"
         codingdna_color = '#00918f'
         textcolor = "#000000"
-        textsize = 14
+        textsize = 20
 
 
         feature_middle_pos_list = []
@@ -446,11 +451,13 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             if normalize == False:
                 ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp']), feature_width_list, color=barcolor_list)
                 ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
-#                ax.set_ylim(0.0,20.0)
+#                ax.set_ylim(0.0,10.0)
             elif normalize == True:
                 ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_central80p_normalized']), feature_width_list, color=barcolor_list)
+#                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_normalized']), feature_width_list, color=barcolor_list)
+#                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_normalized']), feature_width_list, color=barcolor_list)
                 ax.set_ylabel("Normalized reads per bp per region", fontsize=textsize, color=textcolor)
-#                ax.set_ylim(0.0, 1.0)
+#                ax.set_ylim(0.0, 150.0)
 
         if roi_start != None and roi_end != None and roi_start < len_chr and roi_end < len_chr:
             ax.set_xlim(roi_start, roi_end)
@@ -553,7 +560,7 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features(region = 'iv', #["V", 0, 14790],
+    dna_df2 = dna_features(region = 'XV', #["V", 0, 14790],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
                  normalize=True,
