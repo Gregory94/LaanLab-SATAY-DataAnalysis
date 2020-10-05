@@ -326,19 +326,29 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     feature_name_list = []
     feature_type_list = []
     feature_alias_list = []
+    feature_standardname_list = []
     for feature_name in feature_NameAndType_list:
         feature_name_list.append(feature_name[0])
         feature_type_list.append(feature_name[1])
         if feature_name[1] != None and feature_name[1].startswith('Gene') and feature_name[0] in gene_alias_dict:
             if gene_alias_dict.get(feature_name[0])[0] == feature_name[0]:
-                feature_alias_list.append(feature_name[0])
+                feature_standardname_list.append(feature_name[0])
+                feature_alias_list.append('')
             else:
-                feature_alias_list.append(gene_alias_dict.get(feature_name[0]))
+                if len(gene_alias_dict.get(feature_name[0])) > 1:
+                    feature_standardname_list.append(gene_alias_dict.get(feature_name[0])[0])
+                    feature_alias_list.append(gene_alias_dict.get(feature_name[0])[1:])
+                else:
+                    feature_standardname_list.append(gene_alias_dict.get(feature_name[0])[0])
+                    feature_alias_list.append('')
         else:
-            feature_alias_list.append(feature_name[0])
+            feature_standardname_list.append(feature_name[0])
+            feature_alias_list.append('')
+
 
     all_features = {'Feature_name': feature_name_list,
-                    'Feature_alias': feature_alias_list,
+                    'Standard_name': feature_standardname_list,
+                    'Feature_alias':feature_alias_list,
                     'Feature_type': feature_type_list,
                     'Essentiality': essentiality_list,
                     'position': f_pos_list,
@@ -374,15 +384,15 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         total_reads_in_genome = total_mapped_reads(wig_file)
 
 
-        read_density_chromosome = sum([nc[13] for nc in dna_df2.itertuples() if nc[3] == None])
+        read_density_chromosome = sum([nc[14] for nc in dna_df2.itertuples() if nc[4] == None])
         read_density_windows = np.ones(len(window_edge_list)-1)
         window_start = 0
         i = 0
         for window_end in window_edge_list[1:]:
-            read_density = sum([nc[13] for nc in dna_df2.itertuples() if window_start <= nc[5][0] < window_end and nc[3] == None])
+            read_density = sum([nc[14] for nc in dna_df2.itertuples() if window_start <= nc[6][0] < window_end and nc[4] == None])
             if not read_density == 0:
                 read_density_windows[i] = read_density
-#            read_density_windows.append(sum([nc[12] for nc in dna_df2.itertuples() if window_start <= nc[4][0] < window_end and nc[2] == None]))
+#            read_density_windows.append(sum([nc[14] for nc in dna_df2.itertuples() if window_start <= nc[6][0] < window_end and nc[4] == None]))
             window_start = window_end
             i += 1
 
@@ -398,12 +408,12 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             #row[4] contains the number of basepairs in the current feature
             #row[3] contains the position of the feature
             #row[1] contains feature type
-            read_density_windows_index = int(row[4][0]/window_length) #determine which window the current feature belongs to.
-            if not row[2] == None and row[2].startswith('Gene'):
-                norm_reads_central80p_list.append(row[9] * (1/row[5]) * ((10**6)/(total_reads_in_genome)*0.8) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
+            read_density_windows_index = int(row[5][0]/window_length) #determine which window the current feature belongs to.
+            if not row[3] == None and row[3].startswith('Gene'):
+                norm_reads_central80p_list.append(row[10] * (1/row[6]) * ((10**6)/(total_reads_in_genome)*0.8) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
             else:
-                norm_reads_central80p_list.append(row[9] * (1/row[5]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
-            norm_reads_list.append(row[8] * (1/row[5]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
+                norm_reads_central80p_list.append(row[10] * (1/row[6]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
+            norm_reads_list.append(row[9] * (1/row[6]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
 
         dna_df2['Nreadsperbp_normalized'] = norm_reads_list
         dna_df2['Nreadsperbp_central80p_normalized'] = norm_reads_central80p_list
@@ -494,11 +504,11 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         l = 0
         counter = 0
         for width in feature_width_list:
-            if dna_df2.loc[counter][3] == True:
+            if dna_df2.loc[counter][4] == True:
                 axc.axvspan(l,l+width,facecolor=essential_color,alpha=0.3)
-            elif dna_df2.loc[counter][3] == False and not dna_df2.loc[counter][0] == 'noncoding':
+            elif dna_df2.loc[counter][4] == False and not dna_df2.loc[counter][0] == 'noncoding':
                 axc.axvspan(l,l+width,facecolor=nonessential_color,alpha=0.3)
-            elif dna_df2.loc[counter][3] == None and not dna_df2.loc[counter][0] == 'noncoding':
+            elif dna_df2.loc[counter][4] == None and not dna_df2.loc[counter][0] == 'noncoding':
                 axc.axvspan(l,l+width,facecolor=codingdna_color,alpha=0.5)
             l += width
             counter += 1
@@ -568,7 +578,7 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features(region = 'xiii', #["V", 0, 14790],
+    dna_df2 = dna_features(region = 'xiv', #["V", 0, 14790],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
                  normalize=True,
