@@ -588,6 +588,7 @@ if __name__ == '__main__':
                      variable="reads",
                      normalization_window_size=10000,
                      plotting=True,
+                     savefigure=True,
                      verbose=True))
             
             
@@ -603,6 +604,7 @@ if __name__ == '__main__':
                      normalize=norm,
                      variable="reads",
                      normalization_window_size=10000,
+                     savefigure=True,
                      plotting=True,
                      verbose=True))
             
