@@ -524,11 +524,11 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
         if savefigure == True:
             if normalize == True and variable == 'reads':
-                saving_name = os.path.join(file_dirname,'dpl1-GenomicFeaturesReads_Barplot_Chrom'+chrom+'_Normalized_with_Windowsize_'+str(normalization_window_size))
+                saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_Normalized_with_Windowsize_'+str(normalization_window_size))
             elif normalize == False and variable == 'reads':
-                saving_name = os.path.join(file_dirname,'dpl1-GenomicFeaturesReads_Barplot_Chrom'+chrom+'_NonNormalized')
+                saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_NonNormalized')
             else:
-                saving_name = os.path.join(file_dirname,'dpl1-GenomicFeaturesInsertions_Barplot_Chrom'+chrom+'_NonNormalized')
+                saving_name = os.path.join(file_dirname,'GenomicFeaturesInsertions_Barplot_Chrom'+chrom+'_NonNormalized')
             plt.savefig(saving_name, orientation='landscape', dpi=300)
             
         del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width)
@@ -583,8 +583,13 @@ if __name__ == '__main__':
 #%%
 import time 
 
-wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"
-pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"
+#wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"
+#pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"
+
+
+wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam.wig"
+pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
+
 
 t = time.process_time()
 chromosomes=['I',"II","III",'IV','V','VI','VII','VIII','IX','X',
