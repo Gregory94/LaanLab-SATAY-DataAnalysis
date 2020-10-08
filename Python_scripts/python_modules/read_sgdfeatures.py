@@ -41,11 +41,24 @@ def sgd_features(filepath=None):
     feature_orf_dict = {}
     feature_ars_dict = {}
     feature_telomere_dict = {}
+    feature_ltr_dict = {}
     feature_centromere_dict = {}
     feature_Xelement_dict = {}
+    feature_intron_dict = {}
     feature_ncrna_dict = {}
+    feature_ncexon_dict = {}
+    feature_trna_dict = {}
+    feature_snorna_dict = {}
+    feature_teg_dict = {}
+    feature_5p_utrintron_dict = {}
+    feature_mas_dict = {}
+    feature_snrna_dict = {}
+    feature_rrna_dict = {}
     feature_ets_dict = {}
     feature_its_dict = {}
+    feature_oor_dict = {}
+    feature_telrna_dict = {}
+    
     for line in lines:
         l = line.strip('\n').split('\t')
         if not l[1] in feature_list:
@@ -59,22 +72,62 @@ def sgd_features(filepath=None):
                 feature_ars_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
             elif l[1] == 'telomere':
                 feature_telomere_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'long_terminal_repeat':
+                feature_ltr_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
             elif l[1] == 'centromere':
                 feature_centromere_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
             elif l[1] == 'X_element':
                 feature_Xelement_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'intron':
+                feature_intron_dict[l[6]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
             elif l[1] == 'ncRNA_gene':
                 feature_ncrna_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'noncoding_exon':
+                feature_ncexon_dict[l[6]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'tRNA_gene':
+                feature_trna_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'snoRNA_gene':
+                feature_snorna_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'transposable_element_gene':
+                feature_teg_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'five_prime_UTR_intron':
+                feature_5p_utrintron_dict[l[6]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'matrix_attachment_site':
+                feature_mas_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'snRNA_gene':
+                feature_snrna_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'rRNA_gene':
+                feature_rrna_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
             elif l[1] == 'external_transcribed_spacer_region':
-                feature_ets_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+                feature_ets_dict[l[6]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
             elif l[1] == 'internal_transcribed_spacer_region':
-                feature_its_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+                feature_its_dict[l[6]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'origin_of_replication':
+                feature_oor_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+            elif l[1] == 'telomerase_RNA_gene':
+                feature_telrna_dict[l[3]] = [l[1], l[2], l[4], l[5], l[6], chromosome, l[9],l[10]]
+
 
     del (lines, f, arabic_to_roman_dict, line, l, chromosome)
 
-    return(feature_orf_dict, feature_ars_dict, feature_telomere_dict,
-           feature_centromere_dict, feature_Xelement_dict, feature_ncrna_dict,
-           feature_ets_dict, feature_its_dict)
+
+    genomicregions_list = ['ORF', 'ARS', 'Telomere', 'long_terminal_repeat',
+                           'Centromere', 'X_element', 'Intron', 'ncRNA_gene',
+                           'Noncoding_exon', 'tRNA_gene', 'snoRNA_gene',
+                           'transposable_element_gene', 'five_prime_UTR_intron',
+                           'matrix_attachment_site', 'snRNA_gene', 'rRNA_gene',
+                           'external_transcribed_spacer_region',
+                           'internal_transcribed_spacer_region',
+                           'origin_of_replication', 'telomerase_RNA_gene']
+
+
+    return(genomicregions_list, feature_orf_dict, feature_ars_dict, feature_telomere_dict,
+           feature_ltr_dict, feature_centromere_dict, feature_Xelement_dict, feature_intron_dict,
+           feature_ncrna_dict, feature_ncexon_dict, feature_trna_dict,
+           feature_snorna_dict, feature_teg_dict, feature_5p_utrintron_dict,
+           feature_mas_dict, feature_snrna_dict, feature_rrna_dict,
+           feature_ets_dict, feature_its_dict, feature_oor_dict,
+           feature_telrna_dict)
 
 #%%
 if __name__ == '_main__':

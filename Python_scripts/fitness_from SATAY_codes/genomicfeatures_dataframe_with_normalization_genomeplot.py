@@ -22,7 +22,7 @@ wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C
 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
 variable="reads"
 normalize=True
-normalization_window_size = 20000
+normalization_window_size = 10000
 plotting=False
 verbose=False
 
@@ -36,7 +36,7 @@ Nreadsperbp_normalized_list = []
 chr_length_dict = chromosome_position()[0]
 chr_length = 0
 
-chrom_list = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XI', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']
+chrom_list = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']
 
 for region in chrom_list:
     dna_df2 = dna_features(region, wig_file, pergene_insertions_file, variable, normalize, normalization_window_size, plotting, verbose)
@@ -48,7 +48,7 @@ for region in chrom_list:
     chr_length += chr_length_dict.get(region.upper())
 
 #%% BINNING OF THE READS
-N_bins = 30000
+N_bins = 10000
 bins = np.linspace(0, chr_length, round(chr_length/N_bins), dtype=int).tolist()
 
 b_start = bins[0]
@@ -70,6 +70,7 @@ for b_end in bins[1:]:
 
 l_genome = 0
 chr_summedlength_dict = {}
+#!!! THE ORDER IS WRONG
 for chrom, length in chr_length_dict.items():
     chr_summedlength_dict[chrom] = l_genome
     l_genome += length
@@ -89,14 +90,14 @@ ax1 = plt.subplot(grid[0,0])
 ax1.bar(bins, binned_reads_list, width=N_bins, color="#333333")
 ax1.grid(False)
 ax1.set_xlim(0,l_genome)
-ax1.set_ylim(0,300)
+#ax1.set_ylim(0,300)
 ax1.set_ylabel("Reads not normalized [Absolute counts]")
 
 ax2 = plt.subplot(grid[1,0])
 ax2.bar(bins, binned_norm_reads_list, width=N_bins, color="#333333")
 ax2.grid(False)
 ax2.set_xlim(0,l_genome)
-ax2.set_ylim(0,500)
+#ax2.set_ylim(0,500)
 ax2.set_ylabel("Reads normalized [A.U.]")
 
 for chrom in chr_summedlength_dict:
