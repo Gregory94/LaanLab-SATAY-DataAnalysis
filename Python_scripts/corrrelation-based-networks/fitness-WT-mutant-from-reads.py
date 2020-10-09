@@ -42,11 +42,30 @@ data_mutant.rename(columns={'Unnamed: 0':'chrom'},inplace=True)
 
 
 # %% Functions 
-def reads2fitness (reads_data,type):
+def reads2fitness (reads_data,type,feature):
+    """
+    
+
+    Parameters
+    ----------
+    reads_data : dataframe 
+        where the data is 
+    type : string
+        Name of the gene to normalize with , e.g . 'HO'
+    feature : string
+        Name of the column to normalize with
+        examples: 'Nreadsperbp_central80p_normalized', 'Nreadsperbp_normalized'
+
+    Returns
+    -------
+    data_reads_normalized : dataframe
+        same dataframe as the input with an extra column with the fitness values 
+
+    """
     data_reads_normalized=reads_data.copy()
     # Normalization to HO locus:
     if type == 'HO':
-        data_reads_normalized['fitness-'+ type]=reads_data['Nreadsperbp']/(reads_data[reads_data['Standard_name']=='HO']['Nreadsperbp'].tolist()[0])
+        data_reads_normalized['fitness-'+ type]=reads_data[feature]/(reads_data[reads_data['Standard_name']==type][feature].tolist()[0])
     
  
     return data_reads_normalized
@@ -75,19 +94,19 @@ def fitness2score(gene_ref,gene_to_know, feature,data_wt,data_mutant_ref):
         if info_genex_doublemutant==None or info_ref==None or info_genex==None:
             interactions[i]['score']=None
         else:
-            interactions[i]['score']=info_genex_doublemutant-info_ref*info_genex
+            interactions[i]['score']=info_genex_doublemutant-(info_ref*info_genex)
   
     
     return interactions
 
 # %% Fitness from reads of WT and mutant
-data_WT_normalized=reads2fitness(data_wt,type='HO')
-data_mutant_normalized=reads2fitness(data_mutant,type='HO')
+data_WT_normalized=reads2fitness(data_wt,type='HO',feature='Nreads')
+data_mutant_normalized=reads2fitness(data_mutant,type='HO',feature='Nreads')
 
 
 # %% Plotting the distribution of the fitness data
 fig, axes=plt.subplots(1,2)
-plt.subplots_adjust(wspace=1,right=0.5)
+plt.subplots_adjust(wspace=1,right=0.8)
 
 # Get all the data between the 1st and 3rd quartile
 data=data_WT_normalized['fitness-HO']
@@ -96,7 +115,7 @@ data_iqr = data[ (data >  np.percentile(data, 25)) & (data <  np.percentile(data
 
 sns.boxplot(y='fitness-HO',data=data_WT_normalized,ax=axes[0],fliersize=0.5,color='white')
 sns.stripplot(y="fitness-HO", color='black',size=2, alpha=0.1, data=data_WT_normalized,ax=axes[0])
-sns.stripplot(y=data_iqr, color='green', size=2, alpha=0.2,ax=axes[0])
+#sns.stripplot(y=data_iqr, color='green', size=2, alpha=0.1,ax=axes[0])
 # axes[0].text(0.2, 0.8, str(np.round(len(data_iqr)/len(data),decimals=1)*100)+'% of the data' , horizontalalignment='center')
 axes[0].set_title('WT')
 # Get all the data between the 1st and 3rd quartile
@@ -104,14 +123,27 @@ axes[0].set_title('WT')
 data=data_mutant_normalized['fitness-HO']
 data_iqr = data[ (data >  np.percentile(data, 25)) & (data <  np.percentile(data, 75)) ]
 
-axes[0].set_ylim([0,5])
-sns.boxplot(y='fitness-HO',data=data_mutant_normalized,ax=axes[1],fliersize=0.5,color='white')
+axes[0].set_ylim([0,20])
+sns.boxplot(y='fitness-HO',data=data_mutant_normalized,ax=axes[1],fliersize=0.5,color='white',saturation=0.5)
 sns.stripplot(y="fitness-HO", color='black',size=2, alpha=0.1, data=data_mutant_normalized,ax=axes[1])
-sns.stripplot(y=data_iqr, color='green', size=2, alpha=0.2,ax=axes[1])
+#sns.stripplot(y=data_iqr, color='green', size=2, alpha=0.1,ax=axes[1])
 # axes[1].text(0.2, 0.8, str(np.round(len(data_iqr)/len(data),decimals=1)*100)+'% of the data' , horizontalalignment='center')
-axes[1].set_ylim([0,5])
-axes[1].set_title('mutant')
+axes[1].set_ylim([0,20])
+axes[1].set_title('mutant-dpl1d')
+#%%
+fig1, axes=plt.subplots(1,1)
+plt.subplots_adjust(wspace=1,right=0.8)
+plt.scatter(x=data_WT_normalized['fitness-HO'],y=data_mutant_normalized['fitness-HO'],color='black',alpha=0.2)
+plt.xlim([0,50])
+plt.ylim([0,50])
+plt.xlabel('fitness-HO-WT')
+plt.ylabel('fitness-HO-dpl1d')
+plt.plot(np.linspace(0,100),np.linspace(0,100))
 
+#%% saving the figure
+
+fig.savefig('fitness-based-on-HO-locus.png',dpi=300,transparency=True,format='png')
+fig1.savefig('scatter-plot-fitness-HO-dpl1-vs-WT.png',dpi=300,transparency=True,format='png')
 
 # %% evaluating the fitness score in the dpl1 mutant
 interactions_dpl1=fitness2score(gene_ref=['DPL1'],gene_to_know=gene_info['gene-standard-name'],feature='fitness-HO',data_wt=data_WT_normalized,data_mutant_ref=data_mutant_normalized)
@@ -127,25 +159,33 @@ interactions_pd=interactions_pd.set_index(np.arange(0,len(interactions_pd)))
 #%%
 dpl1_fitness=interactions_pd[interactions_pd['array-name']=='DPL1']['fitness-query'].tolist()[0]
 # %% Fitness plot 
-max=5
+max=10
+min=-1
 fig, axes=plt.subplots(1,1)
+
 plt.scatter(x=interactions_pd['fitness-array'],y=interactions_pd['fitness-doublemutant'],alpha=0.1)
-plt.xlim([-0.05,max])
+plt.xlim([min,max])
 plt.xlabel('Single mutant fitness-b')
 plt.ylabel('double mutant fitness-ab')
-plt.ylim([-0.05,max])
-x = np.linspace(0, max)
-plt.plot(x, dpl1_fitness*x,linestyle='solid',color='black');
-x_masking = np.linspace(0, dpl1_fitness)
-plt.plot(x, x,linestyle='solid',color='black');
-plt.hlines(y=dpl1_fitness,xmin=dpl1_fitness,xmax=max)
-plt.fill_between(x=x_masking,y1=dpl1_fitness*x_masking,y2=x_masking,color='blue',alpha=0.2)
-plt.fill_between(x=np.linspace(dpl1_fitness,max),y2=dpl1_fitness,y1=dpl1_fitness*np.linspace(dpl1_fitness,max),color='blue',alpha=0.2)
-plt.title('Fitness related to HO locus, dpl1 fitness='+ str(dpl1_fitness))
-#plt.savefig('dpl1_data_using_reads_normalized_with_HO_as_fitness.png',format='png',dpi=300,transparent=True)
+plt.ylim([min,max])
+x = np.linspace(min, max)
+
+x_masking = np.linspace(min, dpl1_fitness)
+plt.plot(x, x,linestyle='solid',color='gray');
+#plt.hlines(y=dpl1_fitness,xmin=dpl1_fitness,xmax=max)
+#plt.fill_between(x=x_masking,y1=dpl1_fitness*x_masking,y2=x_masking,color='blue',alpha=0.2)
+#plt.fill_between(x=np.linspace(dpl1_fitness,max),y2=dpl1_fitness,y1=dpl1_fitness*np.linspace(dpl1_fitness,max),color='blue',alpha=0.2)
+plt.title('Fitness related to HO locus, dpl1 fitness='+ str(np.round(dpl1_fitness,2)))
+
+plt.plot(x, dpl1_fitness*x,linestyle='solid',color='gray');
 
 
+trianglex=[0,5,5,0]
+triangley=[0,dpl1_fitness*5,5,0]
 
+#plt.fill(trianglex, triangley,alpha=0.3,color='gray')
+#%% saving the figure 
+fig.savefig('dpl1_data_using_reads_normalized_with_HO_as_fitness.png',format='png',dpi=300,transparent=True)
 
 # %% Selecting columns to measure the correlations 
 values2corr=interactions_pd.loc[:,['fitness-array','fitness-doublemutant','score']]
@@ -158,7 +198,7 @@ values2corr=values2corr.set_index(np.arange(0,len(values2corr)))
 # %% Row- wise correlation with data from dpl1 
 # - try to do a loop to do different corrwith based on different genes and then average and see the std of the different correlations 
 
-corr_with_a_row=values2corr.corrwith(values2corr.iloc[997,:],axis=1,method='pearson') # random row
+corr_with_a_row=values2corr.corrwith(values2corr.iloc[997,:],axis=1,method='pearson') # dpl1 row
 #corr_with_a_row=values2corr.corrwith(values2corr.iloc[interactions_pd[interactions_pd['array-name']=='AIM22'].index,:],axis=1,method='pearson')
 corr_with_a_row_pd=pd.DataFrame(corr_with_a_row,columns=['corr-values'])
 corr_with_a_row_pd.sort_values(by='corr-values',inplace=True)
