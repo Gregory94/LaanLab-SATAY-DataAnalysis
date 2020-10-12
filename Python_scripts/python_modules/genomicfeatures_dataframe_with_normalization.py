@@ -9,14 +9,14 @@ This can be used to determine the number of reads outside the genes to use this 
 """
 
 #%%
-import os, sys
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-#sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
+#sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from chromosome_names_in_files import chromosome_name_wigfile
 from gene_names import list_gene_names, gene_aliases
@@ -585,6 +585,7 @@ if __name__ == '__main__':
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
                  variable="reads",
                  normalization_window_size=20000,
+                 normalize=True,
                  plotting=True,
                  savefigure=False,
                  verbose=True)
