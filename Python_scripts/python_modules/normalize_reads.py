@@ -8,7 +8,7 @@ Created on Mon Oct 12 09:46:10 2020
 import os, sys
 import numpy as np
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
+#sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
 from mapped_reads import total_mapped_reads
 
 

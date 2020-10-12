@@ -10,11 +10,9 @@ import matplotlib.pyplot as plt
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
 
-from genomicfeatures_dataframe_with_normalization import dna_features
-
 sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
 from chromosome_and_gene_positions import chromosome_position
-
+from genomicfeatures_dataframe_with_normalization import dna_features
 
 #%% SET PATHS TO FILES
 #region = "ii"

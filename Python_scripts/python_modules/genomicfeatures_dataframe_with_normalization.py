@@ -11,23 +11,21 @@ This can be used to determine the number of reads outside the genes to use this 
 #%%
 import os, sys
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
-from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic
+#sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
+from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from chromosome_names_in_files import chromosome_name_wigfile
 from gene_names import list_gene_names, gene_aliases
 from read_sgdfeatures import sgd_features
-from mapped_reads import total_mapped_reads
-
+from normalize_reads import reads_normalization
 
 
 #%% TEMP
-#region = "ii"
+#region = 1
 #wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
 #pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
 #variable="reads"
@@ -46,14 +44,16 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     This function can be used for normalizing the transposon insertions per gene using the neutral regions.
     
     Input:
-        - Region: e.g. chromosome number (in roman numeral between I and XVI or a list like ['V', 0, 14790] which creates a barplot between basepair 0 and 14790)
+        - Region: e.g. chromosome number (either a normal number between 1 and 16 or in roman numerals between I and XVI), a list like ['V', 0, 14790] which creates a barplot between basepair 0 and 14790) or a genename.
         - wig_file: wiggle file from the output of transposonmapping.py that is used in the processing workflow.
         - pergene_insertions_file: text file from the output of transposonsmapping.py
         - variable: either 'insertions' or 'reads', which determines what is being plotted.
         - normalize: either True or False. Normalization only works for when variable is 'reads'. The normalized reads are plotted and adds a column to the dataframe.
         - normalization_window_size: Integer. Normalization relies on windows that corrects for inter chromosomal differences. This determine the size of those windows in terms of basepairs (default=10000)
         - plotting: Either True or False. Determines whether the barplot has to be created.
+        - savefigure: Whether to save the figure at the same location of this script.
         - Verbose: Either True of False. Determines how much textual feedback is given. When set to False, only warnings will be shown.
+
     Output:
         - dna_df2: Dataframe containing information about the selected chromosome.
     
@@ -64,7 +64,6 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         - sgd_features_file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/SGD_features.tab
     '''
 #%% FILES
-#for region in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XI', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
     essentials_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
 
     gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
@@ -74,26 +73,77 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     sgd_features_file = os.path.join(file_dirname,'..','Data_Files','SGD_features.tab')
 
     variable = variable.lower()
+    if plotting == True:
+        create_plottitle = ''
+
 #%% DETERMINE INPUTTED REGION
+
+    warningmessage = "WARNING: Specified chromosome or gene name not found. Enter chromosome as a number (or roman numeral) between 1 and 16 (I and XVI), a list in the form ['chromosome number, start_position, end_position'] or a valid gene name."
 
     if type(region) == str:
         if region.upper() in chromosomename_roman_to_arabic()[1]:
             chrom = region.upper()
             roi_start = None
             roi_end = None
-        elif region in list_gene_names(gene_information_file):
-            #LOOK UP GENE INFORMATION ...
-            pass
-        else:
-            print("WARNING: Specified chromosome not found. Enter chromosome as a roman numeral between I and XVI")
 
-    elif type(region) == list: #ADD CODE THAT ONLY TAKES GENES WITHIN SPECIFIED REGION
-        chrom = region[0].upper()
+        elif region.upper() in list_gene_names(gene_information_file):
+            gene_pos_dict = gene_position(gff_file)
+            region = region.upper()
+            if region in gene_pos_dict:
+                region_pos = gene_pos_dict.get(region)
+                chrom = region_pos[0]
+                roi_start = int(region_pos[1])
+                roi_end = int(region_pos[2])
+            else:
+                gene_alias_dict = gene_aliases(gene_information_file)[0]
+                region_alias = [key for key, val in gene_alias_dict.items() if region in val]
+                if not region_alias == [] and region_alias[0] in gene_pos_dict:
+                    region_pos = gene_pos_dict.get(region_alias[0])
+                    chrom = region_pos[0]
+                    roi_start = int(region_pos[1])-100
+                    roi_end = int(region_pos[2])+100
+                    del (region_alias, gene_alias_dict)
+                else:
+                    print(warningmessage)
+#                    return()
+            if plotting == True:
+                create_plottitle = region
+            del (region_pos, gene_pos_dict)
+
+        else:
+            print(warningmessage)
+#            return()
+
+
+    elif type(region) == list:
+        if type(region[0]) == str:
+            chrom = region[0].upper()
+        elif type(region[0]) == int:
+            if region[0] in chromosomename_roman_to_arabic()[0]:
+                chrom = chromosomename_roman_to_arabic()[0].get(region[0])
+        else:
+            print(warningmessage)
+#            return()
         roi_start = region[1]
         roi_end = region[2]
 
 
-    del (region)
+    elif type(region) == int:
+        if region in chromosomename_roman_to_arabic()[0]:
+            chrom = chromosomename_roman_to_arabic()[0].get(region)
+            roi_start = None
+            roi_end = None
+        else:
+            print(warningmessage)
+#            return()
+
+
+    else:
+        print(warningmessage)
+#        return()
+
+
+    del (region, warningmessage)
 
 #%% READ WIG FILE FOR GETTING LOCATIONS OF ALL TN INSERTIONS
 
@@ -117,8 +167,6 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
 
     gene_position_dict = {}
-#    gene_inserts_dict = {}
-#    gene_reads_dict = {}
     for line in lines[1:]:
         line_split = line.strip('\n').split('\t')
 
@@ -138,16 +186,12 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             else:
                 geneinserts_list = []
 
-#            gene_inserts_dict[genename] = geneinserts_list
-
 
             genereads_str = line_split[5].strip('[]')
             if not genereads_str == '':
                 genereads_list = [int(read) for read in genereads_str.split(',')]
             else:
                 genereads_list = []
-
-#            gene_reads_dict[genename] = genereads_list
 
 
             if len(geneinserts_list) != len(genereads_list):
@@ -157,18 +201,19 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     del (f, lines, line, line_split, genename, gene_chrom, gene_start, gene_end, geneinserts_list, geneinserts_str, genereads_str, genereads_list)
 
 #%% DETERMINE THE LOCATION GENOMIC FEATURES IN THE CURRENT CHROMOSOME AND STORE THIS IN A DICTIONARY
+
     len_chr = chromosome_position(gff_file)[0].get(chrom)
     start_chr = chromosome_position(gff_file)[1].get(chrom)
     end_chr = chromosome_position(gff_file)[2].get(chrom)
 
     dna_dict = {} #for each bp in chromosome, determine whether it belongs to a noncoding or coding region
-    for bp in range(start_chr, end_chr + 1): #initialize dna_dict
+    for bp in range(start_chr, end_chr + 1): #initialize dna_dict with all basepair positions as ['noncoding', None]
         dna_dict[bp] = ['noncoding', None] #form is: ['element_name', 'type']
 
 
-
-    feature_orf_dict = sgd_features(sgd_features_file)[0]
+    feature_orf_dict = sgd_features(sgd_features_file)[1]
     gene_alias_dict = gene_aliases(gene_information_file)[0]
+
 
     for gene in gene_position_dict:
         if gene in feature_orf_dict:
@@ -180,17 +225,17 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             for bp in range(gene_position_dict.get(gene)[1]+start_chr, gene_position_dict.get(gene)[2]+start_chr+1):
                 dna_dict[bp] = [gene_alias, "Gene; "+feature_orf_dict.get(gene_alias)[1]]
 
+
     del (gff_file, gene, bp, gene_alias)
 
 #%% GET FEATURES FROM INTERGENIC REGIONS (-> SEE SGD_features.tab IN DATA_FILES IN GITHUB FOLDER)
 
-    dna_dict = feature_position(sgd_features(sgd_features_file)[1], chrom, start_chr, dna_dict, "ARS") #ARS
-    dna_dict = feature_position(sgd_features(sgd_features_file)[2], chrom, start_chr, dna_dict, "Telomere") #Telomeres
-    dna_dict = feature_position(sgd_features(sgd_features_file)[3], chrom, start_chr, dna_dict, "Centromere") #Centromeres
-    dna_dict = feature_position(sgd_features(sgd_features_file)[4], chrom, start_chr, dna_dict, "X_element") #X_element
-    dna_dict = feature_position(sgd_features(sgd_features_file)[5], chrom, start_chr, dna_dict, "ncRNA") #ncRNA
-    dna_dict = feature_position(sgd_features(sgd_features_file)[6], chrom, start_chr, dna_dict, "External_transcribed_Spacer_Region") #External transcribed spacer region
-    dna_dict = feature_position(sgd_features(sgd_features_file)[7], chrom, start_chr, dna_dict, "Internal_transcribed_Spacer_Region") #Internal transcribed spacer region
+    genomicregions_list = sgd_features(sgd_features_file)[0]
+
+    i = 2
+    for genomicregion in genomicregions_list[1:]:
+        dna_dict = feature_position(sgd_features(sgd_features_file)[i], chrom, start_chr, dna_dict, genomicregion)
+        i += 1
 
 
     ### TEST IF ELEMENTS IN FEATURE_ORF_DICT FOR SELECTED CHROMOSOME ARE THE SAME AS THE GENES IN GENE_POSITION_DICT BY CREATING THE DICTIONARY FEATURE_POSITION_DICT CONTAINING ALL THE GENES IN FEATURE_ORF_DICT WITH THEIR CORRESPONDING POSITION IN THE CHROMOSOME
@@ -230,6 +275,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     del (i, ins, insrt_in_chrom_list, reads_in_chrom_list)#, dna_df)
 
 #%% CREATE DATAFRAME FOR EACH FEATURE (E.G. NONCODING DNA, GENE, ETC.) IN THE CHROMOSOME AND DETERMINE THE NUMBER OF INSERTIONS AND READS PER FEATURE.
+
     feature_NameAndType_list = []
     f_previous = dna_dict.get(start_chr)[0]
     f_type = dna_dict.get(start_chr)[1]
@@ -237,7 +283,6 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     N_reads_list = []
     N_reads_central80_list = []
     N_insrt_central80_list = []
-#    N_insrt = 0
     N_insrt_list = []
     N_bp = 1
     N_bp_list = []
@@ -251,18 +296,13 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             f_type = dna_dict.get(bp)[1]
             f_end += 1
             N_bp += 1
-#            N_reads += reads_loc_list[i]
             N_reads.append(reads_loc_list[i])
-#            if not reads_loc_list[i] == 0:
-#                N_insrt += 1
         elif (f_current != f_previous or (i+start_chr) == end_chr):# and not f_current.endswith('-A'):
             feature_NameAndType_list.append([f_previous, f_type])
-#            N_reads_list.append(N_reads)
             N_reads_list.append(sum(N_reads))
-#            N_insrt_list.append(N_insrt)
             N_insrt_list.append(len([ins for ins in N_reads if not ins == 0]))
             if not f_type == None and f_type.startswith('Gene'):
-                N10percent = int(len(N_reads) * 0.1)
+                N10percent = 100#int(len(N_reads) * 0.1)
                 N_reads_central80_list.append(sum(N_reads[N10percent:-N10percent]))
                 N_insrt_central80_list.append(len([ins for ins in N_reads[N10percent:-N10percent] if not ins == 0]))
             else:
@@ -270,9 +310,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
                 N_insrt_central80_list.append(len([ins for ins in N_reads if not ins == 0]))
 
             N_bp_list.append(N_bp)
-#            N_reads = 0
             N_reads = []
-#            N_insrt = 0
             N_bp = 1
             f_pos_list.append([f_start, f_end+f_start])
             f_start = f_start + f_end + 1
@@ -311,7 +349,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     essentiality_list = []
     for feature in feature_NameAndType_list:
         if not feature[0] == "noncoding":
-            if feature[1] == "ARS" or feature[1] == "Telomere" or feature[1] == "Centromere" or feature[1] == "X_element" or feature[1] == "ncRNA" or feature[1] == "External_transcribed_Spacer_Region" or feature[1] == "Internal_transcribed_Spacer_Region":
+            if feature[1] in genomicregions_list:
                 essentiality_list.append(None)
             elif feature[0] in essentials_list:
                 essentiality_list.append(True)
@@ -320,17 +358,35 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         else:
             essentiality_list.append(None)
 
-    del (key, val, alias, essentials_list, feature, gene_alias_dict, gene_information_file)#, reads_loc_list)
+    del (key, val, alias, essentials_list, feature, gene_information_file)#, gene_alias_dict)#, reads_loc_list)
     ##############################################################################
 
     feature_name_list = []
     feature_type_list = []
+    feature_alias_list = []
+    feature_standardname_list = []
     for feature_name in feature_NameAndType_list:
         feature_name_list.append(feature_name[0])
         feature_type_list.append(feature_name[1])
+        if feature_name[1] != None and feature_name[1].startswith('Gene') and feature_name[0] in gene_alias_dict:
+            if gene_alias_dict.get(feature_name[0])[0] == feature_name[0]:
+                feature_standardname_list.append(feature_name[0])
+                feature_alias_list.append('')
+            else:
+                if len(gene_alias_dict.get(feature_name[0])) > 1:
+                    feature_standardname_list.append(gene_alias_dict.get(feature_name[0])[0])
+                    feature_alias_list.append(gene_alias_dict.get(feature_name[0])[1:])
+                else:
+                    feature_standardname_list.append(gene_alias_dict.get(feature_name[0])[0])
+                    feature_alias_list.append('')
+        else:
+            feature_standardname_list.append(feature_name[0])
+            feature_alias_list.append('')
 
 
-    all_features = {'Feature': feature_name_list,
+    all_features = {'Feature_name': feature_name_list,
+                    'Standard_name': feature_standardname_list,
+                    'Feature_alias':feature_alias_list,
                     'Feature_type': feature_type_list,
                     'Essentiality': essentiality_list,
                     'position': f_pos_list,
@@ -347,60 +403,12 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     dna_df2 = pd.DataFrame(all_features, columns = [column_name for column_name in all_features]) #search for feature using: dna_df2.loc[dna_df2['Feature'] == 'CDC42']
     #CREATE NEW COLUMN WITH ALL DOMAINS OF THE GENE (IF PRESENT) AND ANOTHER COLUMN THAT INCLUDES LISTS OF THE BP POSITIONS OF THESE DOMAINS
 
-
-#    read_density_chromosome = sum(N_reads_list)/len_chr #CONSIDERS ALL REGIONS, NOT ONLY THE NONCODING REGIONS.
-
-
-    del (dna_dict, feature_NameAndType_list, feature_name_list, feature_type_list, feature_name, f_type, f_previous, f_start, f_end, f_pos_list, f_current, N_reads, N_reads_list, N_insrt_list, N_reads_central80_list, N_insrt_central80_list, N_insrt_per_bp_central80p_list, N_reads_per_bp_central80p_list, N10percent, N_bp, N_bp_list, bp, i, N_reads_per_bp_list, N_insrt_per_bp_list, start_chr, end_chr, all_features, essentiality_list, essentials_file)
+    del (dna_dict, feature_NameAndType_list, feature_name_list, feature_type_list, feature_name, f_type, f_previous, f_start, f_end, f_pos_list, f_current, N_reads, N_reads_list, N_insrt_list, N_reads_central80_list, N_insrt_central80_list, N_insrt_per_bp_central80p_list, N_reads_per_bp_central80p_list, N10percent, N_bp, N_bp_list, bp, i, N_reads_per_bp_list, N_insrt_per_bp_list, start_chr, end_chr, all_features, essentiality_list, essentials_file, genomicregions_list)
 
 
 #%% NORMALIZE USING WINDOWS
 
-    if normalize == True and variable == "reads":
-
-        # DETERMINE MEANS FOR THE NUMBER OF READS/BP IN THE NONCODING REGIONS WITHIN EACH WINDOW.
-        N = round(len_chr/normalization_window_size)
-        window_edge_list = np.linspace(0, len_chr, N, dtype=int).tolist()#[82500, 243500, len_chr]
-        window_length = window_edge_list[1] - window_edge_list[0]
-
-        total_reads_in_genome = total_mapped_reads(wig_file)
-
-
-        read_density_chromosome = sum([nc[12] for nc in dna_df2.itertuples() if nc[2] == None])
-        read_density_windows = np.ones(len(window_edge_list)-1)
-        window_start = 0
-        i = 0
-        for window_end in window_edge_list[1:]:
-            read_density = sum([nc[12] for nc in dna_df2.itertuples() if window_start <= nc[4][0] < window_end and nc[2] == None])
-            if not read_density == 0:
-                read_density_windows[i] = read_density
-#            read_density_windows.append(sum([nc[12] for nc in dna_df2.itertuples() if window_start <= nc[4][0] < window_end and nc[2] == None]))
-            window_start = window_end
-            i += 1
-
-
-        norm_reads_list = []
-        norm_reads_central80p_list = []
-        for index, row in dna_df2.iterrows():
-            #normalization equation:
-                #normalization for gene = raw read count in middle 80% of feature * (1/gene length) * (10^6/total mapped reads in genome) * (read density in chromosome/read density in window)
-                #normalization for other features = raw read count in entire feature * (1/gene length) * (10^6/total mapped reads in genome) * (read density in chromosome/read density in window)
-            #row[8] contains the total number of reads in the central 80% of the gene (or in the entire feature if this is not a gene)
-            #row[7] contains the total number of reads in entire genes and features.
-            #row[4] contains the number of basepairs in the current feature
-            #row[3] contains the position of the feature
-            #row[1] contains feature type
-            read_density_windows_index = int(row[3][0]/window_length) #determine which window the current feature belongs to.
-            if not row[1] == None and row[1].startswith('Gene'):
-                norm_reads_central80p_list.append(row[8] * (1/row[4]) * ((10**6)/(total_reads_in_genome)*0.8) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
-            else:
-                norm_reads_central80p_list.append(row[8] * (1/row[4]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
-            norm_reads_list.append(row[7] * (1/row[4]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
-
-        dna_df2['Nreadsperbp_normalized'] = norm_reads_list
-        dna_df2['Nreadsperbp_central80p_normalized'] = norm_reads_central80p_list
-
-        del (norm_reads_central80p_list, i, reads_loc_list, read_density_chromosome, N, window_edge_list, window_length, total_reads_in_genome, read_density_windows, window_start, window_end, index, row, read_density_windows_index, read_density)
+    dna_df2, window_edge_list = reads_normalization(dna_df2, len_chr, normalization_window_size, wig_file)
 
 #%% CREATE BAR PLOT
     if plotting == True:
@@ -423,14 +431,14 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
 
         barcolor_list = []
-        for feature in dna_df2['Feature']:
+        for feature in dna_df2['Feature_name']:
             if feature == 'noncoding':
                 barcolor_list.append(noncoding_color)
-            elif dna_df2.loc[dna_df2['Feature'] == feature]['Essentiality'].iloc[0] == False:
+            elif dna_df2.loc[dna_df2['Feature_name'] == feature]['Essentiality'].iloc[0] == False:
                 barcolor_list.append(nonessential_color)
-            elif dna_df2.loc[dna_df2['Feature'] == feature]['Essentiality'].iloc[0] == True:
+            elif dna_df2.loc[dna_df2['Feature_name'] == feature]['Essentiality'].iloc[0] == True:
                 barcolor_list.append(essential_color)
-            elif dna_df2.loc[dna_df2['Feature'] == feature]['Essentiality'].iloc[0] == None:
+            elif dna_df2.loc[dna_df2['Feature_name'] == feature]['Essentiality'].iloc[0] == None:
                 barcolor_list.append(codingdna_color)
         del (feature)
 
@@ -453,7 +461,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
                 ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
 #                ax.set_ylim(0.0,10.0)
             elif normalize == True:
-                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_central80p_normalized']), feature_width_list, color=barcolor_list)
+                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_normalized_byNCregions']), feature_width_list, color=barcolor_list)
 #                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_normalized']), feature_width_list, color=barcolor_list)
 #                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_normalized']), feature_width_list, color=barcolor_list)
                 ax.set_ylabel("Normalized reads per bp per region", fontsize=textsize, color=textcolor)
@@ -471,6 +479,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
         ax.xaxis.get_offset_text().set_fontsize(textsize)
         ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize, color=textcolor, labelpad=10)
+        ax.set_title(create_plottitle, fontsize=textsize, color=textcolor)
         legend_noncoding = mpatches.Patch(color=noncoding_color, label="Noncoding DNA")
         legend_essential = mpatches.Patch(color=essential_color, label="Annotated essential genes")
         legend_nonessential = mpatches.Patch(color=nonessential_color, label="Nonessential genes")
@@ -481,16 +490,25 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         del text
 
 
+        count = 0
+        for i in range(len(window_edge_list)-1):
+            if count%2 == 0:
+                ax.axvspan(window_edge_list[i], window_edge_list[i+1], facecolor=[0.0,0.0,0.0,0.1])
+            else:
+                ax.axvspan(window_edge_list[i], window_edge_list[i+1], facecolor=[0.0,0.0,0.0,0.0])
+            count += 1
+
+
         axc = plt.subplot(grid[19,0])
 
         l = 0
         counter = 0
         for width in feature_width_list:
-            if dna_df2.loc[counter][2] == True:
+            if dna_df2.loc[counter][4] == True:
                 axc.axvspan(l,l+width,facecolor=essential_color,alpha=0.3)
-            elif dna_df2.loc[counter][2] == False and not dna_df2.loc[counter][0] == 'noncoding':
+            elif dna_df2.loc[counter][4] == False and not dna_df2.loc[counter][0] == 'noncoding':
                 axc.axvspan(l,l+width,facecolor=nonessential_color,alpha=0.3)
-            elif dna_df2.loc[counter][2] == None and not dna_df2.loc[counter][0] == 'noncoding':
+            elif dna_df2.loc[counter][4] == None and not dna_df2.loc[counter][0] == 'noncoding':
                 axc.axvspan(l,l+width,facecolor=codingdna_color,alpha=0.5)
             l += width
             counter += 1
@@ -523,7 +541,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             else:
                 saving_name = os.path.join(file_dirname,'GenomicFeaturesInsertions_Barplot_Chrom'+chrom+'_NonNormalized')
             plt.savefig(saving_name, orientation='landscape', dpi=200)
-
+            plt.close()
 
         del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width, normalization_window_size)
 
@@ -540,7 +558,8 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
     position_dict = {}
     for feat in feature_dict:
         if feature_dict.get(feat)[5] == chrom:
-            if feat.startswith("TEL") and feat.endswith('L'): #correct for the fact that telomeres at the end of a chromosome are stored in the reverse order.
+#            if feat.startswith("TEL") and feat.endswith('L'): #correct for the fact that telomeres at the end of a chromosome are stored in the reverse order.
+            if int(feature_dict.get(feat)[6]) > int(feature_dict.get(feat)[7]):
                 position_dict[feat] = [feature_dict.get(feat)[5], feature_dict.get(feat)[7], feature_dict.get(feat)[6]]
             else:
                 position_dict[feat] = [feature_dict.get(feat)[5], feature_dict.get(feat)[6], feature_dict.get(feat)[7]]
@@ -560,14 +579,14 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features(region = 'v', #["V", 0, 14790],
+#    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
+    dna_df2 = dna_features(region = 1,#['xiii', 0, 14790],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-                 normalize=True,
                  variable="reads",
-                 normalization_window_size=10000,
+                 normalization_window_size=20000,
                  plotting=True,
-                 savefigure=True,
+                 savefigure=False,
                  verbose=True)
 
 
