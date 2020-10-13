@@ -254,7 +254,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     if sorted(orf_position_dict) == sorted(gene_position_dict):
         if verbose == True:
-            print('Everything alright, just ignore me!')
+#            print('Everything alright, just ignore me!')
+            pass
         else:
             pass
     else:
@@ -580,7 +581,7 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 #%%
 if __name__ == '__main__':
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
-    dna_df2 = dna_features(region = 1,#['xiii', 0, 14790],
+    dna_df2 = dna_features(region = chrom,#['xiii', 0, 14790],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
                  variable="reads",
