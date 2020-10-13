@@ -323,15 +323,27 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     N_reads_per_bp_central80p_list = []
     N_insrt_per_bp_list = []
     N_insrt_per_bp_central80p_list = []
+    N_reads_per_ins_list = []
+    N_reads_per_ins_central80p_list = []
     for i in range(len(N_reads_list)):
         N_reads_per_bp_list.append(N_reads_list[i]/N_bp_list[i])
         N_insrt_per_bp_list.append(N_insrt_list[i]/N_bp_list[i])
         if not feature_NameAndType_list[i][1] == None and feature_NameAndType_list[i][1].startswith('Gene'):
-            N_reads_per_bp_central80p_list.append(N_reads_central80_list[i]/(N_bp_list[i]*0.8))
-            N_insrt_per_bp_central80p_list.append(N_insrt_central80_list[i]/(N_bp_list[i]*0.8))
+            N_reads_per_bp_central80p_list.append(N_reads_central80_list[i]/(N_bp_list[i]-200))#*0.8
+            N_insrt_per_bp_central80p_list.append(N_insrt_central80_list[i]/(N_bp_list[i]-200))#*0.8
         else:
             N_reads_per_bp_central80p_list.append(N_reads_list[i]/N_bp_list[i])
             N_insrt_per_bp_central80p_list.append(N_insrt_list[i]/N_bp_list[i])
+
+        if N_insrt_list[i] == 0:
+            N_reads_per_ins_list.append(0)
+            N_reads_per_ins_central80p_list.append(0)
+        elif N_insrt_central80_list[i] == 0:
+            N_reads_per_ins_list.append(N_reads_list[i]/N_insrt_list[i])
+            N_reads_per_ins_central80p_list.append(0)
+        else:
+            N_reads_per_ins_list.append(N_reads_list[i]/N_insrt_list[i])
+            N_reads_per_ins_central80p_list.append(N_reads_central80_list[i]/N_insrt_central80_list[i])
 
 
     #############get all essential genes together with their aliases##############
@@ -399,7 +411,10 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
                     'Ninsertionsperbp':N_insrt_per_bp_list,
                     'Ninsertionsperbp_gene_central80p':N_insrt_per_bp_central80p_list,
                     'Nreadsperbp':N_reads_per_bp_list,
-                    'Nreadsperbp_gene_central80p':N_reads_per_bp_central80p_list}
+                    'Nreadsperbp_gene_central80p':N_reads_per_bp_central80p_list,
+                    'Nreadsperinsrt':N_reads_per_ins_list,
+                    'Nreadsperinsrt_central80p':N_reads_per_ins_central80p_list}
+
 
     dna_df2 = pd.DataFrame(all_features, columns = [column_name for column_name in all_features]) #search for feature using: dna_df2.loc[dna_df2['Feature'] == 'CDC42']
     #CREATE NEW COLUMN WITH ALL DOMAINS OF THE GENE (IF PRESENT) AND ANOTHER COLUMN THAT INCLUDES LISTS OF THE BP POSITIONS OF THESE DOMAINS
@@ -581,7 +596,7 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 #%%
 if __name__ == '__main__':
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
-    dna_df2 = dna_features(region = chrom,#['xiii', 0, 14790],
+    dna_df2 = dna_features(region = 1,#['xiii', 0, 14790],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
                  variable="reads",
