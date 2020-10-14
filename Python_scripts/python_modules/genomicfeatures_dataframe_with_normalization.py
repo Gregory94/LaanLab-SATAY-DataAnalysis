@@ -99,7 +99,9 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     warningmessage = "WARNING: Specified chromosome or gene name not found. Enter chromosome as a number (or roman numeral) between 1 and 16 (I and XVI), a list in the form ['chromosome number, start_position, end_position'] or a valid gene name."
 
-    print(region)
+    if verbose == True:
+        print('Selected region: ', region)
+
     if type(region) == str:
         if region.upper() in chromosomename_roman_to_arabic()[1]:
             chrom = region.upper()
@@ -306,8 +308,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     f_type = dna_dict.get(start_chr)[1]
     N_reads = []
     N_reads_list = []
-    N_reads_central80_list = []
-    N_insrt_central80_list = []
+    N_reads_truncatedgene_list = []
+    N_insrt_truncatedgene_list = []
     N_insrt_list = []
     N_bp = 1
     N_bp_list = []
@@ -328,11 +330,11 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             N_insrt_list.append(len([ins for ins in N_reads if not ins == 0]))
             if not f_type == None and f_type.startswith('Gene'):
                 N10percent = 100#int(len(N_reads) * 0.1)
-                N_reads_central80_list.append(sum(N_reads[N10percent:-N10percent]))
-                N_insrt_central80_list.append(len([ins for ins in N_reads[N10percent:-N10percent] if not ins == 0]))
+                N_reads_truncatedgene_list.append(sum(N_reads[N10percent:-N10percent]))
+                N_insrt_truncatedgene_list.append(len([ins for ins in N_reads[N10percent:-N10percent] if not ins == 0]))
             else:
-                N_reads_central80_list.append(sum(N_reads))
-                N_insrt_central80_list.append(len([ins for ins in N_reads if not ins == 0]))
+                N_reads_truncatedgene_list.append(sum(N_reads))
+                N_insrt_truncatedgene_list.append(len([ins for ins in N_reads if not ins == 0]))
 
             N_bp_list.append(N_bp)
             N_reads = []
@@ -348,26 +350,26 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 #    N_insrt_per_bp_list = []
 #    N_insrt_per_bp_central80p_list = []
     N_reads_per_ins_list = []
-    N_reads_per_ins_central80p_list = []
+    N_reads_per_ins_truncatedgene_list = []
     for i in range(len(N_reads_list)):
 #        N_reads_per_bp_list.append(N_reads_list[i]/N_bp_list[i])
 #        N_insrt_per_bp_list.append(N_insrt_list[i]/N_bp_list[i])
 #        if not feature_NameAndType_list[i][1] == None and feature_NameAndType_list[i][1].startswith('Gene'):
-#            N_reads_per_bp_central80p_list.append(N_reads_central80_list[i]/(N_bp_list[i]-200))#*0.8
-#            N_insrt_per_bp_central80p_list.append(N_insrt_central80_list[i]/(N_bp_list[i]-200))#*0.8
+#            N_reads_per_bp_central80p_list.append(N_reads_truncatedgene_list[i]/(N_bp_list[i]-200))#*0.8
+#            N_insrt_per_bp_central80p_list.append(N_insrt_truncatedgene_list[i]/(N_bp_list[i]-200))#*0.8
 #        else:
 #            N_reads_per_bp_central80p_list.append(N_reads_list[i]/N_bp_list[i])
 #            N_insrt_per_bp_central80p_list.append(N_insrt_list[i]/N_bp_list[i])
 
         if N_insrt_list[i] == 0:
             N_reads_per_ins_list.append(0)
-            N_reads_per_ins_central80p_list.append(0)
-        elif N_insrt_central80_list[i] == 0:
+            N_reads_per_ins_truncatedgene_list.append(0)
+        elif N_insrt_truncatedgene_list[i] == 0:
             N_reads_per_ins_list.append(N_reads_list[i]/N_insrt_list[i])
-            N_reads_per_ins_central80p_list.append(0)
+            N_reads_per_ins_truncatedgene_list.append(0)
         else:
             N_reads_per_ins_list.append(N_reads_list[i]/N_insrt_list[i])
-            N_reads_per_ins_central80p_list.append(N_reads_central80_list[i]/N_insrt_central80_list[i])
+            N_reads_per_ins_truncatedgene_list.append(N_reads_truncatedgene_list[i]/N_insrt_truncatedgene_list[i])
 
 
     #############get all essential genes together with their aliases##############
@@ -429,15 +431,15 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
                     'Position': f_pos_list,
                     'Nbasepairs':N_bp_list,
                     'Ninsertions':N_insrt_list,
-                    'Ninsertions_truncatedgene':N_insrt_central80_list,
+                    'Ninsertions_truncatedgene':N_insrt_truncatedgene_list,
                     'Nreads':N_reads_list,
-                    'Nreads_truncatedgene':N_reads_central80_list,
+                    'Nreads_truncatedgene':N_reads_truncatedgene_list,
 #                    'Ninsertionsperbp':N_insrt_per_bp_list,
 #                    'Ninsertionsperbp_gene_central80p':N_insrt_per_bp_central80p_list,
 #                    'Nreadsperbp':N_reads_per_bp_list,
 #                    'Nreadsperbp_gene_central80p':N_reads_per_bp_central80p_list,
                     'Nreadsperinsrt':N_reads_per_ins_list,
-                    'Nreadsperinsrt_central80p':N_reads_per_ins_central80p_list}
+                    'Nreadsperinsrt_truncatedgene':N_reads_per_ins_truncatedgene_list}
 
 
     dna_df2 = pd.DataFrame(all_features, columns = [column_name for column_name in all_features]) #search for feature using: dna_df2.loc[dna_df2['Feature'] == 'CDC42']
@@ -451,7 +453,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
                 print(region_info)
 
 
-    del (dna_dict, feature_NameAndType_list, feature_name_list, feature_type_list, feature_name, f_type, f_previous, f_start, f_end, f_pos_list, f_current, N_reads, N_reads_list, N_insrt_list, N_reads_central80_list, N_insrt_central80_list, N10percent, N_bp, N_bp_list, bp, i, start_chr, end_chr, all_features, essentiality_list, essentials_file, genomicregions_list)
+    del (dna_dict, feature_NameAndType_list, feature_name_list, feature_type_list, feature_name, f_type, f_previous, f_start, f_end, f_pos_list, f_current, N_reads, N_reads_list, N_insrt_list, N_reads_truncatedgene_list, N_insrt_truncatedgene_list, N10percent, N_bp, N_bp_list, bp, i, start_chr, end_chr, all_features, essentiality_list, essentials_file, genomicregions_list)
 
 
 #%% NORMALIZE USING WINDOWS
@@ -509,9 +511,9 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
                 ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
 #                ax.set_ylim(0.0,10.0)
             elif normalize == True:
-                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_normalized_byNCregions']), feature_width_list, color=barcolor_list)
-#                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_normalized']), feature_width_list, color=barcolor_list)
-#                ax.bar(feature_middle_pos_list, list(dna_df2['Nreadsperbp_normalized']), feature_width_list, color=barcolor_list)
+                ax.bar(feature_middle_pos_list, list(dna_df2['Nreads_normalized_byNCregions']), feature_width_list, color=barcolor_list)
+#                ax.bar(feature_middle_pos_list, list(dna_df2['Nreads_normalized']), feature_width_list, color=barcolor_list)
+#                ax.bar(feature_middle_pos_list, list(dna_df2['Nreads_normalized']), feature_width_list, color=barcolor_list)
                 ax.set_ylabel("Normalized reads per bp per region", fontsize=textsize, color=textcolor)
 #                ax.set_ylim(0.0, 150.0)
 
@@ -630,12 +632,12 @@ if __name__ == '__main__':
     dna_df2 = dna_features(region = 1,#['xiii', 0, 14790],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-                 variable="insertions",
+                 variable="reads",
                  normalization_window_size=20000,
                  normalize=True,
                  plotting=True,
                  savefigure=False,
-                 verbose=True)
+                 verbose=False)
 
 
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:

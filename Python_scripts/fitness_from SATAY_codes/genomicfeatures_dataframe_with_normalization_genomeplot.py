@@ -38,9 +38,10 @@ def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, varia
 #        print(region)
         dna_df2 = dna_features(region, wig_file, pergene_insertions_file, variable, normalize, normalization_window_size, plotting, verbose)
     
-        feature_position_list = feature_position_list + [pos[0] + chr_length for pos in dna_df2['position'].tolist()]
-        Nreadsperbp_list = Nreadsperbp_list + dna_df2['Nreadsperbp'].tolist()
-        Nreadsperbp_normalized_list = Nreadsperbp_normalized_list + dna_df2['Nreadsperbp_normalized_byNCregions'].tolist()
+        feature_position_list = feature_position_list + [pos[0] + chr_length for pos in dna_df2['Position'].tolist()]
+        Nreadsperbp = [dna.Nreads/dna.Nbasepairs for dna in dna_df2.itertuples()]
+        Nreadsperbp_list = Nreadsperbp_list + Nreadsperbp
+        Nreadsperbp_normalized_list = Nreadsperbp_normalized_list + dna_df2['Nreads_normalized_byNCregions'].tolist()
     
         chr_length += chr_length_dict.get(region.upper())
     
