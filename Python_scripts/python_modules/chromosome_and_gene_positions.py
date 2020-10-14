@@ -134,4 +134,4 @@ def gene_position(gff_file = None):
 
 #%%
 if __name__ == '__main__':
-    chromosome_position()
+    len_chr = chromosome_position()[0]

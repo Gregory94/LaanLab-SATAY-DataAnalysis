@@ -13,6 +13,8 @@ To run this script, the following files are required and should be placed in the
     - read_sgdfeatures.py
     - normalize_reads.py
 
+For the ipython Notebook version of this script with more extensive explanation, see https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.ipynb
+
 Version history:
     1.0: [29-09-2020] First version of this script
     1.1: [14-10-2020] Removed all '..perbp..' colmns in dna_df2 as these can be easily generated using the 'Nbasepairs' column and renamed the following columns
@@ -462,10 +464,10 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
 #%% CREATE BAR PLOT
     if plotting == True:
-        noncoding_color = "#003231"
-        essential_color = "#00F28E"
-        nonessential_color = "#F20064"
-        codingdna_color = '#00918f'
+        noncoding_color = "#002538"
+        essential_color = "#10e372"
+        nonessential_color = "#d9252e"
+        codingdna_color = '#29a7e6'
         textcolor = "#000000"
         textsize = 20
 
@@ -504,17 +506,17 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         if variable == "insertions":
             ax.bar(feature_middle_pos_list, list(dna_df2['Ninsertions']), feature_width_list, color=barcolor_list)
     #        ax.set_ylim(0, max(dna_df2['Ninsertionsperbp']) + 0.1*max(dna_df2['Ninsertionsperbp']))
-            ax.set_ylabel("Transposons/bp per region", fontsize=textsize, color=textcolor)
+            ax.set_ylabel("Transposons per region", fontsize=textsize, color=textcolor)
         elif variable == "reads":
             if normalize == False:
                 ax.bar(feature_middle_pos_list, list(dna_df2['Nreads']), feature_width_list, color=barcolor_list)
-                ax.set_ylabel("Reads/bp per region", fontsize=textsize, color=textcolor)
+                ax.set_ylabel("Reads per region", fontsize=textsize, color=textcolor)
 #                ax.set_ylim(0.0,10.0)
             elif normalize == True:
                 ax.bar(feature_middle_pos_list, list(dna_df2['Nreads_normalized_byNCregions']), feature_width_list, color=barcolor_list)
 #                ax.bar(feature_middle_pos_list, list(dna_df2['Nreads_normalized']), feature_width_list, color=barcolor_list)
 #                ax.bar(feature_middle_pos_list, list(dna_df2['Nreads_normalized']), feature_width_list, color=barcolor_list)
-                ax.set_ylabel("Normalized reads per bp per region", fontsize=textsize, color=textcolor)
+                ax.set_ylabel("Normalized reads per region", fontsize=textsize, color=textcolor)
 #                ax.set_ylim(0.0, 150.0)
 
         if roi_start != None and roi_end != None and roi_start < len_chr and roi_end < len_chr:
@@ -629,12 +631,12 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features(region = 1,#['xiii', 0, 14790],
+    dna_df2 = dna_features(region = 'vi',#['xiii', 0, 14790],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
                  variable="reads",
                  normalization_window_size=20000,
-                 normalize=True,
+                 normalize=False,
                  plotting=True,
                  savefigure=False,
                  verbose=False)

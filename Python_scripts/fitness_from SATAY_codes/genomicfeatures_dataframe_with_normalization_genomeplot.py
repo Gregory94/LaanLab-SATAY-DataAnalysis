@@ -36,7 +36,7 @@ def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, varia
     
     for region in chrom_list:
 #        print(region)
-        dna_df2 = dna_features(region, wig_file, pergene_insertions_file, variable, normalize, normalization_window_size, plotting, verbose)
+        dna_df2 = dna_features(region, wig_file, pergene_insertions_file, variable, normalize, normalization_window_size, plotting, verbose=False)
     
         feature_position_list = feature_position_list + [pos[0] + chr_length for pos in dna_df2['Position'].tolist()]
         Nreadsperbp = [dna.Nreads/dna.Nbasepairs for dna in dna_df2.itertuples()]
@@ -69,9 +69,10 @@ def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, varia
     l_genome = 0
     chr_summedlength_dict = {}
     #!!! THE ORDER IS WRONG
-    for chrom, length in chr_length_dict.items():
+    for chrom in chrom_list:
+#    for chrom, length in chr_length_dict.items():
         chr_summedlength_dict[chrom] = l_genome
-        l_genome += length
+        l_genome += chr_length_dict.get(chrom)
     
     
     
