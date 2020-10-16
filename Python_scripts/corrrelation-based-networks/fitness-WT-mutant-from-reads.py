@@ -164,9 +164,9 @@ interactions_pd.to_excel('dpl1-fitness-based-on-HO-'+ feature+'.xlsx')
 #%%
 dpl1_fitness=interactions_pd[interactions_pd['array-name']=='DPL1']['fitness-query'].tolist()[0]
 # %% Fitness plot 
-max=0.25
+max=0.1
 
-min=-0.2
+min=-0.1
 fig, axes=plt.subplots(1,1)
 
 plt.scatter(x=interactions_pd['fitness-array'],y=interactions_pd['fitness-doublemutant'],alpha=0.1)
