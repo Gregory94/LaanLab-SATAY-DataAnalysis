@@ -596,14 +596,14 @@ reads_non_normalize_pd=pd.concat(dna_df2_false,keys=chromosomes)
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features(region = 'V', #["V", 0, 14790],
+    dna_df2 = dna_features(region = 'IV', #["V", 0, 14790],
                  wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-                 normalize=False,
+                 normalize=True,
                  variable="reads",
                  normalization_window_size=50000,
                  plotting=True,
-                 verbose=True)
+                 verbose=True,savefigure=False)
 
 
 
