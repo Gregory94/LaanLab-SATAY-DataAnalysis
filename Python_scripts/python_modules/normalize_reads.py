@@ -19,9 +19,9 @@ from mapped_reads import total_mapped_reads
 ##dna_df2; load from genomicfeatures_dataframe_with_normalization.py with parameter 'region=1'
 
 #%%
-def reads_normalization(dna_df2, len_chr, normalization_window_size, wig_file):
+def reads_normalization_fixed_window(dna_df2, len_chr, normalization_window_size, wig_file):
     '''
-    This function normalizes the number of reads.
+    This function normalizes the number of reads based on windows of fixed size as determined in the normalization_window_size variable.
     It accepts a dataframe that is created using the function dna_features in genomicfeatures_dataframe_with_normalization.py.
     The normalization procedure is based on the method used in Gallagher et.al. 2011.
     This normalizes the reads for the gene length, differences in the number of mapped reads between experiments and the inhomogeniety in the number of insertions within a
@@ -66,7 +66,7 @@ def reads_normalization(dna_df2, len_chr, normalization_window_size, wig_file):
         read_density_windows_index = int(row.Position[0]/window_length) #determine which window the current feature belongs to.
         window_index_list.append(read_density_windows_index)
         if not row.Feature_type == None and row.Feature_type.startswith('Gene'):
-            norm_reads_truncatedgene_list.append(row.Nreads_truncatedgene * (1/row.Nbasepairs*1.0) * ((10**6)/(total_reads_in_genome)) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
+            norm_reads_truncatedgene_list.append(row.Nreads_truncatedgene * (1/row.Nbasepairs*0.8) * ((10**6)/(total_reads_in_genome)) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
         else:
             norm_reads_truncatedgene_list.append(row.Nreads_truncatedgene * (1/row.Nbasepairs*1.0) * ((10**6)/(total_reads_in_genome)) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
         norm_reads_list.append(row.Nreads * (1/row.Nbasepairs) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
@@ -81,6 +81,104 @@ def reads_normalization(dna_df2, len_chr, normalization_window_size, wig_file):
     N_reads_noncoding = [0] * (len(window_edge_list) - 1) #CONTAINS THE NUMBER OF NONCODING REGIONS IN EACH WINDOW.
     i = 0
     for row in dna_df2.itertuples():
+        if row.Feature_type == None:
+            readsperbp_noncoding[window_index_list[i]] += row.Nreads_normalized
+            N_reads_noncoding[window_index_list[i]] += 1
+        i += 1
+    avg_reads_noncoding = [readsperbp_noncoding[i] / N_reads_noncoding[i] for i in range(len(readsperbp_noncoding))]
+    
+    normbync_reads_list = []
+    for row in dna_df2.itertuples():
+        normbync_reads_list.append(row.Nreads_normalized / avg_reads_noncoding[int(row.Position[0] / window_length)])
+    dna_df2['Nreads_normalized_byNCregions'] = normbync_reads_list
+
+
+
+    return(dna_df2, window_edge_list)
+
+
+#%%
+def reads_normalization_dynamic_window(dna_df2, len_chr, normalization_window_size, wig_file):
+    '''
+    This function normalizes the number of reads based on windows of dynamic size.
+    Each window has at most a number of basepairs as determined in normalization_window_size or a maximum of about 10 transposon insertions.
+    It accepts a dataframe that is created using the function dna_features in genomicfeatures_dataframe_with_normalization.py.
+    The normalization procedure is based on the method used in Gallagher et.al. 2011.
+    This normalizes the reads for the gene length, differences in the number of mapped reads between experiments and the inhomogeniety in the number of insertions within a
+    chromosome.
+    
+    The output of the function is the same dataframe, dna_df2, to which now three more columns are added considering the normalization.
+    The first is the normalization described before, the second column is the same normalization, but only for the central part of the gene (for the other genomic features the
+    entire feature is taken in consideration) and the third column contains an extra normaliztion where the average number of reads in the noncoding regions in a window are
+    defined as fitness 1.
+    Also it returns a list including the basepairs where the windows end.
+    '''
+    
+#    bp_count = 0
+    tn_count = 0
+    window_edge_list = []
+    for dna in dna_df2.itertuples():
+        if dna.Feature_type == None:
+#            bp_count += dna.Nbasepairs
+            tn_count += dna.Ninsertions
+        if tn_count > 20:
+            window_edge_list.append(dna.Position[1])
+#            bp_count = 0
+            tn_count = 0
+    window_edge_list[-1] = dna_df2.iloc[-1].Position[1]
+    
+    window_size_list = [window_edge_list[0]]
+    for i in range(len(window_edge_list[1:])):
+        window_size_list.append(window_edge_list[i+1] - window_edge_list[i])
+
+    total_reads_in_genome = total_mapped_reads(wig_file)
+
+
+    read_density_chromosome = sum([dna.Nreads for dna in dna_df2.itertuples() if dna.Feature_type == None]) / sum([dna.Nbasepairs for dna in dna_df2.itertuples() if dna.Feature_type == None])
+    read_density_windows = np.ones(len(window_edge_list))
+    window_start = 0
+    i = 0
+    for window_end in window_edge_list:
+        read_density = sum([(dna.Nreads) for dna in dna_df2.itertuples() if window_start <= dna.Position[0] < window_end and dna.Feature_type == None]) / sum([(dna.Nbasepairs) for dna in dna_df2.itertuples() if window_start <= dna.Position[0] < window_end and dna.Feature_type == None])
+        if not read_density == 0:
+            read_density_windows[i] = read_density
+        window_start = window_end
+        i += 1
+
+
+#!!! NOTE THAT WINDOW SIZE IS NOT CONSTANT. IMPLEMENT THIS IN FOLLOWING CODE WHERE THE VARIABLE WINDOW_LENGTH IS USED
+    norm_reads_list = []
+    norm_reads_truncatedgene_list = []
+    window_index_list = [] #LIST CONTAINING THE INDICES FOR EACH FEATURE INDICATING TO WHICH WINDOW IT BELONGS. THIS HAS THE SAME LENGTH AS DNA_DF2 WHERE EACH ROW CORRESPONDS TO THE ROW IN DNA_DF2
+    for row in dna_df2.itertuples():
+        for ind, w in reversed(list(enumerate(window_edge_list))):
+            if row.Position[0] < window_edge_list[0]:
+                window_length = window_size_list[0]
+                ind = -1
+                break
+            elif row.Position[0] > w:
+                window_length = window_size_list[ind+1]
+                break
+        
+        read_density_windows_index = ind + 1
+        window_index_list.append(read_density_windows_index)
+        if not row.Feature_type == None and row.Feature_type.startswith('Gene'):
+            norm_reads_truncatedgene_list.append(row.Nreads_truncatedgene * (1/row.Nbasepairs*0.8) * ((10**6)/(total_reads_in_genome)) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
+        else:
+            norm_reads_truncatedgene_list.append(row.Nreads_truncatedgene * (1/row.Nbasepairs*1.0) * ((10**6)/(total_reads_in_genome)) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
+        norm_reads_list.append(row.Nreads * (1/row.Nbasepairs) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
+        
+
+    dna_df2['Nreads_normalized'] = norm_reads_list
+    dna_df2['Nreads_truncatedgene_normalized'] = norm_reads_truncatedgene_list
+
+
+    #NORMALIZE EACH WINDOW WITH THE AVERAGE NUMBER OF READS IN THE NONCODING REGIONS.
+    readsperbp_noncoding = [0] * (len(window_edge_list)) #CONTAINS THE SUM OF THE NUMBER OF READS IN THE NONCODING REGIONS FOR EACH WINDOW.
+    N_reads_noncoding = [0] * (len(window_edge_list)) #CONTAINS THE NUMBER OF NONCODING REGIONS IN EACH WINDOW.
+    i = 0
+    for row in dna_df2.itertuples():
+        
         if row.Feature_type == None:
             readsperbp_noncoding[window_index_list[i]] += row.Nreads_normalized
             N_reads_noncoding[window_index_list[i]] += 1
