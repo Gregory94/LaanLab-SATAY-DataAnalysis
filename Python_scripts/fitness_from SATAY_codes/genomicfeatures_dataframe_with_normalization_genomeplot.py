@@ -35,7 +35,7 @@ def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, varia
     chrom_list = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']
     
     for region in chrom_list:
-#        print(region)
+        print(region)
         dna_df2 = dna_features(region, wig_file, pergene_insertions_file, variable, normalize, normalization_window_size, plotting, verbose=False)
     
         feature_position_list = feature_position_list + [pos[0] + chr_length for pos in dna_df2['Position'].tolist()]

@@ -42,9 +42,19 @@ from chromosome_and_gene_positions import chromosome_position, chromosomename_ro
 from chromosome_names_in_files import chromosome_name_wigfile
 from gene_names import list_gene_names, gene_aliases
 from read_sgdfeatures import sgd_features
-from normalize_reads import reads_normalization_fixed_window #reads_normalization_dynamic_window
+from normalize_reads import reads_normalization_dynamic_window, reads_normalization_fixed_window
 
 
+#%% TEMP
+#region = 10
+#wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
+#pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
+#variable="reads"
+#normalize=True
+#normalization_window_size = 20000
+#plotting=True
+#savefigure=False
+#verbose=True
 #%%
 def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, normalization_window_size=20000, plotting=True, savefigure=False, verbose=True):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
@@ -450,7 +460,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
 #%% NORMALIZE USING WINDOWS
 
-    dna_df2, window_edge_list = reads_normalization_fixed_window(dna_df2, len_chr, normalization_window_size, wig_file)
+    dna_df2, window_edge_list = reads_normalization_dynamic_window(dna_df2, len_chr, normalization_window_size, wig_file)
+#    dna_df2, window_edge_list = reads_normalization_fixed_window(dna_df2, len_chr, normalization_window_size, wig_file)
 
 #%% CREATE BAR PLOT
     if plotting == True:
@@ -621,24 +632,24 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-#    dna_df2 = dna_features(region = 3,#['xiii', 0, 14790],
-#                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
-#                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-#                 variable="reads",
-#                 normalization_window_size=20000,
-#                 normalize=True,
-#                 plotting=True,
-#                 savefigure=False,
-#                 verbose=False)
+    dna_df2 = dna_features(region = 3,#['xiii', 0, 14790],
+                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
+                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
+                 variable="reads",
+                 normalization_window_size=20000,
+                 normalize=True,
+                 plotting=True,
+                 savefigure=False,
+                 verbose=False)
 
 
-    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
-        dna_df2 = dna_features(region = chrom,
-                     wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
-                     pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-                     variable="reads",
-                     normalization_window_size=20000,
-                     normalize=True,
-                     plotting=False,
-                     savefigure=False,
-                     verbose=True)
+#    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
+#        dna_df2 = dna_features(region = chrom,
+#                     wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
+#                     pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
+#                     variable="reads",
+#                     normalization_window_size=20000,
+#                     normalize=True,
+#                     plotting=False,
+#                     savefigure=False,
+#                     verbose=True)
