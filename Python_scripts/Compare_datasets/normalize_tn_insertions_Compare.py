@@ -290,17 +290,18 @@ def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
             dna_df2 = pd.DataFrame(all_features, columns = [column_name for column_name in all_features]) #search for feature using: dna_df2.loc[dna_df2['Feature'] == 'CDC42']
         else:
             dna_df2["Ninsertionsperbp_2"] = N_insrt_per_bp_list
+            dna_df2["Nreadsperbp_2"] = N_reads_per_bp_list
     
     
         del (feature_NameAndType_list, feature_name_list, feature_name, f_type, f_previous, f_current, N_reads, N_reads_list, N_insrt, N_insrt_list, N_bp, N_bp_list, bp, i, N_reads_per_bp_list, N_insrt_per_bp_list, all_features)
     
 #%% CREATE BAR PLOT TO SHOW DIFFERENCES BETWEEN THE NUMBER OF INSERTIONS PER BP PER REGION
-    noncoding_color = '#00918F'#"#003231"
-    essential_color = '#00918F'#"#00F28E"
-    nonessential_color = '#00918F'#"#F20064"
-    codingdna_color = '#00918F'#'#00918f'
+    noncoding_color = "#003231"
+    essential_color = "#00F28E"
+    nonessential_color = "#F20064"
+    codingdna_color = '#00918f'
 #    textcolor = "#003231"
-    textsize = 14
+    textsize = 20
 
 
     feature_middle_pos_list = []
@@ -352,7 +353,7 @@ def dna_features_compare(region, wig_file_list, pergene_insertions_file_list):
     ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
     ax.xaxis.get_offset_text().set_fontsize(textsize)
     ax.set_xlabel("Basepair position on chromosome "+chrom, fontsize=textsize)
-    ax.set_ylabel("Relative difference insertions per bp per region",fontsize=textsize)
+    ax.set_ylabel("Relative difference Insertions per bp per region",fontsize=textsize)
     ax.set_title(r"(WT1 - $\Delta$Dpl1) / max(WT1)", fontsize=textsize)
 #    ax.set_title(r"(WT2 - WT1 / max(WT2)", fontsize=textsize)
     legend_noncoding = mpatches.Patch(color=noncoding_color, label="Noncoding DNA")

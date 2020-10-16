@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 gene_info=pd.read_excel(r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\Python_scripts\corrrelation-based-networks\chromosomal-info-per-gene.xlsx')
 
 # %% Importing all annotated interactions from SGD
-data_all_interactors=pd.read_excel(r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\Calculations\data_sgd\interaction-filtered-data.xlsx',header=0)
+data_all_interactors=pd.read_excel(r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\Calculations\Bioinformatic-Project\datasets\data-BioGrid-Yeast.xlsx',header=0)
 
 # %% Reading the  reads and insertions from WT and the mutant 
 import os
@@ -27,8 +27,8 @@ rel_path_data_wt="WT-normalize-reads-all-chromosome.xlsx"
 rel_path_data_mutant="dpl1-normalize-reads-all-chromosome.xlsx"
 #%% Reading the datafiles 
 
-abs_path_data_wt = os.path.join(script_dir,'Python_scripts','fitness_from SATAY_codes','output_data_files',rel_path_data_wt)
-abs_path_data_mutant = os.path.join(script_dir,'Python_scripts','fitness_from SATAY_codes','output_data_files',rel_path_data_mutant)
+abs_path_data_wt = os.path.join(script_dir,'fitness_from SATAY_codes','output_data_files',rel_path_data_wt)
+abs_path_data_mutant = os.path.join(script_dir,'fitness_from SATAY_codes','output_data_files',rel_path_data_mutant)
 # data_wt = pd.read_csv(abs_path_data_wt, sep="\t", header=0)
 # data_mutant = pd.read_csv(abs_path_data_mutant, sep="\t", header=0)
 data_wt=pd.read_excel(abs_path_data_wt,index_col='Unnamed: 1')
@@ -53,8 +53,8 @@ def reads2fitness (reads_data,type,feature):
     type : string
         Name of the gene to normalize with , e.g . 'HO'
     feature : string
-        Name of the column to normalize with
-        examples: 'Nreadsperbp_central80p_normalized', 'Nreadsperbp_normalized'
+        Name of the read column to normalize with
+        examples: 'Nreads'
 
     Returns
     -------
@@ -65,14 +65,17 @@ def reads2fitness (reads_data,type,feature):
     data_reads_normalized=reads_data.copy()
     # Normalization to HO locus:
     if type == 'HO':
-        data_reads_normalized['fitness-'+ type]=reads_data[feature]/(reads_data[reads_data['Standard_name']==type][feature].tolist()[0])
+        # normalizing by the number of reads reads over number of transposon of gene of interest vs HO
+        data_reads_normalized['fitness-'+ type]=(reads_data[feature]*reads_data[reads_data['Standard_name']==type]['Ninsertions'].tolist()[0])/(reads_data['Ninsertions']*(reads_data[reads_data['Standard_name']==type][feature].tolist()[0]))
     
  
     return data_reads_normalized
 
 def fitness2score(gene_ref,gene_to_know, feature,data_wt,data_mutant_ref):
-
-    info_ref=data_wt[data_wt['Standard_name']==gene_ref[0]][feature].tolist()[0]
+    
+    T=90 # Time of the fitness step in hours (reseeding step)
+    
+    info_ref=np.log2(data_wt[data_wt['Standard_name']==gene_ref[0]][feature].tolist()[0])/T
 
 
     interactions=defaultdict(dict)
@@ -80,11 +83,11 @@ def fitness2score(gene_ref,gene_to_know, feature,data_wt,data_mutant_ref):
         if len(data_wt[data_wt['Standard_name']==gene_to_know[i]][feature].tolist())==0:
             info_genex=None
         else:
-            info_genex=data_wt[data_wt['Standard_name']==gene_to_know[i]][feature].tolist()[0]
+            info_genex=np.log2(data_wt[data_wt['Standard_name']==gene_to_know[i]][feature].tolist()[0])/T
         if len(data_mutant_ref[data_mutant_ref['Standard_name']==gene_to_know[i]][feature].tolist())==0:
              info_genex_doublemutant=None
         else:
-            info_genex_doublemutant=data_mutant_ref[data_mutant_ref['Standard_name']==gene_to_know[i]][feature].tolist()[0]
+            info_genex_doublemutant=np.log2(data_mutant_ref[data_mutant_ref['Standard_name']==gene_to_know[i]][feature].tolist()[0])/T
 
         interactions[i]['background']=gene_ref
         interactions[i]['array-name']=gene_to_know[i]
@@ -155,12 +158,15 @@ interactions_pd=interactions.T
 interactions_pd.reset_index()
 interactions_pd.dropna(inplace=True)
 interactions_pd=interactions_pd.set_index(np.arange(0,len(interactions_pd)))
-
+# %% Save to excel 
+feature='Nreads'
+interactions_pd.to_excel('dpl1-fitness-based-on-HO-'+ feature+'.xlsx')
 #%%
 dpl1_fitness=interactions_pd[interactions_pd['array-name']=='DPL1']['fitness-query'].tolist()[0]
 # %% Fitness plot 
-max=10
-min=-1
+max=0.25
+
+min=-0.2
 fig, axes=plt.subplots(1,1)
 
 plt.scatter(x=interactions_pd['fitness-array'],y=interactions_pd['fitness-doublemutant'],alpha=0.1)

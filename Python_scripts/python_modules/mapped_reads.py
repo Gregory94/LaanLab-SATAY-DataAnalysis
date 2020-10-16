@@ -55,7 +55,7 @@ def total_mapped_reads(file, verbose=False):
 
 
         else:
-            print('WARNING: Not valid file extension. Files must have either of the following extension; .wig or .bed')
+            print('WARNING: No valid file extension. Files must have either of the following extension; .wig or .bed')
 
 
 
