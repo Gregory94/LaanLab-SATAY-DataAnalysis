@@ -17,7 +17,7 @@ import matplotlib.patches as mpatches
 
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
+sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic
 from chromosome_names_in_files import chromosome_name_wigfile
 from gene_names import list_gene_names, gene_aliases
@@ -36,7 +36,7 @@ from mapped_reads import total_mapped_reads
 #plotting=True
 #verbose=True
 #%%
-def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, normalization_window_size=10000, plotting=True, verbose=True):
+def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, normalization_window_size=10000, plotting=True, verbose=True,savefigure=False):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
     Optional is to define with data is displayed, which can be either "insertions" or "reads".
     Output is a dataframe including major information about all genomic features and optionally a barplot indicating the number of transposons per genomic region.
@@ -62,18 +62,18 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         - gff-file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Saccharomyces_cerevisiae.R64-1-1.99.gff3
         - sgd_features_file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/SGD_features.tab
     '''
-#%% FILES
+#FILES
 #for region in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XI', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
-    essentials_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
+    essentials_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
 
-    gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
+    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 
-    gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
 
-    sgd_features_file = os.path.join(file_dirname,'..','Data_Files','SGD_features.tab')
+    sgd_features_file = os.path.join(file_dirname,'Data_Files','SGD_features.tab')
 
     variable = variable.lower()
-#%% DETERMINE INPUTTED REGION
+# DETERMINE INPUTTED REGION
 
     if type(region) == str:
         if region.upper() in chromosomename_roman_to_arabic()[1]:
@@ -94,7 +94,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (region)
 
-#%% READ WIG FILE FOR GETTING LOCATIONS OF ALL TN INSERTIONS
+#READ WIG FILE FOR GETTING LOCATIONS OF ALL TN INSERTIONS
 
     with open(wig_file, 'r') as f:
         lines = f.readlines()
@@ -109,7 +109,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (lines, l, f, chrom_start_line_dict, chrom_end_line_dict)
 
-#%% READ PERGENE_INSERTIONS FILE FOR LOCATION OF ALL INSERTIONS PER EACH GENE.
+# READ PERGENE_INSERTIONS FILE FOR LOCATION OF ALL INSERTIONS PER EACH GENE.
 
     with open(pergene_insertions_file) as f:
         lines = f.readlines()
@@ -155,7 +155,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (f, lines, line, line_split, genename, gene_chrom, gene_start, gene_end, geneinserts_list, geneinserts_str, genereads_str, genereads_list)
 
-#%% DETERMINE THE LOCATION GENOMIC FEATURES IN THE CURRENT CHROMOSOME AND STORE THIS IN A DICTIONARY
+# DETERMINE THE LOCATION GENOMIC FEATURES IN THE CURRENT CHROMOSOME AND STORE THIS IN A DICTIONARY
     len_chr = chromosome_position(gff_file)[0].get(chrom)
     start_chr = chromosome_position(gff_file)[1].get(chrom)
     end_chr = chromosome_position(gff_file)[2].get(chrom)
@@ -177,11 +177,11 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         else:
             gene_alias = [key for key, val in gene_alias_dict.items() if gene in val][0]
             for bp in range(gene_position_dict.get(gene)[1]+start_chr, gene_position_dict.get(gene)[2]+start_chr+1):
-                dna_dict[bp] = [gene_alias, "Gene; "+feature_orf_dict.get(gene_alias)[1]]
+                dna_dict[bp] = [gene_alias, "Gene; " + feature_orf_dict.get(gene_alias)[1]]
 
     del (gff_file, gene, bp, gene_alias)
 
-#%% GET FEATURES FROM INTERGENIC REGIONS (-> SEE SGD_features.tab IN DATA_FILES IN GITHUB FOLDER)
+# GET FEATURES FROM INTERGENIC REGIONS (-> SEE SGD_features.tab IN DATA_FILES IN GITHUB FOLDER)
 
     dna_dict = feature_position(sgd_features(sgd_features_file)[1], chrom, start_chr, dna_dict, "ARS") #ARS
     dna_dict = feature_position(sgd_features(sgd_features_file)[2], chrom, start_chr, dna_dict, "Telomere") #Telomeres
@@ -217,7 +217,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (sgd_features_file, feature_orf_dict, orf_position_dict, feature, feature_alias)#, gene_position_dict)
 
-#%% DETERMINE THE NUMBER OF TRANSPOSONS PER BP FOR EACH FEATURE
+#DETERMINE THE NUMBER OF TRANSPOSONS PER BP FOR EACH FEATURE
 
     reads_loc_list = [0] * len(dna_dict) # CONTAINS ALL READS JUST LIKE READS_IN_CHROM_LIST, BUT THIS LIST HAS THE SAME LENGTH AS THE NUMBER OF BP IN THE CHROMOSOME WHERE THE LOCATIONS WITH NO READS ARE FILLED WITH ZEROS
     i = 0
@@ -228,7 +228,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (i, ins, insrt_in_chrom_list, reads_in_chrom_list)#, dna_df)
 
-#%% CREATE DATAFRAME FOR EACH FEATURE (E.G. NONCODING DNA, GENE, ETC.) IN THE CHROMOSOME AND DETERMINE THE NUMBER OF INSERTIONS AND READS PER FEATURE.
+# CREATE DATAFRAME FOR EACH FEATURE (E.G. NONCODING DNA, GENE, ETC.) IN THE CHROMOSOME AND DETERMINE THE NUMBER OF INSERTIONS AND READS PER FEATURE.
     feature_NameAndType_list = []
     f_previous = dna_dict.get(start_chr)[0]
     f_type = dna_dict.get(start_chr)[1]
@@ -353,7 +353,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     del (dna_dict, feature_NameAndType_list, feature_name_list, feature_type_list, feature_name, f_type, f_previous, f_start, f_end, f_pos_list, f_current, N_reads, N_reads_list, N_insrt_list, N_reads_central80_list, N_insrt_central80_list, N10percent, N_bp, N_bp_list, bp, i, N_reads_per_bp_list, N_insrt_per_bp_list, all_features, essentiality_list, essentials_file)
 
 
-#%% NORMALIZE USING WINDOWS
+#NORMALIZE USING WINDOWS
 
     if normalize == True and variable == "reads": #remove outliers before normalization using: dna_df2.at[273, "Nreadsperbp"] = 0
 
@@ -393,7 +393,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
         del (read_density_chromosome, N, window_edge_list, window_length, total_reads_in_genome, read_density_windows, window_start, window_end, index, row, read_density_windows_index)
 
-#%% CREATE BAR PLOT
+# CREATE BAR PLOT
     if plotting == True:
         noncoding_color = "#003231"
         essential_color = "#00F28E"
@@ -504,9 +504,18 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             labelleft=False)   # labels along the bottom edge are off
 
         del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width)
+        if savefigure == True:
+            if normalize == True and variable == 'reads':
+                saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_Normalized_with_Windowsize_'+str(normalization_window_size))
+            elif normalize == False and variable == 'reads':
+                saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_NonNormalized')
+            else:
+                saving_name = os.path.join(file_dirname,'GenomicFeaturesInsertions_Barplot_Chrom'+chrom+'_NonNormalized')
+            plt.savefig(saving_name, orientation='landscape', dpi=300)
+            
+        del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width)
 
-
-#%% RETURN STATEMENT
+# RETURN STATEMENT
     return(dna_df2)
 
 
@@ -536,11 +545,60 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
     return(dna_dict)
 
 
+
+#%%
+import time 
+
+t = time.process_time()
+chromosomes=['I',"II","III",'IV','V','VI','VII','VIII','IX','X',
+             'XI','XII','XIII','XIV','XV','XVI']
+
+wig_file=r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam.wig"
+pergene_insertions_file=r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
+
+normalize=[True]
+
+dna_df2=[]
+if __name__ == '__main__':
+    for ch in chromosomes:
+        for norm in normalize:
+            dna_df2.append(dna_features(region = ch, #["V", 0, 14790],
+                     wig_file = wig_file,
+                     pergene_insertions_file = pergene_insertions_file,
+                     normalize=norm,
+                     variable="reads",
+                     normalization_window_size=10000,
+                     plotting=True,
+                     verbose=True))
+            
+            
+normalize=[False]
+
+dna_df2_false=[]
+if __name__ == '__main__':
+    for ch in chromosomes:
+        for norm in normalize:
+            dna_df2_false.append(dna_features(region = ch, #["V", 0, 14790],
+                     wig_file = wig_file,
+                     pergene_insertions_file = pergene_insertions_file,
+                     normalize=norm,
+                     variable="reads",
+                     normalization_window_size=10000,
+                     plotting=True,
+                     verbose=True))
+            
+elapsed_time = time.process_time() - t
+
+print('The elapsed time was',elapsed_time,'seconds')
+#%%
+reads_normalize_pd=pd.concat(dna_df2,keys=chromosomes)      
+reads_non_normalize_pd=pd.concat(dna_df2_false,keys=chromosomes)   
+
 #%%
 if __name__ == '__main__':
     dna_df2 = dna_features(region = 'V', #["V", 0, 14790],
-                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
-                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
+                 wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam.wig",
+                 pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
                  normalize=False,
                  variable="reads",
                  normalization_window_size=50000,
