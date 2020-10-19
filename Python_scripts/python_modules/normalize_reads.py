@@ -13,10 +13,10 @@ from mapped_reads import total_mapped_reads
 
 
 #%% TEST PARAMETERS
-#len_chr = 230218
-#normalization_window_size= 20000
-#wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
-##dna_df2; load from genomicfeatures_dataframe_with_normalization.py with parameter 'region=1'
+len_chr = 813184#230218
+normalization_window_size= 20000
+wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
+#dna_df2; load from genomicfeatures_dataframe_with_normalization.py with parameter 'region=1'
 
 #%%
 def reads_normalization_fixed_window(dna_df2, len_chr, normalization_window_size, wig_file):
@@ -113,7 +113,9 @@ def reads_normalization_dynamic_window(dna_df2, len_chr, normalization_window_si
     defined as fitness 1.
     Also it returns a list including the basepairs where the windows end.
     '''
-    
+
+#DETERMINE THE EDGES OF THE WINDOWS
+#!!! CREATE NEW CODE THAT TAKES THE GENES, AND NORMALIZE WITH NC REGIONS BEFORE AND AFTER THAT ADDS UP TO N INSERTIONS
 #    bp_count = 0
     tn_count = 0
     window_edge_list = []
@@ -121,19 +123,23 @@ def reads_normalization_dynamic_window(dna_df2, len_chr, normalization_window_si
         if dna.Feature_type == None:
 #            bp_count += dna.Nbasepairs
             tn_count += dna.Ninsertions
-        if tn_count > 20:
+        if tn_count > 30:
             window_edge_list.append(dna.Position[1])
 #            bp_count = 0
             tn_count = 0
     window_edge_list[-1] = dna_df2.iloc[-1].Position[1]
-    
+
+
+#FOR EACH WINDOW, DETERMINE ITS SIZE
     window_size_list = [window_edge_list[0]]
     for i in range(len(window_edge_list[1:])):
         window_size_list.append(window_edge_list[i+1] - window_edge_list[i])
 
+#GET THE TOTAL NUMBER OF READS IN THE GENOME
     total_reads_in_genome = total_mapped_reads(wig_file)
 
 
+#
     read_density_chromosome = sum([dna.Nreads for dna in dna_df2.itertuples() if dna.Feature_type == None]) / sum([dna.Nbasepairs for dna in dna_df2.itertuples() if dna.Feature_type == None])
     read_density_windows = np.ones(len(window_edge_list))
     window_start = 0
@@ -146,7 +152,6 @@ def reads_normalization_dynamic_window(dna_df2, len_chr, normalization_window_si
         i += 1
 
 
-#!!! NOTE THAT WINDOW SIZE IS NOT CONSTANT. IMPLEMENT THIS IN FOLLOWING CODE WHERE THE VARIABLE WINDOW_LENGTH IS USED
     norm_reads_list = []
     norm_reads_truncatedgene_list = []
     window_index_list = [] #LIST CONTAINING THE INDICES FOR EACH FEATURE INDICATING TO WHICH WINDOW IT BELONGS. THIS HAS THE SAME LENGTH AS DNA_DF2 WHERE EACH ROW CORRESPONDS TO THE ROW IN DNA_DF2
@@ -167,7 +172,7 @@ def reads_normalization_dynamic_window(dna_df2, len_chr, normalization_window_si
         else:
             norm_reads_truncatedgene_list.append(row.Nreads_truncatedgene * (1/row.Nbasepairs*1.0) * ((10**6)/(total_reads_in_genome)) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
         norm_reads_list.append(row.Nreads * (1/row.Nbasepairs) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
-        
+
 
     dna_df2['Nreads_normalized'] = norm_reads_list
     dna_df2['Nreads_truncatedgene_normalized'] = norm_reads_truncatedgene_list
@@ -184,10 +189,19 @@ def reads_normalization_dynamic_window(dna_df2, len_chr, normalization_window_si
             N_reads_noncoding[window_index_list[i]] += 1
         i += 1
     avg_reads_noncoding = [readsperbp_noncoding[i] / N_reads_noncoding[i] for i in range(len(readsperbp_noncoding))]
-    
+
+
     normbync_reads_list = []
     for row in dna_df2.itertuples():
-        normbync_reads_list.append(row.Nreads_normalized / avg_reads_noncoding[int(row.Position[0] / window_length)])
+        for ind, w in reversed(list(enumerate(window_edge_list))):
+            if row.Position[0] < window_edge_list[0]:
+                window_length = window_size_list[0]
+                ind = -1
+                break
+            elif row.Position[0] > w:
+                window_length = window_size_list[ind+1]
+                break
+        normbync_reads_list.append(row.Nreads_normalized / avg_reads_noncoding[ind+1])#int(row.Position[0] / window_length)])
     dna_df2['Nreads_normalized_byNCregions'] = normbync_reads_list
 
 

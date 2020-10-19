@@ -42,9 +42,19 @@ from chromosome_and_gene_positions import chromosome_position, chromosomename_ro
 from chromosome_names_in_files import chromosome_name_wigfile
 from gene_names import list_gene_names, gene_aliases
 from read_sgdfeatures import sgd_features
-from normalize_reads import reads_normalization_fixed_window #reads_normalization_dynamic_window
+from normalize_reads import reads_normalization_dynamic_window, reads_normalization_fixed_window
 
 
+#%% TEMP
+#region = 10
+#wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
+#pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
+#variable="reads"
+#normalize=True
+#normalization_window_size = 20000
+#plotting=True
+#savefigure=False
+#verbose=True
 #%%
 def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, normalization_window_size=20000, plotting=True, savefigure=False, verbose=True):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
@@ -74,18 +84,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         - gff-file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Saccharomyces_cerevisiae.R64-1-1.99.gff3
         - sgd_features_file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/SGD_features.tab
     '''
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-################### FILES
-#for region in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XI', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
-    essentials_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
-=======
 #%% FILES
-<<<<<<< HEAD
     essentials_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
-=======
-    essentials_file = os.path.join(file_dirname,'..','Data_Files',"Cerevisiae_AllEssentialGenes_List.txt")
->>>>>>> 0af8d3433e4654e231168d220fee00b5815bf2ae
 
     gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
 
@@ -94,14 +94,10 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     sgd_features_file = os.path.join(file_dirname,'..','Data_Files','SGD_features.tab')
 
     variable = variable.lower()
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-################## DETERMINE INPUTTED REGION
-=======
     if plotting == True:
         create_plottitle = ''
 
 #%% DETERMINE INPUTTED REGION
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
 
     warningmessage = "WARNING: Specified chromosome or gene name not found. Enter chromosome as a number (or roman numeral) between 1 and 16 (I and XVI), a list in the form ['chromosome number, start_position, end_position'] or a valid gene name."
 
@@ -177,7 +173,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (warningmessage)
 
-################READ WIG FILE FOR GETTING LOCATIONS OF ALL TN INSERTIONS
+#%% READ WIG FILE FOR GETTING LOCATIONS OF ALL TN INSERTIONS
 
     with open(wig_file, 'r') as f:
         lines = f.readlines()
@@ -192,7 +188,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (lines, l, f, chrom_start_line_dict, chrom_end_line_dict)
 
-###############READ PERGENE_INSERTIONS FILE FOR LOCATION OF ALL INSERTIONS PER EACH GENE.
+#%% READ PERGENE_INSERTIONS FILE FOR LOCATION OF ALL INSERTIONS PER EACH GENE.
 
     with open(pergene_insertions_file) as f:
         lines = f.readlines()
@@ -232,12 +228,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (f, lines, line, line_split, genename, gene_chrom, gene_start, gene_end, geneinserts_list, geneinserts_str, genereads_str, genereads_list)
 
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-############# DETERMINE THE LOCATION GENOMIC FEATURES IN THE CURRENT CHROMOSOME AND STORE THIS IN A DICTIONARY
-=======
 #%% DETERMINE THE LOCATION GENOMIC FEATURES IN THE CURRENT CHROMOSOME AND STORE THIS IN A DICTIONARY
 
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
     len_chr = chromosome_position(gff_file)[0].get(chrom)
     start_chr = chromosome_position(gff_file)[1].get(chrom)
     end_chr = chromosome_position(gff_file)[2].get(chrom)
@@ -264,7 +256,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (gff_file, gene, bp, gene_alias)
 
-################ GET FEATURES FROM INTERGENIC REGIONS (-> SEE SGD_features.tab IN DATA_FILES IN GITHUB FOLDER)
+#%% GET FEATURES FROM INTERGENIC REGIONS (-> SEE SGD_features.tab IN DATA_FILES IN GITHUB FOLDER)
 
     genomicregions_list = sgd_features(sgd_features_file)[0]
 
@@ -300,7 +292,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (sgd_features_file, feature_orf_dict, orf_position_dict, feature, feature_alias, gene_position_dict)
 
-############### DETERMINE THE NUMBER OF TRANSPOSONS PER BP FOR EACH FEATURE
+#%% DETERMINE THE NUMBER OF TRANSPOSONS PER BP FOR EACH FEATURE
 
     reads_loc_list = [0] * len(dna_dict) # CONTAINS ALL READS JUST LIKE READS_IN_CHROM_LIST, BUT THIS LIST HAS THE SAME LENGTH AS THE NUMBER OF BP IN THE CHROMOSOME WHERE THE LOCATIONS WITH NO READS ARE FILLED WITH ZEROS
     i = 0
@@ -311,12 +303,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (i, ins, insrt_in_chrom_list, reads_in_chrom_list)#, dna_df)
 
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-############# CREATE DATAFRAME FOR EACH FEATURE (E.G. NONCODING DNA, GENE, ETC.) IN THE CHROMOSOME AND DETERMINE THE NUMBER OF INSERTIONS AND READS PER FEATURE.
-=======
 #%% CREATE DATAFRAME FOR EACH FEATURE (E.G. NONCODING DNA, GENE, ETC.) IN THE CHROMOSOME AND DETERMINE THE NUMBER OF INSERTIONS AND READS PER FEATURE.
 
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
     feature_NameAndType_list = []
     f_previous = dna_dict.get(start_chr)[0]
     f_type = dna_dict.get(start_chr)[1]
@@ -470,65 +458,12 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     del (dna_dict, feature_NameAndType_list, feature_name_list, feature_type_list, feature_name, f_type, f_previous, f_start, f_end, f_pos_list, f_current, N_reads, N_reads_list, N_insrt_list, N_reads_truncatedgene_list, N_insrt_truncatedgene_list, N10percent, N_bp, N_bp_list, bp, i, start_chr, end_chr, all_features, essentiality_list, essentials_file, genomicregions_list)
 
 
-#####NORMALIZE USING WINDOWS
+#%% NORMALIZE USING WINDOWS
 
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-    if normalize == True and variable == "reads":
-
-        # DETERMINE MEANS FOR THE NUMBER OF READS/BP IN THE NONCODING REGIONS WITHIN EACH WINDOW.
-        N = round(len_chr/normalization_window_size)
-        window_edge_list = np.linspace(0, len_chr, N, dtype=int).tolist()#[82500, 243500, len_chr]
-        window_length = window_edge_list[1] - window_edge_list[0]
-
-        total_reads_in_genome = total_mapped_reads(wig_file)
-
-
-        read_density_chromosome = sum([nc[14] for nc in dna_df2.itertuples() if nc[4] == None])
-        read_density_windows = np.ones(len(window_edge_list)-1)
-        window_start = 0
-        i = 0
-        for window_end in window_edge_list[1:]:
-            read_density = sum([nc[14] for nc in dna_df2.itertuples() if window_start <= nc[6][0] < window_end and nc[4] == None])
-            if not read_density == 0:
-                read_density_windows[i] = read_density
-#            read_density_windows.append(sum([nc[14] for nc in dna_df2.itertuples() if window_start <= nc[6][0] < window_end and nc[4] == None]))
-            window_start = window_end
-            i += 1
-
-
-        norm_reads_list = []
-        norm_reads_central80p_list = []
-        for index, row in dna_df2.iterrows(): #NOTE THAT IN THIS METHOD THE INDEX COLUMN IS NOT CONSIDERED (I.E. ROW[0] IS THE FEATURE COLUMN, WHEREAS PREVIOUSLY NC[0] IS THE INDEX COLUMN)
-            #normalization equation:
-                #normalization for gene = raw read count in middle 80% of feature * (1/gene length) * (10^6/total mapped reads in genome) * (read density in chromosome/read density in window)
-                #normalization for other features = raw read count in entire feature * (1/gene length) * (10^6/total mapped reads in genome) * (read density in chromosome/read density in window)
-            #row[8] contains the total number of reads in the central 80% of the gene (or in the entire feature if this is not a gene)
-            #row[7] contains the total number of reads in entire genes and features.
-            #row[4] contains the number of basepairs in the current feature
-            #row[3] contains the position of the feature
-            #row[1] contains feature type
-            read_density_windows_index = int(row[5][0]/window_length) #determine which window the current feature belongs to.
-            if not row[3] == None and row[3].startswith('Gene'):
-                norm_reads_central80p_list.append(row[10] * (1/row[6]) * ((10**6)/(total_reads_in_genome)*0.8) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
-            else:
-                norm_reads_central80p_list.append(row[10] * (1/row[6]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
-            norm_reads_list.append(row[9] * (1/row[6]) * ((10**6)/(total_reads_in_genome)*1.0) * (read_density_chromosome/read_density_windows[read_density_windows_index]))
-
-        dna_df2['Nreadsperbp_normalized'] = norm_reads_list
-        dna_df2['Nreadsperbp_central80p_normalized'] = norm_reads_central80p_list
-
-        del (norm_reads_central80p_list, i, reads_loc_list, read_density_chromosome, N, window_edge_list, window_length, total_reads_in_genome, read_density_windows, window_start, window_end, index, row, read_density_windows_index, read_density)
-
-<<<<<<< HEAD
-########## CREATE BAR PLOT
-=======
-#    dna_df2, window_edge_list = reads_normalization_dynamic_window(dna_df2, len_chr, normalization_window_size, wig_file)
-=======
->>>>>>> 0af8d3433e4654e231168d220fee00b5815bf2ae
-    dna_df2, window_edge_list = reads_normalization_fixed_window(dna_df2, len_chr, normalization_window_size, wig_file)
+    dna_df2, window_edge_list = reads_normalization_dynamic_window(dna_df2, len_chr, normalization_window_size, wig_file)
+#    dna_df2, window_edge_list = reads_normalization_fixed_window(dna_df2, len_chr, normalization_window_size, wig_file)
 
 #%% CREATE BAR PLOT
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
     if plotting == True:
         noncoding_color = "#002538"
         essential_color = "#10e372"
@@ -650,6 +585,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
             right=False,       # ticks along the top edge are off
             labelleft=False)   # labels along the bottom edge are off
 
+
         if savefigure == True:
             if normalize == True and variable == 'reads':
                 saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_Normalized_with_Windowsize_'+str(normalization_window_size))
@@ -657,14 +593,6 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
                 saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_NonNormalized')
             else:
                 saving_name = os.path.join(file_dirname,'GenomicFeaturesInsertions_Barplot_Chrom'+chrom+'_NonNormalized')
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-            plt.savefig(saving_name, orientation='landscape', dpi=300)
-            
-        del (barcolor_list, codingdna_color, essential_color, feature_middle_pos_list, feature_width_list, noncoding_color, nonessential_color, textcolor, textsize, l, counter, width)
-        
-        
-######### RETURN STATEMENT
-=======
             plt.savefig(saving_name, orientation='landscape', dpi=200)
             plt.close()
 
@@ -672,7 +600,6 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
 
 #%% RETURN STATEMENT
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
     return(dna_df2)
 
 
@@ -704,86 +631,15 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 
 #%%
-chromosomes=['I',"II","III",'IV','V','IV','V','VI','VII','VIII','IX','X',
-             'XI','XII','XIII','XIV','XV','XVI']
 if __name__ == '__main__':
-<<<<<<< HEAD
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-    dna_df2 = dna_features(region = 'iv', #["V", 0, 14790],
-                 wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam.wig",
-                 pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt",
-                 normalize=True,
-=======
-    dna_df2 = dna_features(region = 10,#['xiii', 0, 14790],
+    dna_df2 = dna_features(region = 3,#['xiii', 0, 14790],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
                  variable="reads",
                  normalization_window_size=20000,
                  normalize=True,
                  plotting=True,
                  savefigure=False,
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-                 verbose=True)
-
-
-
-#%%
-import time 
-################## mutant ################################
-wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam.wig"
-pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt"
-
-######### WT #################################S
-#wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam.wig"
-#pergene_insertions_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_WT1_KornmannLab\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
-
-
-t = time.process_time()
-chromosomes=['I',"II","III",'IV','V','VI','VII','VIII','IX','X',
-             'XI','XII','XIII','XIV','XV','XVI']
-
-
-normalize=[True]
-
-dna_df2=[]
-if __name__ == '__main__':
-    for ch in chromosomes:
-        for norm in normalize:
-            dna_df2.append(dna_features(region = ch, #["V", 0, 14790],
-                     wig_file = wig_file,
-                     pergene_insertions_file = pergene_insertions_file,
-                     normalize=norm,
-                     variable="reads",
-                     normalization_window_size=10000,
-                     plotting=True,
-                     savefigure=False,
-                     verbose=True))
-            
-            
-normalize=[False]
-
-dna_df2_false=[]
-if __name__ == '__main__':
-    for ch in chromosomes:
-        for norm in normalize:
-            dna_df2_false.append(dna_features(region = ch, #["V", 0, 14790],
-                     wig_file = wig_file,
-                     pergene_insertions_file = pergene_insertions_file,
-                     normalize=norm,
-                     variable="reads",
-                     normalization_window_size=10000,
-                     savefigure=False,
-                     plotting=True,
-                     verbose=True))
-            
-elapsed_time = time.process_time() - t
-
-print('The elapsed time was',elapsed_time/60,'minutes')
-#%%
-reads_normalize_pd=pd.concat(dna_df2,keys=chromosomes)      
-reads_non_normalize_pd=pd.concat(dna_df2_false,keys=chromosomes)   
-=======
                  verbose=False)
 
 
@@ -797,27 +653,3 @@ reads_non_normalize_pd=pd.concat(dna_df2_false,keys=chromosomes)
 #                     plotting=False,
 #                     savefigure=False,
 #                     verbose=True)
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
-=======
-#    dna_df2 = dna_features(region = 3,#['xiii', 0, 14790],
-#                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
-#                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-#                 variable="reads",
-#                 normalization_window_size=20000,
-#                 normalize=True,
-#                 plotting=True,
-#                 savefigure=False,
-#                 verbose=False)
-
-
-    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
-        dna_df2 = dna_features(region = chrom,
-                     wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
-                     pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-                     variable="reads",
-                     normalization_window_size=20000,
-                     normalize=True,
-                     plotting=False,
-                     savefigure=False,
-                     verbose=True)
->>>>>>> 0af8d3433e4654e231168d220fee00b5815bf2ae
