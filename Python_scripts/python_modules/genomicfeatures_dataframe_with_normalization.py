@@ -74,18 +74,13 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         - gff-file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Saccharomyces_cerevisiae.R64-1-1.99.gff3
         - sgd_features_file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/SGD_features.tab
     '''
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-################### FILES
+ ################### FILES
 #for region in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XI', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
     essentials_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
-=======
+
 #%% FILES
-<<<<<<< HEAD
-    essentials_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Python_scripts\Data_Files\Cerevisiae_AllEssentialGenes_List.txt"
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
-=======
-    essentials_file = os.path.join(file_dirname,'..','Data_Files',"Cerevisiae_AllEssentialGenes_List.txt")
->>>>>>> 0af8d3433e4654e231168d220fee00b5815bf2ae
+
+    
 
     gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
 
@@ -94,14 +89,10 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     sgd_features_file = os.path.join(file_dirname,'..','Data_Files','SGD_features.tab')
 
     variable = variable.lower()
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-################## DETERMINE INPUTTED REGION
-=======
     if plotting == True:
         create_plottitle = ''
 
 #%% DETERMINE INPUTTED REGION
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
 
     warningmessage = "WARNING: Specified chromosome or gene name not found. Enter chromosome as a number (or roman numeral) between 1 and 16 (I and XVI), a list in the form ['chromosome number, start_position, end_position'] or a valid gene name."
 
@@ -232,12 +223,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (f, lines, line, line_split, genename, gene_chrom, gene_start, gene_end, geneinserts_list, geneinserts_str, genereads_str, genereads_list)
 
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-############# DETERMINE THE LOCATION GENOMIC FEATURES IN THE CURRENT CHROMOSOME AND STORE THIS IN A DICTIONARY
-=======
 #%% DETERMINE THE LOCATION GENOMIC FEATURES IN THE CURRENT CHROMOSOME AND STORE THIS IN A DICTIONARY
 
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
     len_chr = chromosome_position(gff_file)[0].get(chrom)
     start_chr = chromosome_position(gff_file)[1].get(chrom)
     end_chr = chromosome_position(gff_file)[2].get(chrom)
@@ -311,12 +298,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
     del (i, ins, insrt_in_chrom_list, reads_in_chrom_list)#, dna_df)
 
-<<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
-############# CREATE DATAFRAME FOR EACH FEATURE (E.G. NONCODING DNA, GENE, ETC.) IN THE CHROMOSOME AND DETERMINE THE NUMBER OF INSERTIONS AND READS PER FEATURE.
-=======
 #%% CREATE DATAFRAME FOR EACH FEATURE (E.G. NONCODING DNA, GENE, ETC.) IN THE CHROMOSOME AND DETERMINE THE NUMBER OF INSERTIONS AND READS PER FEATURE.
 
->>>>>>> 5324574961d4910a202e03eea91b9be180bce08f:Python_scripts/python_modules/genomicfeatures_dataframe_with_normalization.py
     feature_NameAndType_list = []
     f_previous = dna_dict.get(start_chr)[0]
     f_type = dna_dict.get(start_chr)[1]
