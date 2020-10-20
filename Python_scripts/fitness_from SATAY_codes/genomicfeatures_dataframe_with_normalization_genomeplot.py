@@ -81,6 +81,8 @@ def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, varia
     
     
     #%% PLOTTING
+    textsize = 20
+    
     plt.figure(figsize=(19,9))
     grid = plt.GridSpec(2, 1, wspace=0.0, hspace=0.01)
     
@@ -90,14 +92,17 @@ def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, varia
     ax1.grid(False)
     ax1.set_xlim(0,l_genome)
     ax1.set_ylim(0,250)
-    ax1.set_ylabel("Reads not normalized [Absolute counts]")
+    ax1.set_ylabel("Reads not normalized \n [Absolute counts]", fontsize=textsize)
+    ax1.tick_params(labelsize=textsize)
+    ax1.tick_params(axis='x', labelbottom=False)
     
     ax2 = plt.subplot(grid[1,0])
     ax2.bar(bins, binned_norm_reads_list, width=N_bins, color="#333333")
     ax2.grid(False)
     ax2.set_xlim(0,l_genome)
     ax2.set_ylim(0,250)
-    ax2.set_ylabel("Reads normalized [A.U.]")
+    ax2.set_ylabel("Reads normalized [A.U.]", fontsize=textsize)
+    ax2.tick_params(labelsize=textsize)
     
     for chrom in chr_summedlength_dict:
         ax1.axvline(x = chr_summedlength_dict.get(chrom), linestyle='-', color=(0.9,0.9,0.9,1.0))
