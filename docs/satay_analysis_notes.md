@@ -455,7 +455,7 @@ This is chosen because if now a bar is empty in a gene than this is not a coinci
 
 These plots can be used for checking if a gene has transposon free regions which might indicate that this gene is essential.
 
-# Data analysis; From raw sequencing data to number of insertions and reads per genomic region
+# Preprocessing; From raw sequencing data to number of insertions and reads per genomic region
 
 SATAY experiments need to be sequenced which results in a FASTQ file.
 The sequence reads from this file needs to be aligned to create a SAM file (and/or the compressed binary equivalent BAM file).
@@ -464,6 +464,20 @@ Using the BAM file, the number of transposons can be determined for each inserti
 For guides and manuals of the software discussed below, see [the Github page for this project](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/master/docs).
 
 For testing, the raw data (.FASTQ files) discussed in the paper of Michel et.al. 2017 is used and can be found [here](<https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-4885/samples/>).
+
+This section describes how to use the software for preprocessing.
+To make this more efficient, **it is advised to use [an automated workflow](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Python_TransposonMapping/processing_workflow.sh) that has been created for Linux**.
+This automated workflow is written in a bash file that performs all steps in the *processing pipeline* described in the next subsection.
+The workflow in the bash file starts with a section with user defined options in which the name of the fastq-file has to be given and the options can be set that are described in the following sections.
+It requires the fastq file to be located in the shared folder of the Linux machine where the workflow gets the fastq file to perform all processing steps and, when finished, returns the file together with the output files back to the shared folder.
+This bash script is located on the desktop of the Linux Virtual Machine.
+This Virtual machine can be found on the N-Drive/VirtualMachines.
+This N-drive folder also contains a readme about how to use the virtual machine and how to run the bash script.
+When you want to use this VirtualMachine, **please make a copy of the .vhd file, do not use the vhd file directly from the VirtualMachine folder!**
+You can make your own copy on the N-drive, but when using it make sure you have a very stable internet connection, preferably using an internet cable.
+To start the Virtual machine, first download [VirtualBox](https://www.virtualbox.org/).
+The [InstallationGuide](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/docs/Installation_Guide_SATAY_Analysis_Software.pdf) (which can also be found in the N-Drive/VirtualMachines) explains how to get started with the virtual machine.
+The readme file on the N-drive/VirtualMachines folder should be enough to get you started with the processing, but for a more detailed explaination about the used software or how to perform the processing without the workflow, see the following subsections.
 
 ## Workflow
 
