@@ -391,10 +391,16 @@ This value is assigned a ‘+’ or ‘-‘ to indicate the reading orientation.
 There are 42 scores, each of which are related to a specific error.
 See for example [phred score conversion table](<https://drive5.com/usearch/manual/quality_score.html>) for a conversion table.
 
-## Determine essentiality based on transposon counts
+## Data analysis tools
 
-Using the number of transposons and reads, the essentiality can be determined.
+Using the number of transposons and reads, the fitness of gene deletions can be estimated.
 Currently, genes that are taken as essential are the annotated essentials based on previous research (e.g. see the [Github page of this research](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Cerevisiae_AllEssentialGenes_List.txt)).
+
+### Create python dataframe for concatenating all data from the processing output folder
+The processing pipeline yields a number of files that includes information about the location of transposon insertions and the reads in each of the insertions.
+To easily use this data, a python function ([genomicfeatures_dataframe_with_normalization.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/python_modules/genomicfeatures_dataframe_with_normalization.py)) has been developed that creates a dataframe for each chromosome that includes all genomic features (genes, centromeres, telomeres, RNA genes, ARS etc.) together with some information (e.g. genomic location, essentiality etc.) and the number of insertions and reads in different formats (see below figure for an example).
+For more detailed explanation see the help text of the function.
+![Dataframe as is being output from dna_features function in genomicfeatures_dataframe_with_normaliation.py.](./media/dna_df2.png)
 
 ### Distribution number of insertions and reads compared with essential and non-essential genes
 
@@ -472,12 +478,12 @@ The workflow in the bash file starts with a section with user defined options in
 It requires the fastq file to be located in the shared folder of the Linux machine where the workflow gets the fastq file to perform all processing steps and, when finished, returns the file together with the output files back to the shared folder.
 This bash script is located on the desktop of the Linux Virtual Machine.
 This Virtual machine can be found on the N-Drive/VirtualMachines.
-This N-drive folder also contains a readme about how to use the virtual machine and how to run the bash script.
+This N-drive folder also contains a [VM_README](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/docs/VM_README.pdf) about how to use the virtual machine and how to run the bash script.
 When you want to use this VirtualMachine, **please make a copy of the .vhd file, do not use the vhd file directly from the VirtualMachine folder!**
 You can make your own copy on the N-drive, but when using it make sure you have a very stable internet connection, preferably using an internet cable.
 To start the Virtual machine, first download [VirtualBox](https://www.virtualbox.org/).
 The [InstallationGuide](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/docs/Installation_Guide_SATAY_Analysis_Software.pdf) (which can also be found in the N-Drive/VirtualMachines) explains how to get started with the virtual machine.
-The readme file on the N-drive/VirtualMachines folder should be enough to get you started with the processing, but for a more detailed explaination about the used software or how to perform the processing without the workflow, see the following subsections.
+The [VM_README](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/docs/VM_README.pdf) file on the N-drive/VirtualMachines folder should be enough to get you started with the processing, but for a more detailed explaination about the used software or how to perform the processing without the workflow, see the following subsections.
 
 ## Workflow
 
