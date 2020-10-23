@@ -627,7 +627,7 @@ if __name__ == '__main__':
                  variable="reads",
                  normalization_window_size=20000,
                  normalize=True,
-                 plotting=True,
+                 plotting=False,
                  savefigure=False,
                  verbose=False)
 
