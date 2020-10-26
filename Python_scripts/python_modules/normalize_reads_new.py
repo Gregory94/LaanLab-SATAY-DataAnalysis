@@ -32,29 +32,30 @@ def reads_normalization_dynamic_window(dna_df2, len_chr, wig_file):
 
 
     window_start_end_dict = {}
-    for dna in dna_df2.itertuples(index=True):
+    for dna in dna_df2.itertuples(index=True): # dna = list(dna_df2.itertuples(index=True))[1]
         if not dna.Feature_name == 'noncoding':
             
             #GET CLOSEST NONCODING REGION OF CURRENT FEATURE
             feature_start_position = dna.Position[0]
-            difference_startposition_featureandnc_list = [abs(nc_startposition - feature_start_position) for nc_startposition in nc_startposition_list]
-#            index_closest_nc_region = np.where(np.array(difference_startposition_featureandnc_list) > 0, difference_startposition_featureandnc_list, np.inf).argmin()
-            index_closest_nc_region = difference_startposition_featureandnc_list.index(min(difference_startposition_featureandnc_list))
-            if dna.Feature_name == 'YAL011W':
-                print(nc_startposition_list[index_closest_nc_region])
-
+            difference_startposition_featureandnc_list = [(nc_startposition - feature_start_position) for nc_startposition in nc_startposition_list]
+            index_closest_nc_region = np.where(np.array(difference_startposition_featureandnc_list) > 0, difference_startposition_featureandnc_list, np.inf).argmin()
+#            index_closest_nc_region = difference_startposition_featureandnc_list.index(min(difference_startposition_featureandnc_list))
 
             #DETERMINE THE NONCODING REGIONS CLOSEST TO THE CURRENT FEATURE
             tn_innc_forwardcount = 0
             index_count = index_closest_nc_region
-            for nc_endposition in nc_endposition_list[index_closest_nc_region+1:]:
-                if tn_innc_forwardcount < 10:
-#                    print('Forward count nc start position: ', nc_endposition_list[index_count])
-                    tn_innc_forwardcount += nc_insrt_list[index_count]
-                    index_count += 1
-                else:
+            for nc_endposition in nc_endposition_list[index_closest_nc_region:]:
+                if tn_innc_forwardcount > 10:
+                    window_start_end_dict[dna.Feature_name] = [nc_endposition_list[index_count-1]]
+                    break
+                elif index_count >= len(nc_startposition_list)-1:
                     window_start_end_dict[dna.Feature_name] = [nc_endposition_list[index_count]]
                     break
+                elif tn_innc_forwardcount < 10:
+                    tn_innc_forwardcount += nc_insrt_list[index_count]
+                    index_count += 1
+
+
 #            nc_startposition_list.reverse()
 #            tn_innc_reversecount = 0
 #            index_count = 0
