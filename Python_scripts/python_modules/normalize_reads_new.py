@@ -21,7 +21,7 @@ wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C
 def reads_normalization_dynamic_window(dna_df2, len_chr, wig_file):
     '''
     '''
-    Ninsrt_threshold = 10
+    Ninsrt_threshold = 20 #NUMBER OF INSERTIONS BEFORE AND AFTER A FEATURE. THIS IS NOT THE NUMBER OF READS.
 
     nc_df = dna_df2[dna_df2['Feature_name'] == 'noncoding']
     nc_startposition_list = [position[0] for position in nc_df['Position'].tolist()]
@@ -30,7 +30,8 @@ def reads_normalization_dynamic_window(dna_df2, len_chr, wig_file):
     del(nc_df)
 
 
-    window_start_end_dict = {} #-> CONTAINS TWO INTEGERS: 1;START_POSITION NONCODING REGION BEFORE CURRENT GENE THAT HAS MORE THAN N TRANSPOSONS 2;END_POSITION NONCODING REGION AFTER CURRENT GENE THAT HAS MORE THAN N TRANPOSONS
+    window_start_end_dict = {} #-> EACH VALUE CONTAINS TWO INTEGERS IN A LIST: 1;START_POSITION NONCODING REGION BEFORE CURRENT GENE THAT HAS MORE THAN N TRANSPOSONS 2;END_POSITION NONCODING REGION AFTER CURRENT GENE THAT HAS MORE THAN N TRANPOSONS
+    window_insrt_dict = {}
     for dna in dna_df2.itertuples(index=True): # dna = list(dna_df2.itertuples(index=True))[1]
         if not dna.Feature_name == 'noncoding':
 
@@ -45,9 +46,11 @@ def reads_normalization_dynamic_window(dna_df2, len_chr, wig_file):
             for nc_endposition in nc_endposition_list[index_closest_nc_region:]:
                 if tn_innc_forwardcount > Ninsrt_threshold:
                     window_start_end_dict[dna.Feature_name] = [nc_endposition_list[index_count-1]]
+                    window_insrt_dict[dna.Feature_name] = [tn_innc_forwardcount]
                     break
                 elif index_count >= len(nc_endposition_list)-1:
                     window_start_end_dict[dna.Feature_name] = [nc_endposition_list[index_count]]
+                    window_insrt_dict[dna.Feature_name] = [tn_innc_forwardcount]
                     break
                 elif tn_innc_forwardcount <= Ninsrt_threshold:
                     tn_innc_forwardcount += nc_insrt_list[index_count]
@@ -58,33 +61,17 @@ def reads_normalization_dynamic_window(dna_df2, len_chr, wig_file):
             for nc_startposition in nc_startposition_list[:index_closest_nc_region]:
                 if tn_innc_reversecount > Ninsrt_threshold:
                     window_start_end_dict[dna.Feature_name] = [nc_startposition_list[index_count]] + window_start_end_dict.get(dna.Feature_name)
+                    window_insrt_dict[dna.Feature_name] = [tn_innc_reversecount] + window_insrt_dict.get(dna.Feature_name)
                     break
                 elif index_count <= 1:
                     window_start_end_dict[dna.Feature_name] = [nc_startposition_list[index_count-1]] + window_start_end_dict.get(dna.Feature_name)
+                    window_insrt_dict[dna.Feature_name] = [tn_innc_reversecount] + window_insrt_dict.get(dna.Feature_name)
                     break
                 elif tn_innc_reversecount <= Ninsrt_threshold:
                     tn_innc_reversecount += nc_insrt_list[index_count]
                     index_count -= 1
 
-
-##            if index_closest_nc_region == 1:
-##                window_start_end_dict[dna.Feature_name] = [nc_startposition_list[index_closest_nc_region-1]] + window_start_end_dict.get(dna.Feature_name)
-##            else:
-#            tn_innc_reversecount = 0
-#            index_count = index_closest_nc_region
-#            for inx in range(1, len(nc_startposition_list[:index_closest_nc_region])):
-#                if index_count <= 1:
-#                    print(dna.Feature_name)
-#                    window_start_end_dict[dna.Feature_name] = [nc_startposition_list[index_count]] + window_start_end_dict.get(dna.Feature_name)
-#                    break
-#                elif tn_innc_reversecount > Ninsrt_threshold:
-#                    window_start_end_dict[dna.Feature_name] = [nc_startposition_list[index_count]] + window_start_end_dict.get(dna.Feature_name)
-#                    break
-#                elif tn_innc_reversecount <= Ninsrt_threshold:
-#                    tn_innc_reversecount += nc_insrt_list[index_count]
-#                    index_count -= 1
-##                    inx -= 1
-
+    del (difference_startposition_featureandnc_list, dna, feature_start_position, index_closest_nc_region, index_count, nc_endposition, nc_endposition_list, nc_startposition, nc_startposition_list, tn_innc_forwardcount, tn_innc_reversecount, nc_insrt_list)
 
 
 
