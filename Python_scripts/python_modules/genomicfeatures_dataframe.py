@@ -43,7 +43,7 @@ from chromosome_and_gene_positions import chromosome_position, chromosomename_ro
 from chromosome_names_in_files import chromosome_name_wigfile
 from gene_names import list_gene_names, gene_aliases
 from read_sgdfeatures import sgd_features
-#from normalize_reads import reads_normalization_fixed_window #reads_normalization_dynamic_window
+from normalize_reads_new import reads_normalization_dynamic_window
 
 
 #%%
@@ -434,7 +434,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
 
 #%% NORMALIZE USING WINDOWS
 
-    #dna_df2, window_edge_list = reads_normalization_fixed_window(dna_df2, len_chr, normalization_window_size, wig_file)
+#    reads_normalization_dynamic_window(dna_df2, len_chr, wig_file)
 
 #%% CREATE BAR PLOT
     if plotting == True:
@@ -596,8 +596,8 @@ if __name__ == '__main__':
 
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
 #        dna_df2 = dna_features(region = chrom,
-#                     wig_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Data_Files\test_data\KornmannLab_dataset_dDpl1\E-MTAB-4885.Dpl1Kan.sorted.bam.wig",
-#                     pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Data_Files\test_data\KornmannLab_dataset_dDpl1\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt",
+#                     wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig",
+#                     pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt",
 #                     variable="reads",
 #                     plotting=False,
 #                     savefigure=False,
