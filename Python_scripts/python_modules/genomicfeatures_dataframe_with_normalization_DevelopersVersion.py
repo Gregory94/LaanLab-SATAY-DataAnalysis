@@ -42,7 +42,7 @@ from chromosome_and_gene_positions import chromosome_position, chromosomename_ro
 from chromosome_names_in_files import chromosome_name_wigfile
 from gene_names import list_gene_names, gene_aliases
 from read_sgdfeatures import sgd_features
-from normalize_reads import reads_normalization_dynamic_window, reads_normalization_fixed_window
+from normalize_reads_new import reads_normalization_dynamic_window
 
 
 #%% TEMP
@@ -51,12 +51,11 @@ from normalize_reads import reads_normalization_dynamic_window, reads_normalizat
 #pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt"
 #variable="reads"
 #normalize=True
-#normalization_window_size = 20000
 #plotting=True
 #savefigure=False
 #verbose=True
 #%%
-def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, normalization_window_size=20000, plotting=True, savefigure=False, verbose=True):
+def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, plotting=True, savefigure=False, verbose=True):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
     Optional is to define with data is displayed, which can be either "insertions" or "reads".
     Output is a dataframe including major information about all genomic features and optionally a barplot indicating the number of transposons per genomic region.
@@ -70,7 +69,6 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         - pergene_insertions_file: text file from the output of transposonsmapping.py
         - variable: (only for plotting) either 'insertions' or 'reads', which determines what is being plotted.
         - normalize: (only for plotting) either True or False. Normalization only works for when variable is 'reads'. The normalized reads are plotted and adds a column to the dataframe.
-        - normalization_window_size: Integer. Normalization relies on windows that corrects for inter chromosomal differences. This determine the size of those windows in terms of basepairs (default=10000)
         - plotting: Either True or False. Determines whether the barplot has to be created.
         - savefigure: (only for plotting) Whether to save the figure at the same location of this script.
         - Verbose: Either True of False. Determines how much textual feedback is given. When set to False, only warnings will be shown.
@@ -460,8 +458,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
 #%% NORMALIZE USING WINDOWS
 
-    dna_df2, window_edge_list = reads_normalization_dynamic_window(dna_df2, len_chr, normalization_window_size, wig_file)
-#    dna_df2, window_edge_list = reads_normalization_fixed_window(dna_df2, len_chr, normalization_window_size, wig_file)
+    dna_df2, window_edge_list = reads_normalization_dynamic_window(dna_df2, len_chr, wig_file)
 
 #%% CREATE BAR PLOT
     if plotting == True:
@@ -514,7 +511,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
                 ax.set_ylabel("Reads per region", fontsize=textsize, color=textcolor)
 #                ax.set_ylim(0.0,10.0)
             elif normalize == True:
-                ax.bar(feature_middle_pos_list, list(dna_df2['Nreads_normalized_byNCregions']), feature_width_list, color=barcolor_list)
+                ax.bar(feature_middle_pos_list, list(dna_df2['Nreads_truncatedgene_normalized']), feature_width_list, color=barcolor_list)
 #                ax.bar(feature_middle_pos_list, list(dna_df2['Nreads_normalized']), feature_width_list, color=barcolor_list)
 #                ax.bar(feature_middle_pos_list, list(dna_df2['Nreads_normalized']), feature_width_list, color=barcolor_list)
                 ax.set_ylabel("Normalized reads per region", fontsize=textsize, color=textcolor)
@@ -588,7 +585,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
         if savefigure == True:
             if normalize == True and variable == 'reads':
-                saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_Normalized_with_Windowsize_'+str(normalization_window_size))
+                saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_Normalized')
             elif normalize == False and variable == 'reads':
                 saving_name = os.path.join(file_dirname,'GenomicFeaturesReads_Barplot_Chrom'+chrom+'_NonNormalized')
             else:
@@ -636,19 +633,17 @@ if __name__ == '__main__':
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
                  variable="reads",
-                 normalization_window_size=20000,
                  normalize=True,
                  plotting=True,
                  savefigure=False,
                  verbose=False)
 
-
+#
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
 #        dna_df2 = dna_features(region = chrom,
 #                     wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
 #                     pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
 #                     variable="reads",
-#                     normalization_window_size=20000,
 #                     normalize=True,
 #                     plotting=False,
 #                     savefigure=False,
