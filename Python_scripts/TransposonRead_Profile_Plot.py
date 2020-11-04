@@ -343,10 +343,10 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     print('Plotting chromosome ', chrom, '...')
     print('bar width for plotting is ',bar_width)
     
-    textsize = 22
+    textsize = 18
     textcolor = "#000000"
 
-    plt.figure(figsize=(17,4))
+    plt.figure(figsize=(19,9))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
     
     binsize = bar_width
@@ -359,7 +359,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 ##            ax.text(gene_start_pos,max(alltransposoncounts_binnedlist),gene_alias_list.get(gene)[0], rotation=90, fontsize=18)
 #        else:
 #            ax.axvspan(gene_start_pos,gene_end_pos,facecolor="#F6A089",alpha=1.0)
-    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color="#00918f")
+    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color="#000000")
     ax.tick_params(axis='both', which='major', labelsize=textsize)
     ax.set_axisbelow(True)
     ax.grid(True)
@@ -404,5 +404,6 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
 
 #%%
 if __name__ == '__main__':
-#    read_profile(chrom='IX',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
-    transposon_profile(chrom='V', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
+#    read_profile(chrom='I',wig_file=r"C:\Users\gregoryvanbeek\Documents\TRANSIT\transit_testfile.Dpl1Kan.sorted.bam.wig")
+    read_profile(chrom='I',wig_file=r"C:\Users\gregoryvanbeek\Documents\TRANSIT\transit_testfile_outputnormalizationtransit.Dpl1Kan.sorted.bam.wig")
+#    transposon_profile(chrom='V', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")

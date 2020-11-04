@@ -109,13 +109,13 @@ This can be determined by measuring the relative number of transposons.
 
 ## Interpreting Transposon Counts & Reads
 
-Once cells have a transposon inserted somewhere in the DNA, the cells are let to grow so they can potentially generate a few new generations.
-A cell with a tranposon inserted in an essential part of its DNA grows very slowly or might not grow at all (due to its decreased fitness).
-Since the sequencing starts only at the location of a transposon insertion (see experimental methods section), the location where each read maps in the reference genome corresponds with the location where the transposon has been inserted.
-Cells with a transposon inserted in an essential genomic region, will not have divided and therefore does not contribute to the sequencing reads.
-When the sequencing reads are aligned to a reference genome, missing regions in the alignment might correspond with essential parts.
+With a transposon inserted in the genome, the cells are reseeded so that each cell grow multiple daughter cells.
+The number of daughter cells is depending on the fitness of the cells after transposon insertion.
+When all cells are sequenced, the cells with a high fitness have will have divided more often than cells with a lower fitnes.
+All cells are then sequenced (only the location of the insertion is sequenced, see next section)and the number of sequencing reads indicate how well the cells were able to proliferate.
+The sequencing reads are aligned to a reference genome during the pre-proceesing and locations where many reads map indicate regions of relative high fitness after transposon insertions and regions with few reads (or where reads are lacking) indicate low fitness (or essential) regions.
 Negative selection can thus be found by looking for empty regions in the reads mapping.
-When a transposon is inserted in a non-essential genomic region, these cells can still divide and proliferate and after sequencing the non-essential regions will be represented by relatively many reads.
+In short, the number of transposons per region tells the probability to survive when that region is inhibited and the number of reads per transposon tells the growth rate of the cells.
 
 During processing the genes can be analyzed using the number of transposon insertions per gene (or region) or the number of reads per gene.
 Reads per gene, instead of transposons per gene, might be a good measure for positive selection since locations can be distinquished that have more reads then expected (e.g. more reads relative to the background).
@@ -175,7 +175,14 @@ Therefore, SATAY analysis only says something about the relative fitness of cell
 
 ## Genetic interaction Maps
 
-...
+Using the fitness of a single mutant and a double mutant cell, the genetic interactions can be determined.
+This is a method that has been used before, for example for creating [thecellmap](https://thecellmap.org/).
+When the fitness of two single mutant cells are determined (where the mutants each have a different gene mutation), the fitness of the double mutant where both genes are inhibited can be calculated.
+This can be done both in an additive and multiplicative way.
+Assuming that the genes are independent, typically the multiplicative approach is used [Costanzo et.al. 2019].
+When the actual fitness of the cells are measured using a double mutant and compared with the fitness from the calculation from the single mutants, the difference gives an indication about possible interactions between the genes.
+This method is able to distinquish between positive and negative interactions as well (see next figure from Costanzo et.al. 2013).
+![Graphical overview genetic interactions.](./media/genetic_interactions_graph.png)
 
 # Methods and File types
 
@@ -191,10 +198,11 @@ SATAY uses two kinds of transposable elements found in maize, the activator tran
 Ac is autonomous, meaning that it can express the transposase that is needed to cut loose the transposon.
 Ds is nonautonomous and cannot express the transposase and thus it needs the Ac for transposition.
 In yeast cells, the Ds is used (called MiniDs) that is inserted in the [Ade2 gene](https://www.yeastgenome.org/locus/S000005654/go) and thereby disrupting this gene.
-The cells are induced to express the transposase Ac that cuts out the Ds and repairs the Ade2 gene.
+The cells are induced to express the transposase Ac located on a plasmid that cuts out the Ds and repairs the Ade2 gene.
 Only cells in which the Ade2 gene is repaired are able to form colonies again.
 The excised Ds transposon reinserts randomly in the DNA.
 However, since the original location of the Ds transposon is the Ade2 gene, the genomic locations around this Ade2 are more likely to have the transposon reinserted compared with other genomic regions (e.g. see figure 1 in Michel et.al. 2017).
+Also each chromosome has a transposition bias towards the centromeres because a centromeric plasmid is used.
 All cells are then put in media where only cells grow that have a repaired Ade2 gene, so that only the cells where the transposon is not excised from the Ade2 are diluted since they are outcompeted by the cells that have their transposons excised.
 
 (See next figure for the following section).
@@ -205,6 +213,8 @@ Each of the two halves of the cut transposon, together with the part of the gene
 A part of the circle is then the half transposon and the rest of the circle is a part of the gene where the transposon is inserted in.
 Using PCR and primers, this can then be unfolded by cutting the circle at the halved transposon.
 The part of the gene is then between the transposon quarters.
+The transposon sequence contains an adapter that is used for sequencing, thus only the transposon is sequenced.
+The location where a sequencing read maps to the reference genome during the pre-processing (see next section) indicates the location where the transposon has been inserted.
 Since the sequence of the transposon is known, the part of the gene can be extracted.
 This is repeated for the other half of the transposon that includes the other part of the gene.
 When both parts of the gene are known, the sequence from the original gene can be determined.
@@ -1155,6 +1165,8 @@ The fifth column includes a list of all insertion locations within the gene and 
 Chen, P., Wang, D., Chen, H., Zhou, Z., & He, X. (2016). The nonessentiality of essential genes in yeast provides therapeutic insights into a human disease. Genome research, 26(10), 1355-1362.
 
 Costanzo, M., VanderSluis, B., Koch, E. N., Baryshnikova, A., Pons, C., Tan, G., ... & Pelechano, V. (2016). A global genetic interaction network maps a wiring diagram of cellular function. Science, 353(6306).
+
+Costanzo, M., Kuzmin, E., van Leeuwen, J., Mair, B., Moffat, J., Boone, C., & Andrews, B. (2019). Global genetic networks and the genotype-to-phenotype relationship. Cell, 177(1), 85-100.
 
 Del Fabbro, C., Scalabrin, S., Morgante, M., & Giorgi, F. M. (2013). An extensive evaluation of read trimming effects on Illumina NGS data analysis. PloS one, 8(12).
 

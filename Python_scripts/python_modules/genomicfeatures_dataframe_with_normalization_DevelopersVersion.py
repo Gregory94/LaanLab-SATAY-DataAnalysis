@@ -55,7 +55,7 @@ from normalize_reads_new import reads_normalization_dynamic_window
 #savefigure=False
 #verbose=True
 #%%
-def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, plotting=True, savefigure=False, verbose=True):
+def dna_features(region, wig_file, pergene_insertions_file, variable="reads", normalize=True, Ninsrt_threshold=20, plotting=True, savefigure=False, verbose=True):
     '''This function inputs a wig file and pergene_insertions file created using transposonmapping_satay.py.
     Optional is to define with data is displayed, which can be either "insertions" or "reads".
     Output is a dataframe including major information about all genomic features and optionally a barplot indicating the number of transposons per genomic region.
@@ -458,7 +458,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
 
 #%% NORMALIZE USING WINDOWS
 
-    dna_df2, window_edge_list = reads_normalization_dynamic_window(dna_df2, len_chr, wig_file)
+    dna_df2, window_startedge_list, window_endedge_list = reads_normalization_dynamic_window(dna_df2, len_chr, wig_file, Ninsrt_threshold)
 
 #%% CREATE BAR PLOT
     if plotting == True:
@@ -540,13 +540,14 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
         del text
 
 
-        count = 0
-        for i in range(len(window_edge_list)-1):
-            if count%2 == 0:
-                ax.axvspan(window_edge_list[i], window_edge_list[i+1], facecolor=[0.0,0.0,0.0,0.1])
-            else:
-                ax.axvspan(window_edge_list[i], window_edge_list[i+1], facecolor=[0.0,0.0,0.0,0.0])
-            count += 1
+#        #COLOR BACKGROUND OF GRAPH TO INDICATE WHERE THE NORMALIZATION WINDOWS ARE.
+#        count = 0
+#        for i in range(len(window_startedge_list)-1):
+#            if count%2 == 0:
+#                ax.axvspan(window_startedge_list[i], window_endedge_list[i], facecolor=[0.0,0.0,0.0,0.1])
+#            else:
+#                ax.axvspan(window_startedge_list[i], window_endedge_list[i], facecolor=[0.0,0.0,0.0,0.0])
+#            count += 1
 
 
         axc = plt.subplot(grid[19,0])
@@ -634,17 +635,19 @@ if __name__ == '__main__':
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
                  variable="reads",
                  normalize=True,
+                 Ninsrt_threshold=50,
                  plotting=True,
                  savefigure=False,
                  verbose=False)
 
-#
+
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
 #        dna_df2 = dna_features(region = chrom,
 #                     wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
 #                     pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
 #                     variable="reads",
 #                     normalize=True,
+#                     Ninsrt_threshold=20,
 #                     plotting=False,
 #                     savefigure=False,
 #                     verbose=True)
