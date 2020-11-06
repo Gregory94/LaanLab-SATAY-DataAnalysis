@@ -109,13 +109,13 @@ This can be determined by measuring the relative number of transposons.
 
 ## Interpreting Transposon Counts & Reads
 
-Once cells have a transposon inserted somewhere in the DNA, the cells are let to grow so they can potentially generate a few new generations.
-A cell with a tranposon inserted in an essential part of its DNA grows very slowly or might not grow at all (due to its decreased fitness).
-Since the sequencing starts only at the location of a transposon insertion (see experimental methods section), the location where each read maps in the reference genome corresponds with the location where the transposon has been inserted.
-Cells with a transposon inserted in an essential genomic region, will not have divided and therefore does not contribute to the sequencing reads.
-When the sequencing reads are aligned to a reference genome, missing regions in the alignment might correspond with essential parts.
+With a transposon inserted in the genome, the cells are reseeded so that each cell grow multiple daughter cells.
+The number of daughter cells is depending on the fitness of the cells after transposon insertion.
+When all cells are sequenced, the cells with a high fitness have will have divided more often than cells with a lower fitnes.
+All cells are then sequenced (only the location of the insertion is sequenced, see next section)and the number of sequencing reads indicate how well the cells were able to proliferate.
+The sequencing reads are aligned to a reference genome during the pre-proceesing and locations where many reads map indicate regions of relative high fitness after transposon insertions and regions with few reads (or where reads are lacking) indicate low fitness (or essential) regions.
 Negative selection can thus be found by looking for empty regions in the reads mapping.
-When a transposon is inserted in a non-essential genomic region, these cells can still divide and proliferate and after sequencing the non-essential regions will be represented by relatively many reads.
+In short, the number of transposons per region tells the probability to survive when that region is inhibited and the number of reads per transposon tells the growth rate of the cells.
 
 During processing the genes can be analyzed using the number of transposon insertions per gene (or region) or the number of reads per gene.
 Reads per gene, instead of transposons per gene, might be a good measure for positive selection since locations can be distinquished that have more reads then expected (e.g. more reads relative to the background).
@@ -175,7 +175,14 @@ Therefore, SATAY analysis only says something about the relative fitness of cell
 
 ## Genetic interaction Maps
 
-...
+Using the fitness of a single mutant and a double mutant cell, the genetic interactions can be determined.
+This is a method that has been used before, for example for creating [thecellmap](https://thecellmap.org/).
+When the fitness of two single mutant cells are determined (where the mutants each have a different gene mutation), the fitness of the double mutant where both genes are inhibited can be calculated.
+This can be done both in an additive and multiplicative way.
+Assuming that the genes are independent, typically the multiplicative approach is used [Costanzo et.al. 2019].
+When the actual fitness of the cells are measured using a double mutant and compared with the fitness from the calculation from the single mutants, the difference gives an indication about possible interactions between the genes.
+This method is able to distinquish between positive and negative interactions as well (see next figure from Costanzo et.al. 2013).
+![Graphical overview genetic interactions.](./media/genetic_interactions_graph.png)
 
 # Methods and File types
 
@@ -191,10 +198,11 @@ SATAY uses two kinds of transposable elements found in maize, the activator tran
 Ac is autonomous, meaning that it can express the transposase that is needed to cut loose the transposon.
 Ds is nonautonomous and cannot express the transposase and thus it needs the Ac for transposition.
 In yeast cells, the Ds is used (called MiniDs) that is inserted in the [Ade2 gene](https://www.yeastgenome.org/locus/S000005654/go) and thereby disrupting this gene.
-The cells are induced to express the transposase Ac that cuts out the Ds and repairs the Ade2 gene.
+The cells are induced to express the transposase Ac located on a plasmid that cuts out the Ds and repairs the Ade2 gene.
 Only cells in which the Ade2 gene is repaired are able to form colonies again.
 The excised Ds transposon reinserts randomly in the DNA.
 However, since the original location of the Ds transposon is the Ade2 gene, the genomic locations around this Ade2 are more likely to have the transposon reinserted compared with other genomic regions (e.g. see figure 1 in Michel et.al. 2017).
+Also each chromosome has a transposition bias towards the centromeres because a centromeric plasmid is used.
 All cells are then put in media where only cells grow that have a repaired Ade2 gene, so that only the cells where the transposon is not excised from the Ade2 are diluted since they are outcompeted by the cells that have their transposons excised.
 
 (See next figure for the following section).
@@ -205,6 +213,8 @@ Each of the two halves of the cut transposon, together with the part of the gene
 A part of the circle is then the half transposon and the rest of the circle is a part of the gene where the transposon is inserted in.
 Using PCR and primers, this can then be unfolded by cutting the circle at the halved transposon.
 The part of the gene is then between the transposon quarters.
+The transposon sequence contains an adapter that is used for sequencing, thus only the transposon is sequenced.
+The location where a sequencing read maps to the reference genome during the pre-processing (see next section) indicates the location where the transposon has been inserted.
 Since the sequence of the transposon is known, the part of the gene can be extracted.
 This is repeated for the other half of the transposon that includes the other part of the gene.
 When both parts of the gene are known, the sequence from the original gene can be determined.
@@ -391,10 +401,16 @@ This value is assigned a ‘+’ or ‘-‘ to indicate the reading orientation.
 There are 42 scores, each of which are related to a specific error.
 See for example [phred score conversion table](<https://drive5.com/usearch/manual/quality_score.html>) for a conversion table.
 
-## Determine essentiality based on transposon counts
+## Data analysis tools
 
-Using the number of transposons and reads, the essentiality can be determined.
+Using the number of transposons and reads, the fitness of gene deletions can be estimated.
 Currently, genes that are taken as essential are the annotated essentials based on previous research (e.g. see the [Github page of this research](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Cerevisiae_AllEssentialGenes_List.txt)).
+
+### Create python dataframe for concatenating all data from the processing output folder
+The processing pipeline yields a number of files that includes information about the location of transposon insertions and the reads in each of the insertions.
+To easily use this data, a python function ([genomicfeatures_dataframe_with_normalization.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/python_modules/genomicfeatures_dataframe_with_normalization.py)) has been developed that creates a dataframe for each chromosome that includes all genomic features (genes, centromeres, telomeres, RNA genes, ARS etc.) together with some information (e.g. genomic location, essentiality etc.) and the number of insertions and reads in different formats (see below figure for an example).
+For more detailed explanation see the help text of the function.
+![Dataframe as is being output from dna_features function in genomicfeatures_dataframe_with_normaliation.py.](./media/dna_df2.png)
 
 ### Distribution number of insertions and reads compared with essential and non-essential genes
 
@@ -455,7 +471,7 @@ This is chosen because if now a bar is empty in a gene than this is not a coinci
 
 These plots can be used for checking if a gene has transposon free regions which might indicate that this gene is essential.
 
-# Data analysis; From raw sequencing data to number of insertions and reads per genomic region
+# Preprocessing; From raw sequencing data to number of insertions and reads per genomic region
 
 SATAY experiments need to be sequenced which results in a FASTQ file.
 The sequence reads from this file needs to be aligned to create a SAM file (and/or the compressed binary equivalent BAM file).
@@ -464,6 +480,20 @@ Using the BAM file, the number of transposons can be determined for each inserti
 For guides and manuals of the software discussed below, see [the Github page for this project](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/master/docs).
 
 For testing, the raw data (.FASTQ files) discussed in the paper of Michel et.al. 2017 is used and can be found [here](<https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-4885/samples/>).
+
+This section describes how to use the software for preprocessing.
+To make this more efficient, **it is advised to use [an automated workflow](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Python_TransposonMapping/processing_workflow.sh) that has been created for Linux**.
+This automated workflow is written in a bash file that performs all steps in the *processing pipeline* described in the next subsection.
+The workflow in the bash file starts with a section with user defined options in which the name of the fastq-file has to be given and the options can be set that are described in the following sections.
+It requires the fastq file to be located in the shared folder of the Linux machine where the workflow gets the fastq file to perform all processing steps and, when finished, returns the file together with the output files back to the shared folder.
+This bash script is located on the desktop of the Linux Virtual Machine.
+This Virtual machine can be found on the N-Drive/VirtualMachines.
+This N-drive folder also contains a [VM_README](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/docs/VM_README.pdf) about how to use the virtual machine and how to run the bash script.
+When you want to use this VirtualMachine, **please make a copy of the .vhd file, do not use the vhd file directly from the VirtualMachine folder!**
+You can make your own copy on the N-drive, but when using it make sure you have a very stable internet connection, preferably using an internet cable.
+To start the Virtual machine, first download [VirtualBox](https://www.virtualbox.org/).
+The [InstallationGuide](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/docs/Installation_Guide_SATAY_Analysis_Software.pdf) (which can also be found in the N-Drive/VirtualMachines) explains how to get started with the virtual machine.
+The [VM_README](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/docs/VM_README.pdf) file on the N-drive/VirtualMachines folder should be enough to get you started with the processing, but for a more detailed explaination about the used software or how to perform the processing without the workflow, see the following subsections.
 
 ## Workflow
 
@@ -1135,6 +1165,8 @@ The fifth column includes a list of all insertion locations within the gene and 
 Chen, P., Wang, D., Chen, H., Zhou, Z., & He, X. (2016). The nonessentiality of essential genes in yeast provides therapeutic insights into a human disease. Genome research, 26(10), 1355-1362.
 
 Costanzo, M., VanderSluis, B., Koch, E. N., Baryshnikova, A., Pons, C., Tan, G., ... & Pelechano, V. (2016). A global genetic interaction network maps a wiring diagram of cellular function. Science, 353(6306).
+
+Costanzo, M., Kuzmin, E., van Leeuwen, J., Mair, B., Moffat, J., Boone, C., & Andrews, B. (2019). Global genetic networks and the genotype-to-phenotype relationship. Cell, 177(1), 85-100.
 
 Del Fabbro, C., Scalabrin, S., Morgante, M., & Giorgi, F. M. (2013). An extensive evaluation of read trimming effects on Illumina NGS data analysis. PloS one, 8(12).
 

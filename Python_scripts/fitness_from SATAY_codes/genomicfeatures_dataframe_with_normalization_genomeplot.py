@@ -12,10 +12,11 @@ file_dirname = os.path.dirname(os.path.abspath('__file__'))
 
 sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
 from chromosome_and_gene_positions import chromosome_position
-from genomicfeatures_dataframe_with_normalization import dna_features
+#from genomicfeatures_dataframe_with_normalization import dna_features
+from genomicfeatures_dataframe_with_normalization_DevelopersVersion import dna_features
 
 #%% 
-def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, variable='reads', normalize=True, normalization_window_size=20000, plotting=False, verbose=False):
+def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, variable='reads', normalize=True, Ninsrt_threshold=35, plotting=False, verbose=False):
 
     if wig_file == None:
         wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig"
@@ -36,12 +37,12 @@ def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, varia
     
     for region in chrom_list:
         print(region)
-        dna_df2 = dna_features(region, wig_file, pergene_insertions_file, variable, normalize, normalization_window_size, plotting, verbose=False)
+        dna_df2 = dna_features(region, wig_file, pergene_insertions_file, variable, normalize, Ninsrt_threshold, plotting, verbose=False)
     
         feature_position_list = feature_position_list + [pos[0] + chr_length for pos in dna_df2['Position'].tolist()]
         Nreadsperbp = [dna.Nreads/dna.Nbasepairs for dna in dna_df2.itertuples()]
         Nreadsperbp_list = Nreadsperbp_list + Nreadsperbp
-        Nreadsperbp_normalized_list = Nreadsperbp_normalized_list + dna_df2['Nreads_normalized_byNCregions'].tolist()
+        Nreadsperbp_normalized_list = Nreadsperbp_normalized_list + dna_df2['Nreads_truncatedgene_normalized'].tolist()
     
         chr_length += chr_length_dict.get(region.upper())
     
@@ -81,6 +82,8 @@ def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, varia
     
     
     #%% PLOTTING
+    textsize = 20
+    
     plt.figure(figsize=(19,9))
     grid = plt.GridSpec(2, 1, wspace=0.0, hspace=0.01)
     
@@ -90,14 +93,17 @@ def genome_normalization_plot(wig_file=None, pergene_insertions_file=None, varia
     ax1.grid(False)
     ax1.set_xlim(0,l_genome)
     ax1.set_ylim(0,250)
-    ax1.set_ylabel("Reads not normalized [Absolute counts]")
+    ax1.set_ylabel("Reads not normalized \n [Absolute counts]", fontsize=textsize)
+    ax1.tick_params(labelsize=textsize)
+    ax1.tick_params(axis='x', labelbottom=False)
     
     ax2 = plt.subplot(grid[1,0])
     ax2.bar(bins, binned_norm_reads_list, width=N_bins, color="#333333")
     ax2.grid(False)
     ax2.set_xlim(0,l_genome)
-    ax2.set_ylim(0,250)
-    ax2.set_ylabel("Reads normalized [A.U.]")
+#    ax2.set_ylim(0,250)
+    ax2.set_ylabel("Reads normalized [A.U.]", fontsize=textsize)
+    ax2.tick_params(labelsize=textsize)
     
     for chrom in chr_summedlength_dict:
         ax1.axvline(x = chr_summedlength_dict.get(chrom), linestyle='-', color=(0.9,0.9,0.9,1.0))
