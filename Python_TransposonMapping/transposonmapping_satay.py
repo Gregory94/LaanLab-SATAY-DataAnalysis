@@ -73,11 +73,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
         path = bamfile.replace(filename,'')
 
 
-    if os.path.isfile(bamfile):
-        print('Running: ', bamfile)
-    else:
-        raise ValueError('Bam file not found at: ', bamfile)
-
+    assert os.path.isfile(bamfile), 'Bam file not found at: %s' % bamfile #check if given bam file exists
 
 
 #%% LOADING ADDITIONAL FILES
@@ -86,22 +82,18 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
     #LOADING GFF-FILE
     if gfffile is None:
         gfffile = os.path.join(files_path,'Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    if not os.path.isfile(gfffile):
-        raise ValueError('Path to GFF-file does not exist.')
+    assert os.path.isfile(gfffile), 'Path to GFF-file does not exist.'
 
     #LOADING TEXT FILES WITH ESSENTIAL GENES
     if essentialfiles is None:
         essentialfiles = os.path.join(files_path,'Cerevisiae_AllEssentialGenes_List.txt')
-    if not os.path.isfile(essentialfiles):
-        raise ValueError('Following path does not exist: ' + essentialfiles)
+    assert os.path.isfile(essentialfiles), 'Following path does not exist: %s' % essentialfiles
     del essentialfiles
 
     #LOADING TEXT FILE WITH GENE NAME ALIASES
     if genenamesfile is None:
         genenamesfile = os.path.join(files_path,'Yeast_Protein_Names.txt')
-    if not os.path.isfile(genenamesfile):
-        raise ValueError('Following path does not exist: ' + genenamesfile)
-
+    assert os.path.isfile(genenamesfile), 'Following path does not exist: %s' % genenamesfile
 
 
 #%% READ BAM FILE
