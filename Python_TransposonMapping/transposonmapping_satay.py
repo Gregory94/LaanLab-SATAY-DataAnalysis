@@ -381,6 +381,9 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
     del (bedfile, coordinates_counter, refname)
 
 #%% CREATE TEXT FILE WITH TRANSPOSONS AND READS PER GENE
+# NOTE THAT THE TRANSPOSON WITH THE HIGHEST READ COUNT IS IGNORED.
+# E.G. IF THIS FILE IS COMPARED WITH THE _PERGENE_INSERTIONS.TXT FILE THE READS DON'T ADD UP (SEE https://groups.google.com/forum/#!category-topic/satayusers/bioinformatics/uaTpKsmgU6Q)
+# TOO REMOVE THIS HACK, CHANGE THE INITIALIZATION OF THE VARIABLE readpergene
     pergenefile = bamfile+'_pergene.txt'
     print('Writing pergene.txt file at: ', pergenefile)
     print('')
