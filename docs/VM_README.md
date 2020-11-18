@@ -45,7 +45,7 @@ The installed software packages are
 Also, the S288C reference sequence is stored.
 
 If the VM is setup according to [the installation guide](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/docs/Installation_Guide_SATAY_Analysis_Software.md), there should appear a shared folder on the Desktop with the name: *sf_VMSharedFolder_Ubuntu64_1*.
-This shared folder can be used for easy sharing of files between the VM and the host system (i.e. Windows).
+This shared folder can be used for easy sharing of files between the VM and the host system (i.e. Windows) and be accessed using the command *cd /media/sf_VMSharedFolder_Ubuntu64_1/*
 In the host system the files are located in the folder that was selected during the setup of the VM.
 
 ## Running the workflow
