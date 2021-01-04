@@ -9,6 +9,7 @@ def samflag(flag=0):
     '''
     This script converts a decimal flag to binary and get the corresponding properties according to the sam-flag standard.
     The code is based on the explanation given here https://davetang.org/muse/2014/03/06/understanding-bam-flags/
+    For manual checking sam flags, check https://broadinstitute.github.io/picard/explain-flags.html
     The input is a decimal number.
     '''
 
@@ -50,6 +51,6 @@ def samflag(flag=0):
 if __name__ == '__main__':
     flag_binary, flagproperties = samflag(flag=1040)
 
-    print('PROPERTIES:')
-    for prop in flagproperties:
-        print(prop)
+#    print('PROPERTIES:')
+#    for prop in flagproperties:
+#        print(prop)
