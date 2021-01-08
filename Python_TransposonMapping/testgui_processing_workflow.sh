@@ -15,7 +15,32 @@
 #
 fileselection1=`yad --width=1000 --height=400 --title="Select fastq file" --file-selection="Please select datafile" --file-filter="*.fq" --file-filter="*.fastq"`
 #fileselection2=`yad --width=1000 --height=400 --title="Select fastq file" --file-selection="Please select datafile" --file-filter="*.fq" --file-filter="*fastq" --file-directory="/home/laanlab/Documents/satay"`
-settings=`yad --width=1000 --height=800 --title="Processing settings" --text="Settings" --form --field="Selected file primary reads":RO --field="Enter data type":CB --field="Enter trimming settings" --field="Enter alignment settings":CHK $fileselection1 "single-read!paired-end" "" ""`
+settings=`yad --width=1000 --height=500 --title="Processing settings" --text="Settings" --form \
+--field="Selected file primary reads":RO \
+--field="Data type":CB \
+--field="Which trimming to use":CB \
+--field="Enter trimming settings" \
+--field="Enter alignment settings" \
+--field="Quality checking raw data":CHK \
+--field="Quality checking trimmed data":CHK \
+--field="Quality check interrupt\n (allows for changing trimming and alignment settings after quality report raw data)":CHK \
+--field="Delete sam file":CHK \
+--field="Sort and index bam files":CHK \
+--field="Transposon mapping (NOTE: requires sorting and indexing)":CHK \
+--field="Create flagstat report":CHK \
+$fileselection1 \
+"Paired-end!Single-read" \
+"bbduk!trimmomatic!Do not trim" \
+"ktrim=l k=15 mink=10 hdist=1 tpe tbo qtrim=r trimq=10 minlen=30" \
+"-M -B 3 -O 3,3 -S -v 2" \
+"" \
+"TRUE" \
+"TRUE" \
+"TRUE" \
+"FALSE" \
+"TRUE" \
+"TRUE" \
+"TRUE"`
 echo $settings
 
 ####################### USER SETTINGS ######################
@@ -33,7 +58,7 @@ filepath2=''
 trimming_software='b'
 
 ###    bbduk    ###
-trimming_settings_bbduk='ktrim=l k=15 mink=10 hdist=1 tpe tbo qtrim=r trimq=10 minlen=30'
+trimming_settings_bbduk="ktrim=l k=15 mink=10 hdist=1 tpe tbo qtrim=r trimq=10 minlen=30"
 #trimming_settings_bbduk='k=20 mink=8 ktrim=l restrictleft=50 hdist=3 hdist2=1 qtrim=r trimq=10 minlen=25 tpe=t tbo=t'
 ## Set adapter sequences
 ## Open file using xdg-open /home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa
