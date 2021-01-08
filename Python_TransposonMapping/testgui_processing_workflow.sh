@@ -4,11 +4,23 @@
 
 
 
+#filepath=`zenity --file-selection --file-filter="*.fq" --file-filter="*.fastq" --file-directory="/home/laanlab/Documents/satay"`
+#zenity --warning --title="file selection" --text="selected file is "$filepath
+#
+#settings=`zenity --entry --text="Input settings"`
+#zenity --info --title="Input settings" --text=$settings
+#
+#settings=`zenity --forms --title="Processing settings" --text="Data type" --add-entry="Using paired end data?" --add-entry="Enter settings for BBDuk"`
+#echo 'settings are '$settings
+#
+fileselection1=`yad --width=1000 --height=400 --title="Select fastq file" --file-selection="Please select datafile" --file-filter="*.fq" --file-filter="*.fastq"`
+#fileselection2=`yad --width=1000 --height=400 --title="Select fastq file" --file-selection="Please select datafile" --file-filter="*.fq" --file-filter="*fastq" --file-directory="/home/laanlab/Documents/satay"`
+settings=`yad --width=1000 --height=800 --title="Processing settings" --text="Settings" --form --field="Selected file primary reads":RO --field="Enter data type":CB --field="Enter trimming settings" --field="Enter alignment settings":CHK $fileselection1 "single-read!paired-end" "" ""`
+echo $settings
 
 ####################### USER SETTINGS ######################
 # Define whether data is paired-end ('t' for paired-end, 'f' for single end)
 paired=T
-
 
 # Define filename (can also be a zipped file ending with .gz). Use filename2 for paired end or leave empty for single end or interleaved paired end (i.e. paired end reads are in single file).
 filepath1=/home/laanlab/Documents/satay/datasets/wt1_enzo_dataset/wt1_enzo_dataset_demultiplexed_interleaved/wt1_enzo_dataset_demultiplexed_interleaved_sample1/D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_pairs.fq
