@@ -122,7 +122,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
     for key,val in ref_tid_dict.items():
         ref_tid_roman_dict[ref_romannums[int(val)+1]] = key
 
-
+    print(ref_tid_roman_dict)
 
     del (key, val, ref_romannums)
 
