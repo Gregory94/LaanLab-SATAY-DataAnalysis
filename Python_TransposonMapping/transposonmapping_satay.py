@@ -78,7 +78,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
 
 
 #%% LOADING ADDITIONAL FILES
-    files_path = os.path.join(dirname,'..','data_files')
+    files_path = os.path.join(dirname,'..','Data_Files')
 
     #LOADING GFF-FILE
     if gfffile is None:
@@ -188,7 +188,15 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
             if 'not primary alignment' in samprop or 'read unmapped' in samprop:
                 flag_array[read_counter] = 0
 
-            readlength_array[read_counter] = int(len(read[9]))
+
+            cigarmatch_list = []
+            if not reads.cigartuples == None:
+                for cigar_type, cigar_length in reads.cigartuples:
+                    if cigar_type == 0:
+                        cigarmatch_list.append(cigar_length)
+                match_length = sum(cigarmatch_list)
+
+            readlength_array[read_counter] = match_length #int(len(read[9]))
 
             read_counter += 1
 

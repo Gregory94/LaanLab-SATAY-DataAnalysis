@@ -78,7 +78,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
 
 
 #%% LOADING ADDITIONAL FILES
-    files_path = os.path.join(dirname,'..','data_files')
+    files_path = os.path.join(dirname,'..','Data_Files')
 
     #LOADING GFF-FILE
     if gfffile is None:
@@ -122,7 +122,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
     for key,val in ref_tid_dict.items():
         ref_tid_roman_dict[ref_romannums[int(val)+1]] = key
 
-    print(ref_tid_roman_dict)
+
 
     del (key, val, ref_romannums)
 
@@ -175,6 +175,12 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
         print('Getting reads for chromosome %s ...' % kk)
         for reads in bam.fetch(kk, 0, chr_length_dict[kk], until_eof=True):
             read = str(reads).split('\t')
+            cigarmatch_list = []
+            if not reads.cigartuples == None:
+                for cigar_type, cigar_length in reads.cigartuples:
+                    if cigar_type == 0:
+                        cigarmatch_list.append(cigar_length)
+                match_length = sum(cigarmatch_list)
 
             start_array[read_counter] = int(read[3]) + 1
 
@@ -188,7 +194,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
             if 'not primary alignment' in samprop or 'read unmapped' in samprop:
                 flag_array[read_counter] = 0
 
-            readlength_array[read_counter] = int(len(read[9]))
+            readlength_array[read_counter] = match_length #int(len(read[9]))
 
             read_counter += 1
 
@@ -256,6 +262,7 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
 
         timer_end = timeit.default_timer()
         print('Chromosome %s completed in %.3f seconds' % (kk, (timer_end - timer_start)))
+#        print('tncoordinates_array: ',tncoordinates_array[-10:])
         print('')
 
 
