@@ -1,0 +1,16 @@
+ERR1533147.fastq.gz 2020-09-08_07:58:23
+
+Trimming options:
+BBDuk
+ktrim=r k=4 hdist=0 qtrim=r trimq=4
+
+Alignment options:
+-B 2 -O 3
+
+Reference genome used: S288C
+
+Adapter sequences from adapters.fa:
+>Adapter_sequence1
+CATG
+>Adapter_sequence2
+GATC
