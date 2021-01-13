@@ -194,9 +194,20 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
                 for cigar_type, cigar_length in reads.cigartuples:
                     if cigar_type == 0:
                         cigarmatch_list.append(cigar_length)
-                match_length = sum(cigarmatch_list)
+                    elif cigar_type == 2:
+                        cigarmatch_list.append(cigar_length)
+            match_length = sum(cigarmatch_list)
 
             readlength_array[read_counter] = match_length #int(len(read[9]))
+
+#            print('start_array ', start_array[read_counter]) #!!!
+#            print('samprop: ', samprop) #!!!
+#            print('flag_array: ', flag_array[read_counter]) #!!!
+#            print('match_length: ', match_length) #!!!
+#            print('startindirect_array: ', start_array[read_counter]+readlength_array[read_counter]) #!!!
+#            print('') #!!!
+#            if read_counter > 40: #!!!
+#                quit() #!!!
 
             read_counter += 1
 
