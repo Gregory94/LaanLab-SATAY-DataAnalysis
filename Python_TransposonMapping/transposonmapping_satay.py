@@ -200,15 +200,6 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
 
             readlength_array[read_counter] = match_length #int(len(read[9]))
 
-#            print('start_array ', start_array[read_counter]) #!!!
-#            print('samprop: ', samprop) #!!!
-#            print('flag_array: ', flag_array[read_counter]) #!!!
-#            print('match_length: ', match_length) #!!!
-#            print('startindirect_array: ', start_array[read_counter]+readlength_array[read_counter]) #!!!
-#            print('') #!!!
-#            if read_counter > 40: #!!!
-#                quit() #!!!
-
             read_counter += 1
 
 
