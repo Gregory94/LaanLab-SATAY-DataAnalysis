@@ -13,10 +13,17 @@
 #settings=`zenity --forms --title="Processing settings" --text="Data type" --add-entry="Using paired end data?" --add-entry="Enter settings for BBDuk"`
 #echo 'settings are '$settings
 #
-fileselection1=`yad --width=1000 --height=400 --title="Select fastq file" --file-selection="Please select datafile" --file-filter="*.fq" --file-filter="*.fastq"`
+fileselections=`yad --width=1000 --height=400 --title="Select fastq file" --center --on-top --buttons-layout=spread --multiple --file-selection="Please select datafile" --file-filter="*.fq" --file-filter="*.fastq"`
 #fileselection2=`yad --width=1000 --height=400 --title="Select fastq file" --file-selection="Please select datafile" --file-filter="*.fq" --file-filter="*fastq" --file-directory="/home/laanlab/Documents/satay"`
-settings=`yad --width=1000 --height=500 --title="Processing settings" --text="Settings" --form \
+fileselection1=$(echo $fileselections | awk 'BEGIN {FS="|" } { print $1 }')
+fileselection2=$(echo $fileselections | awk 'BEGIN {FS="|" } { print $2 }')
+echo $fileselection1
+echo $fileselection2
+[ -z $fileselection2 ] && fileselection2='none'
+echo $fileselection2
+settings=`yad --width=1000 --height=500 --title="Processing settings" --text="Settings" --center --on-top --buttons-layout=spread --form \
 --field="Selected file primary reads":RO \
+--field="Selected file secondary reads":RO \
 --field="Data type":CB \
 --field="Which trimming to use":CB \
 --field="Enter trimming settings" \
@@ -29,10 +36,11 @@ settings=`yad --width=1000 --height=500 --title="Processing settings" --text="Se
 --field="Transposon mapping (NOTE: requires sorting and indexing)":CHK \
 --field="Create flagstat report":CHK \
 $fileselection1 \
+$fileselection2 \
 "Paired-end!Single-read" \
 "bbduk!trimmomatic!Do not trim" \
 "ktrim=l k=15 mink=10 hdist=1 tpe tbo qtrim=r trimq=10 minlen=30" \
-"-M -B 3 -O 3,3 -S -v 2" \
+" -p -M -S -P -v 2" \
 "" \
 "TRUE" \
 "TRUE" \
@@ -45,7 +53,7 @@ echo $settings
 
 ####################### USER SETTINGS ######################
 # Define whether data is paired-end ('t' for paired-end, 'f' for single end)
-paired=T
+paired=$(echo $settings | awk 'BEGIN {FS="|" } { print $2 }')
 
 # Define filename (can also be a zipped file ending with .gz). Use filename2 for paired end or leave empty for single end or interleaved paired end (i.e. paired end reads are in single file).
 filepath1=/home/laanlab/Documents/satay/datasets/wt1_enzo_dataset/wt1_enzo_dataset_demultiplexed_interleaved/wt1_enzo_dataset_demultiplexed_interleaved_sample1/D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_pairs.fq
