@@ -38,6 +38,7 @@ then
 	--field="Sort and index bam files":CHK \
 	--field="Transposon mapping (NOTE: requires sorting and indexing)":CHK \
 	--field="Create flagstat report":CHK \
+	--field="Open adapters file":FBTN \
 	$filepath1 \
 	$filepath2 \
 	"Paired-end!Single-read" \
@@ -50,9 +51,13 @@ then
 	"TRUE" \
 	"TRUE" \
 	"TRUE" \
-	"TRUE"`
+	"TRUE" \
+	"bash -c 'xdg-open /home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa'"`
 
-	echo $settings >> $cachefile
+	if [ ! -z "$settings" ] && [ $filepath1 != "none" ]
+	then
+		echo $settings >> $cachefile
+	fi
 
 elif [ -f $cachefile ];
 then
@@ -63,8 +68,8 @@ then
 	settings=`yad --width=1000 --height=500 --title="Processing settings" --text="Settings" --center --on-top --buttons-layout=spread --form \
 	--field="Selected file primary reads":RO \
 	--field="Selected file secondary reads":RO \
-	--field="Data type":CB \
-	--field="Which trimming to use":CB \
+	--field="Data type":RO \
+	--field="Which trimming to use":RO \
 	--field="Enter trimming settings" \
 	--field="Enter alignment settings" \
 	--field="Quality checking raw data":CHK \
@@ -74,19 +79,21 @@ then
 	--field="Sort and index bam files":CHK \
 	--field="Transposon mapping (NOTE: requires sorting and indexing)":CHK \
 	--field="Create flagstat report":CHK \
+	--field="Open adapters file":FBTN \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $1 }') \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $2 }') \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $3 }') \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $4 }') \
-	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $5 }') \
-	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $6 }') \
+	"$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $5 }')" \
+	"$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $6 }')" \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $7 }') \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $8 }') \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $9 }') \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $10 }') \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $11 }') \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $12 }') \
-	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $13 }')`
+	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $13 }') \
+	"bash -c 'xdg-open /home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa'"`
 
 	rm $cachefile
 fi
