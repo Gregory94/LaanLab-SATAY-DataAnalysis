@@ -18,7 +18,7 @@ cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
 
 if [ ! -f $cachefile ];
 then
-	fileselections=`yad --width=1000 --height=400 --title="Select fastq file" --center --on-top --buttons-layout=spread --multiple --file-selection="Please select datafile (or two files in case of paired-end noninterleaved fastq files)" --file-filter="*.fq" --file-filter="*.fastq"`
+	fileselections=`yad --width=1000 --height=400 --title="Select fastq file" --center --on-top --buttons-layout=spread --multiple --file-selection="Please select datafile (or two files in case of paired-end noninterleaved fastq files)" --file-filter="*.fq" --file-filter="*.fastq" --file-filter="*.fq.gz" --file-filter="*.fastq.gz"`
 	filepath1=$(echo $fileselections | awk 'BEGIN {FS="|" } { print $1 }')
 	filepath2=$(echo $fileselections | awk 'BEGIN {FS="|" } { print $2 }')
 	[ -z $filepath1 ] && filepath1='none'
