@@ -42,7 +42,7 @@ then
 	$filepath1 \
 	$filepath2 \
 	"Paired-end!Single-end" \
-	"bbduk!trimmomatic!Do not trim" \
+	"bbduk!trimmomatic!Do_not_trim" \
 	"ktrim=l k=15 mink=10 hdist=1 tpe tbo qtrim=r trimq=10 minlen=30" \
 	" -p -M -S -P -v 2" \
 	"False" \
