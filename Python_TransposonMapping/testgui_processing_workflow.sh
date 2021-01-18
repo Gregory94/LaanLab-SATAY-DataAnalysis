@@ -174,6 +174,6 @@ echo 'qualitycheck_interrupt ' $qualitycheck_interrupt
 
 ############################################################
 
-
+#After interrupt, rm $cachefile
 
 echo 'Processing finished'
