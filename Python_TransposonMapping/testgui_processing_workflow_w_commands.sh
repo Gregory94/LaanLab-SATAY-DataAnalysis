@@ -54,10 +54,10 @@ then
 	"TRUE" \
 	"bash -c 'xdg-open /home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa'"`
 
-	if [ ! -z "$settings" ] && [ $filepath1 != "none" ]
-	then
-		echo $settings >> $cachefile
-	fi
+#	if [ ! -z "$settings" ] && [ $filepath1 != "none" ]
+#	then
+#		echo $settings >> $cachefile
+#	fi
 
 elif [ -f $cachefile ];
 then
@@ -127,7 +127,7 @@ echo 'trimming_settings_trimmomatic ' $trimming_settings_trimmomatic
 ###############################################
 
 
-# Set options for alignment software (bwa mem) (note that for paired end data the parameter -p does not need to be set as long as paired=T)
+# Set options for alignment software (bwa mem) (note that for paired end data the parameter -p does not need to be set as long as paired=Paired-end)
 alignment_settings=$(echo $settings | awk 'BEGIN {FS="|" } { print $6 }')
 echo 'alignment_settings ' $alignment_settings
 
@@ -192,7 +192,7 @@ then
 fi
 
 
-if [[ ${paired} =~ TRUE ]] && ! [[ ${filepath2} =~ 'none' ]]
+if [[ ${paired} =~ 'Paired-end' ]] && ! [[ ${filepath2} =~ 'none' ]]
 then
 	if [ ! -f ${filepath2} ]
 	then
@@ -200,7 +200,7 @@ then
 	else
 		filename2=$(basename ${filepath2})
 	fi
-elif [[ ${paired} =~ TRUE ]] && [[ ${filepath2} =~ 'none' ]]
+elif [[ ${paired} =~ 'Single-end' ]] && ! [[ ${filepath2} =~ 'none' ]]
 then
 	echo 'WARNING: A secondary reads file was specified but paired was set to single-end. Therefore the secondary reads file will be ignored.'
 fi
@@ -210,8 +210,7 @@ then
 	echo 'Process canceled.' && exit 1
 fi
 
-exit 1
-echo 'This you should not read:('
+
 
 # Get extension of the file
 extension='.'$(echo $filename1 | rev | cut -d. -f1 | rev)
@@ -223,10 +222,10 @@ fi
 
 
 # Define filename for trimming and alignment results
-if [[ ${trimming} =~ ^[tT]$ ]]
+if ! [[ ${trimming_software} =~ 'Do not trim' ]]
 then
 	filename_trimmed1=${filename1%$extension*}'_trimmed.fastq'
-	if ! [[ -z ${filename2} ]] #if not filename2 is empty string
+	if ! [[ ${filepath2} =~ 'none' ]] #if not filename2 is none
 	then
 		filename_trimmed2=${filename2%$extension*}'_trimmed.fastq'
 	fi
@@ -235,7 +234,7 @@ then
 	filename_sort=${filename1%$extension*}'_trimmed.sorted.bam'
 else
 	filename_trimmed1=${filename1}
-	if ! [[ -z ${filename2} ]] #if not filename2 is empty string
+	if ! [[ ${filepath2} =~ 'none' ]] #if not filename2 is none
 	then
 		filename_trimmed2=${filename2}
 	fi
@@ -245,12 +244,16 @@ else
 fi
 
 
+
 # Define path output directory fastqc
-if [[ ${quality_check_raw} =~ ^[tT]$ ]] || [[ ${quality_check_trim} =~ ^[tT]$ ]]
+if [[ ${quality_check_raw} =~ TRUE ]] || [[ ${quality_check_trim} =~ TRUE ]]
 then
 	path_fastqc_out=${pathdata}/fastqc_out
-	[ ! -d ${path_fastqc_out} ] && echo 'Creating fastqc output folder ...' && mkdir ${path_fastqc_out} || echo 'Folder for fastqc output exists with name:' $(basename ${path_fastqc_out})
+	[ ! -d ${path_fastqc_out} ] && echo 'Creating fastqc output folder ...' && mkdir ${path_fastqc_out} || echo 'Folder for fastqc output exists with path:' ${path_fastqc_out}
 fi
+
+exit 1
+echo 'This you should not read:('
 
 # Define path output directory trimming
 if [[ ${trimming} =~ ^[tT]$ ]]
