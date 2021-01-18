@@ -222,7 +222,7 @@ fi
 
 
 # Define filename for trimming and alignment results
-if ! [[ ${trimming_software} =~ 'Do not trim' ]]
+if ! [[ ${trimming_software} =~ 'Do_not_trim' ]]
 then
 	filename_trimmed1=${filename1%$extension*}'_trimmed.fastq'
 	if ! [[ ${filepath2} =~ 'none' ]] #if not filename2 is none
