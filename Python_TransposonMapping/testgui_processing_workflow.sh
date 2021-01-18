@@ -41,7 +41,7 @@ then
 	--field="Open adapters file":FBTN \
 	$filepath1 \
 	$filepath2 \
-	"Paired-end!Single-read" \
+	"Paired-end!Single-end" \
 	"bbduk!trimmomatic!Do not trim" \
 	"ktrim=l k=15 mink=10 hdist=1 tpe tbo qtrim=r trimq=10 minlen=30" \
 	" -p -M -S -P -v 2" \
