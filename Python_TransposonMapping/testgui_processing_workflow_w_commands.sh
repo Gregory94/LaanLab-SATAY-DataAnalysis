@@ -18,7 +18,7 @@ cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
 
 if [ ! -f $cachefile ];
 then
-	fileselections=`yad --width=1000 --height=400 --title="Select fastq file" --center --on-top --buttons-layout=spread --multiple --file-selection="Please select datafile (or two files in case of paired-end noninterleaved fastq files)" --file-filter="*.fq" --file-filter="*.fastq"`
+	fileselections=`yad --width=1000 --height=400 --title="Select fastq file" --center --on-top --buttons-layout=spread --multiple --file-selection="Please select datafile (or two files in case of paired-end noninterleaved fastq files)" --file-filter="*.fq" --file-filter="*.fastq" --file-filter="*.fq.gz" --file-filter="*.fastq.gz"`
 	filepath1=$(echo $fileselections | awk 'BEGIN {FS="|" } { print $1 }')
 	filepath2=$(echo $fileselections | awk 'BEGIN {FS="|" } { print $2 }')
 	[ -z $filepath1 ] && filepath1='none'
@@ -183,7 +183,10 @@ echo ''
 pathdata=$(dirname ${filepath1})
 filename1=$(basename ${filepath1})
 
-if [ ! -f ${filepath1} ]
+if [[ ${filepath1} =~ 'none' ]]
+then
+	echo 'ERROR: No file selected. Process canceled.' && exit 1
+elif [ ! -f ${filepath1} ]
 then
 	echo 'ERROR: File' ${filepath1} 'not found.' && exit 1
 fi
@@ -202,7 +205,13 @@ then
 	echo 'WARNING: A secondary reads file was specified but paired was set to single-end. Therefore the secondary reads file will be ignored.'
 fi
 
+if [[ -z "${settings}" ]]
+then
+	echo 'Process canceled.' && exit 1
+fi
 
+exit 1
+echo 'This you should not read:('
 
 # Get extension of the file
 extension='.'$(echo $filename1 | rev | cut -d. -f1 | rev)
