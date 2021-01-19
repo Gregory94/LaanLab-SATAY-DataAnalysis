@@ -2,19 +2,9 @@
 
 ### This is test version of the processing_workflow.sh that is used for developing a gui using zenity.
 
-
-
-#filepath=`zenity --file-selection --file-filter="*.fq" --file-filter="*.fastq" --file-directory="/home/laanlab/Documents/satay"`
-#zenity --warning --title="file selection" --text="selected file is "$filepath
-#
-#settings=`zenity --entry --text="Input settings"`
-#zenity --info --title="Input settings" --text=$settings
-#
-#settings=`zenity --forms --title="Processing settings" --text="Data type" --add-entry="Using paired end data?" --add-entry="Enter settings for BBDuk"`
-#echo 'settings are '$settings
-#
-
-cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
+cachefile="/home/gregoryvanbeek/Desktop/processing_workflow_cache.txt"
+#cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
+adapterfile="/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/resources/adapters.fa"
 
 if [ ! -f $cachefile ];
 then
@@ -52,12 +42,13 @@ then
 	"TRUE" \
 	"TRUE" \
 	"TRUE" \
-	"bash -c 'xdg-open /home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa'"`
+	"bash -c 'xdg-open ${adapterfile}'"`
 
-#	if [ ! -z "$settings" ] && [ $filepath1 != "none" ]
-#	then
-#		echo $settings >> $cachefile
-#	fi
+	if [ ! -z "$settings" ] && [ $filepath1 != "none" ] && [ $(echo $settings | awk 'BEGIN {FS="|" } { print $9 }') == TRUE ]
+	then
+		echo $settings >> $cachefile
+		echo 'Cache file created.'
+	fi
 
 elif [ -f $cachefile ];
 then
@@ -65,7 +56,7 @@ then
 	previoussettings=`head -n 1 $cachefile`
 	echo $previoussettings
 
-	settings=`yad --width=1000 --height=500 --title="Processing settings" --text="Settings" --center --on-top --buttons-layout=spread --form \
+	settings=`yad --width=1100 --height=500 --title="Processing settings" --text="Settings" --center --on-top --buttons-layout=spread --form \
 	--field="Selected file primary reads":RO \
 	--field="Selected file secondary reads":RO \
 	--field="Data type":RO \
@@ -93,7 +84,7 @@ then
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $11 }') \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $12 }') \
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $13 }') \
-	"bash -c 'xdg-open /home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa'"`
+	"bash -c 'xdg-open ${adapterfile}'"`
 
 	rm $cachefile
 fi
