@@ -2,9 +2,13 @@
 
 ### This is test version of the processing_workflow.sh that is used for developing a gui using zenity.
 
+
 cachefile="/home/gregoryvanbeek/Desktop/processing_workflow_cache.txt"
 #cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
 adapterfile="/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/resources/adapters.fa"
+#path_refgenome=/home/laanlab/Documents/satay/reference_sequences/Cerevisiae_S288C_reference/S288C_reference_sequence_R64-2-1_20150113.fsa
+path_refgenome='/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa'
+
 
 if [ ! -f $cachefile ];
 then
@@ -44,7 +48,7 @@ then
 	"TRUE" \
 	"bash -c 'xdg-open ${adapterfile}'"`
 
-	if [ ! -z "$settings" ] && [ $filepath1 != "none" ] && [ $(echo $settings | awk 'BEGIN {FS="|" } { print $9 }') == TRUE ]
+	if [ ! -z "$settings" ] && [ $filepath1 != "none" ] && [ $(echo $settings | awk 'BEGIN {FS="|" } { print $9 }') == TRUE ] #Create cachefile only if settings or filepath1 is not empty and Qualitycheck interrupt is set to True.
 	then
 		echo $settings >> $cachefile
 		echo 'Cache file created.'
@@ -243,11 +247,9 @@ then
 	[ ! -d ${path_fastqc_out} ] && echo 'Creating fastqc output folder ...' && mkdir ${path_fastqc_out} || echo 'Folder for fastqc output exists with path:' ${path_fastqc_out}
 fi
 
-exit 1
-echo 'This you should not read:('
 
 # Define path output directory trimming
-if [[ ${trimming} =~ ^[tT]$ ]]
+if [[ ${trimming} =~ TRUE ]]
 then
 	path_trimm_out=${pathdata}/trimm_out
 	[ ! -d ${path_trimm_out} ] && echo 'Creating trimming output folder ...' && mkdir ${path_trimm_out} || echo 'Folder for trimming output exists with name:' $(basename ${path_trimm_out})
@@ -259,8 +261,7 @@ fi
 path_align_out=${pathdata}/align_out
 [ ! -d ${path_align_out} ] && echo 'Creating alignment output folder ...' && mkdir ${path_align_out} || echo 'Folder for alignment output exists with name:' $(basename ${path_align_out})
 
-# Define paths to reference genomes (both S288C and W303)
-path_refgenome=/home/laanlab/Documents/satay/reference_sequences/Cerevisiae_S288C_reference/S288C_reference_sequence_R64-2-1_20150113.fsa
+# Define paths to reference genomes S288C
 name_refgenome='S288C'
 if [ ! -f ${path_refgenome} ] #if path to reference genome does not exist
 then
@@ -268,6 +269,9 @@ then
 else
 	echo 'Reference genome:' ${name_refgenome}
 fi
+
+exit 1
+echo 'This you should not read:('
 
 # Define path bbduk software
 path_bbduk_software=/home/laanlab/Documents/satay/software/bbmap/
