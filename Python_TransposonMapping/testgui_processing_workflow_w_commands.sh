@@ -1,6 +1,6 @@
 #!/bin/bash
 
-### This is test version of the processing_workflow.sh that is used for developing a gui using zenity.
+### This is test version of the processing_workflow.sh that is used for developing a gui using zenity and yad.
 
 
 cachefile="/home/gregoryvanbeek/Desktop/processing_workflow_cache.txt"
@@ -48,7 +48,7 @@ then
 	"TRUE" \
 	"bash -c 'xdg-open ${adapterfile}'"`
 
-	if [ ! -z "$settings" ] && [ $filepath1 != "none" ] && [ $(echo $settings | awk 'BEGIN {FS="|" } { print $9 }') == TRUE ] #Create cachefile only if settings or filepath1 is not empty and Qualitycheck interrupt is set to True.
+	if [ ! -z "$settings" ] && [ $filepath1 != "none" ] && [ $(echo $settings | awk 'BEGIN {FS="|" } { print $9 }') == TRUE ] && [ $(echo $settings | awk 'BEGIN {FS="|" } { print $7 }') == TRUE ] #Create cachefile only if settings or filepath1 is not empty and Qualitycheck interrupt is set to True and Quality check raw files is set to True.
 	then
 		echo $settings >> $cachefile
 		echo 'Cache file created.'
@@ -90,9 +90,16 @@ then
 	$(echo $previoussettings | awk 'BEGIN {FS="|" } { print $13 }') \
 	"bash -c 'xdg-open ${adapterfile}'"`
 
-	rm $cachefile
-fi
+	filepath1=$(echo $settings | awk 'BEGIN {FS="|" } { print $1 }')
+	filepath2=$(echo $settings | awk 'BEGIN {FS="|" } { print $2 }')
 
+	rm $cachefile
+	if [[ -z ${settings} ]]
+	then
+		echo 'Process canceled.'
+		exit 1
+	fi
+fi
 
 ####################### USER SETTINGS ######################
 # Define whether data is paired-end ('t' for paired-end, 'f' for single end)
@@ -170,7 +177,6 @@ echo 'qualitycheck_interrupt ' $qualitycheck_interrupt
 ############################################################
 
 #After interrupt, rm $cachefile
-
 echo 'Preparing processing for' $(basename ${filepath1}) '...'
 echo ''
 
@@ -198,6 +204,7 @@ then
 elif [[ ${paired} =~ 'Single-end' ]] && ! [[ ${filepath2} =~ 'none' ]]
 then
 	echo 'WARNING: A secondary reads file was specified but paired was set to single-end. Therefore the secondary reads file will be ignored.'
+	echo ''
 fi
 
 if [[ -z "${settings}" ]]
@@ -209,11 +216,10 @@ fi
 
 # Get extension of the file
 extension='.'$(echo $filename1 | rev | cut -d. -f1 | rev)
-if [[ '$extension' == '.gz' ]]
+if [[ ${extension} == '.gz' ]]
 then
 	extension='.'$(echo $filename1 | rev | cut -d. -f2 | rev)
 fi
-
 
 
 # Define filename for trimming and alignment results
@@ -249,7 +255,7 @@ fi
 
 
 # Define path output directory trimming
-if [[ ${trimming} =~ TRUE ]]
+if ! [[ ${trimming_software} == 'Do_not_trim' ]]
 then
 	path_trimm_out=${pathdata}/trimm_out
 	[ ! -d ${path_trimm_out} ] && echo 'Creating trimming output folder ...' && mkdir ${path_trimm_out} || echo 'Folder for trimming output exists with name:' $(basename ${path_trimm_out})
@@ -270,23 +276,21 @@ else
 	echo 'Reference genome:' ${name_refgenome}
 fi
 
-exit 1
-echo 'This you should not read:('
-
 # Define path bbduk software
-path_bbduk_software=/home/laanlab/Documents/satay/software/bbmap/
+#path_bbduk_software=/home/laanlab/Documents/satay/software/bbmap/
+path_bbduk_software=/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/
 path_bbduk_adapters=${path_bbduk_software}/resources/adapters.fa
 [ ! -d ${path_ddbuk_software} ] && echo 'WARNING: Path to bbduk software does not exists.'
 
 # Define path trimmomatic software
-path_trimm_software=/home/laanlab/Documents/satay/software/Trimmomatic-0.39/
+#path_trimm_software=/home/laanlab/Documents/satay/software/Trimmomatic-0.39/
+path_trimm_software=/home/gregoryvanbeek/Documents/Software/Trimmomatic-0.39/
 [ ! -d ${path_trimm_software} ] && echo 'WARNING: Path to trimmomatic software does not exists.'
 
 # Define path to python script
-path_python_codes=/home/laanlab/Documents/satay/software/python_codes/
+#path_python_codes=/home/laanlab/Documents/satay/software/python_codes/
+path_python_codes=/home/gregoryvanbeek/Documents/Software/python_codes/
 [ ! -d ${path_python_codes} ] && echo 'WARNING: Path to python codes does not exists.'
-
-
 
 
 
@@ -298,7 +302,7 @@ echo ''
 
 
 # Quality checking raw data
-if [[ ${quality_check_raw} =~ ^[tT]$ ]]
+if [[ ${quality_check_raw} =~ TRUE ]]
 then
 	if [[ ! -e ${path_fastqc_out}/${filename1%$extension*}'_fastqc.html' ]]
 	then
@@ -307,7 +311,7 @@ then
 		echo 'Quality checking raw data completed. Results are stored at' ${path_fastqc_out}
 		echo ''
 
-		if [[ ${paired} =~ ^[tT]$ ]] && ! [[ -z ${filepath2} ]]
+		if [[ ${paired} =~ 'Paired-end' ]] && ! [[ ${filepath2} =~ 'none' ]] #! [[ -z ${filepath2} ]]
 		then
 			fastqc --outdir ${path_fastqc_out} ${pathdata}/${filename2}
 			echo 'Quality checking raw data paired end reads completed. Results are stored at' ${path_fastqc_out}
@@ -317,8 +321,7 @@ then
 		echo 'Quality report raw data already exists. Skipping fastqc'
 	fi
 
-
-	if [[ ${qualitycheck_interrupt} =~ ^[tT]$ ]]
+	if [[ ${qualitycheck_interrupt} =~ TRUE ]]
 	then
 		read -p 'Continue processing? (press "y" if yes, press "n" if no): ' -n 1 -r
 		echo
@@ -330,33 +333,25 @@ then
 fi
 
 
-#if [[ ${open_adapters} =~ ^[tT]$ ]]
-#then
-#	echo "Adapter.fa file is being opened..."
-#	xdg-open ~/Documents/Software/BBMap/bbmap/resources/adapters.fa
-#	read -s -p "Press enter to continue"
-#fi
-
-
 # Trimming
-if [[ ${trimming} =~ ^[tT]$ ]]
+if ! [[ ${trimming_software} == 'Do_not_trim' ]]
 then
-	if [[ ${trimming_software} =~ ^[bB]$ ]]
+	if [[ ${trimming_software} == 'bbduk' ]]
 	then
-		if [[ ${paired} =~ ^[fF]$ ]]
+		if [[ ${paired} == 'Single-end' ]]
 		then
 			echo 'Data trimming using bbduk single end reads...'
 			${path_bbduk_software}bbduk.sh -Xmx2g in=${pathdata}/${filename1} out=${path_trimm_out}/${filename_trimmed1} ref=${path_bbduk_adapters} ${trimming_settings_bbduk}
 			echo 'Trimming with bbduk is completed. Results are stored in' ${path_trimm_out}/${filename_trimmed1}
 			echo ''
-		elif [[ ${paired} =~ ^[tT]$ ]] && ! [[ -z ${filepath2} ]]
+		elif [[ ${paired} == 'Paired-end' ]] && ! [[ ${filepath2} == 'none' ]]
 		then
 			echo 'Data trimming using bbduk paired end reads...'
 			${path_bbduk_software}bbduk.sh -Xmx2g in1=${pathdata}/${filename1} out1=${path_trimm_out}/${filename_trimmed1} in2=${pathdata}/${filename2} out2=${path_trimm_out}/${filename_trimmed2} ref=${path_bbduk_adapters} ${trimming_settings_bbduk}
 			echo 'Trimming with bbduk is completed. Results are stored in' ${path_trimm_out}/${filename_trimmed1} 'and for the paired end reads in' ${path_trimm_out}/${filename_trimmed2}
 			echo ''
 
-		elif [[ ${paired} =~ ^[tT]$ ]] && [[ -z ${filepath2} ]]
+		elif [[ ${paired} == 'Paired-end' ]] && [[ ${filepath2} == 'none' ]]
 		then
 			echo 'Data trimming using bbduk paired end reads...'
 			${path_bbduk_software}bbduk.sh -Xmx2g interleaved=t in=${pathdata}/${filename1} out=${path_trimm_out}/${filename_trimmed1} ref=${path_bbduk_adapters} ${trimming_settings_bbduk}
@@ -364,9 +359,9 @@ then
 			echo ''
 		fi
 
-	elif [[ ${trimming_software} =~ ^[tT]$ ]]
+	elif [[ ${trimming_software} == 'trimmomatic' ]]
 	then
-		if [[ ${paired} =~ ^[fF]$ ]]
+		if [[ ${paired} == 'Single-end' ]]
 		then
 			echo 'Data trimming using trimmomatic ...'
 			currentpath=$(pwd)
@@ -374,7 +369,7 @@ then
 			java -jar ${path_trimm_software}trimmomatic-0.39.jar SE ${trimmomatic_initialization} ${pathdata}/${filename1} ${path_trimm_out}/${filename_trimmed1} ${trimming_settings_trimmomatic}
 			cd ${currentpath}
 
-		elif [[ ${paired} =~ ^[tT]$ ]] && ! [[ -z ${filepath2} ]]
+		elif [[ ${paired} == 'Paired-end' ]] && ! [[ ${filepath2} == 'none' ]]
 		then
 			echo 'Data trimming using trimmomatic ...'
 			currentpath=$(pwd)
@@ -382,7 +377,7 @@ then
 			java -jar ${path_trimm_software}trimmomatic-0.39.jar PE ${trimmomatic_initialization} ${pathdata}/${filename1} ${pathdata}/${filename2} ${path_trimm_out}/${filename_trimmed1} ${path_trimm_out}/${filename_trimmed1%_trimmed.fastq*}'_trimmedorphanedreads.fastq' ${path_trimm_out}/${filename_trimmed2} ${path_trimm_out}/${filename_trimmed1%_trimmed.fastq*}'_trimmedorphanedreads.fastq' ${trimming_settings_trimmomatic}
 			cd ${currentpath}
 
-		elif [[ ${paired} =~ ^[tT]$ ]] && [[ -z ${filepath2} ]]
+		elif [[ ${paired} = 'Paired-end' ]] && [[ ${filepath2} == 'none' ]]
 		then
 			echo 'Enter two input files for using paired end reads with Trimmomatic.'
 			exit 1
@@ -394,13 +389,13 @@ then
 fi
 
 # Quality report trimmed data
-if [[ ${quality_check_trim} =~ ^[tT]$ ]] && [[ ${trimming}  =~ ^[tT]$ ]]
+if [[ ${quality_check_trim} == TRUE ]] && ! [[ ${trimming_software}  == 'Do_not_trim' ]]
 then
 	echo 'Quality checking trimmed data ...'
 	fastqc --outdir ${path_fastqc_out} ${path_trimm_out}/${filename_trimmed1}
 	echo 'Quality checking trimmed data completed. Results are stored at' ${path_fastqc_out}
 	echo ''
-	if [[ ${paired} =~ ^[tT]$ ]] && ! [[ -z ${filepath2} ]]
+	if [[ ${paired} == 'Paired-end' ]] && ! [[ ${filepath2} == 'none' ]]
 	then
 		echo 'Quality checking trimmed data paired end reads ...'
 		fastqc --outdir ${path_fastqc_out} ${path_trimm_out}/${filename_trimmed2}
@@ -408,6 +403,7 @@ then
 		echo ''
 	fi
 fi
+
 
 
 # Sequence alignment
@@ -426,6 +422,10 @@ then
 fi
 echo 'Sequence alignment is completed. Results are stored in' ${path_align_out}/${filename_sam}
 echo ''
+
+
+exit 1
+echo 'This you should not read:('
 
 
 # Creating alignment quality report
