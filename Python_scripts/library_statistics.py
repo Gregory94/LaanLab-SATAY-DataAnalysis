@@ -34,7 +34,7 @@ def library_stats(bedfile=None):
 
 #%%
 if __name__ == '__main__':
-#    file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\ERR1533147_trimmed.sorted.bam.bed"
-    file=r"C:\Users\gregoryvanbeek\Desktop\test_Matlab_wt1\E-MTAB-4885.WT1.bam.bed"
+    file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt2_testfolder\wt2_matlab_tnmapping_20210127\E-MTAB-4885.WT2.bam.bed"
+#    file=r"X:\tnw\BN\LL\Shared\Gregory\datasets\wt1_testfolder\E-MTAB-4885.WT1.sorted.bam.bed"
+#    file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\wt1_dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample2_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.bed"
     read_list = library_stats(bedfile=file)
-    
