@@ -223,6 +223,12 @@ fi
 
 
 # Define filename for trimming and alignment results
+if ! [[ ${trimming_software} == 'Do_not_trim' ]] && [[ ${trimming_settings} == '' ]]
+then
+	echo 'WARNING: No trimming setting were specified. Trimming set to Do_not_trim'
+	trimming_software=Do_not_trim
+fi
+
 if ! [[ ${trimming_software} =~ 'Do_not_trim' ]]
 then
 	filename_trimmed1=${filename1%$extension*}'_trimmed.fastq'
@@ -389,7 +395,7 @@ then
 fi
 
 # Quality report trimmed data
-if [[ ${quality_check_trim} == TRUE ]] && ! [[ ${trimming_software}  == 'Do_not_trim' ]]
+if [[ ${quality_check_trim} == TRUE ]] && ! [[ ${trimming_software} == 'Do_not_trim' ]]
 then
 	echo 'Quality checking trimmed data ...'
 	fastqc --outdir ${path_fastqc_out} ${path_trimm_out}/${filename_trimmed1}
@@ -407,15 +413,15 @@ fi
 
 
 # Sequence alignment
-if [[ ${paired} =~ ^[fF]$ ]]
+if [[ ${paired} == 'Single-end' ]]
 then
 	echo 'Sequence alignment ...'
 	bwa mem ${alignment_settings} ${path_refgenome} ${path_trimm_out}/${filename_trimmed1} > ${path_align_out}/${filename_sam}
-elif [[ ${paired} =~ ^[tT]$ ]] && [[ -z ${filepath2} ]]
+elif [[ ${paired} == 'Paired-end' ]] && [[ ${filepath2} == 'none' ]]
 then
 	echo 'Sequence alignment paired end interleaved ...'
-	bwa mem -p ${alignment_settings} ${path_refgenome} ${path_trimm_out}/${filename_trimmed1} > ${path_align_out}/${filename_sam}
-elif [[ ${paired} =~ ^[tT]$ ]] && ! [[ -z ${filepath2} ]]
+	bwa mem ${alignment_settings} ${path_refgenome} ${path_trimm_out}/${filename_trimmed1} > ${path_align_out}/${filename_sam}
+elif [[ ${paired} == 'Paired-end' ]] && ! [[ ${filepath2} == 'none' ]]
 then
 	echo 'Sequence alignment paired end ...'
 	bwa mem ${alignment_settings} ${path_refgenome} ${path_trimm_out}/${filename_trimmed1} ${path_trimm_out}/${filename_trimmed2} > ${path_align_out}/${filename_sam}
@@ -424,12 +430,9 @@ echo 'Sequence alignment is completed. Results are stored in' ${path_align_out}/
 echo ''
 
 
-exit 1
-echo 'This you should not read:('
-
 
 # Creating alignment quality report
-if [[ ${flagstat_report} =~ ^[tT]$ ]]
+if [[ ${flagstat_report} == TRUE ]]
 then
 	echo 'Creating flagstat report sam file ...'
 	samtools flagstat ${path_align_out}/${filename_sam} > ${path_align_out}/${filename1%$extension*}'_trimmed_flagstatreport.txt'
@@ -452,7 +455,7 @@ echo ''
 
 
 # Indexing and sorting bam file
-if [[ ${sort_and_index} =~ ^[tT]$ ]]
+if [[ ${sort_and_index} == TRUE ]]
 then
 	echo 'Indexing bam file ...'
 	sambamba-0.7.1-linux-static sort -m 500MB ${path_align_out}/${filename_bam}
@@ -462,7 +465,7 @@ fi
 
 
 # Transposon mapping
-if [[ ${mapping} =~ ^[tT]$ ]]
+if [[ ${mapping} == TRUE ]]
 then
 	echo 'Transposon mapping ...'
 	cd /home/laanlab/Documents/satay/software/python_codes
@@ -475,7 +478,7 @@ fi
 
 
 
-if [[ ${delete_sam} =~ ^[tT]$ ]]
+if [[ ${delete_sam} == TRUE ]]
 then
 	echo 'Removing .sam file ...'
 	rm ${path_align_out}/${filename_sam}
@@ -485,30 +488,28 @@ fi
 
 
 
-
-
 ### Creating log file
 echo ''
 echo 'Creating log file ...'
 echo ${filename1}	$(date +%F_%T) > ${pathdata}/${filename1%$extension*}'_log.txt'
-if [[ ${paired} =~ ^[tT]$ ]] && ! [[ -z ${filepath2} ]]
+if [[ ${paired} == 'Paired-end' ]] && ! [[ ${filepath2} == 'none' ]]
 then
 	echo 'Paired end reads with paired file:' >> ${pathdata}/${filename1%$extension*}'_log.txt'
 	echo ${filename2} >> ${pathdata}/${filename1%$extension*}'_log.txt'
-elif [[ ${paired} =~ ^[tT]$ ]] && [[ -z ${filepath2} ]]
+elif [[ ${paired} == 'Paired-end' ]] && [[ ${filepath2} == 'none' ]]
 then
 	echo 'Interleaved paired end reads:' >> ${pathdata}/${filename1%$extension*}'_log.txt'
 fi
 
-if [[ ${trimming} =~ ^[tT]$ ]]
+if ! [[ ${trimming_software} == 'Do_not_trim' ]]
 then
 	echo '' >> ${pathdata}/${filename1%$extension*}'_log.txt'
 	echo 'Trimming options:' >> ${pathdata}/${filename1%$extension*}'_log.txt'
-	if [[ ${trimming_software} =~ ^[bB]$ ]]
+	if [[ ${trimming_software} == 'bbduk' ]]
 	then
 		echo 'BBDuk' >> ${pathdata}/${filename1%$extension*}'_log.txt'
 		echo ${trimming_settings_bbduk} >> ${pathdata}/${filename1%$extension*}'_log.txt'
-	elif [[ ${trimming_software} =~ ^[tT]$ ]]
+	elif [[ ${trimming_software} == 'trimmomatic' ]]
 	then
 		echo 'Trimmomatic' >> ${pathdata}/${filename1%$extension*}'_log.txt'
 		echo ${trimmomatic_initialization} ${trimming_settings_trimmomatic} >> ${pathdata}/${filename1%$extension*}'_log.txt'
@@ -520,9 +521,9 @@ fi
 
 echo '' >> ${pathdata}/${filename1%$extension*}'_log.txt'
 echo 'Alignment options:' >> ${pathdata}/${filename1%$extension*}'_log.txt'
-if [[ ${paired} =~ ^[tT]$ ]] && [[ -z ${filepath2} ]]
+if [[ ${paired} == 'Paired-end' ]] && [[ ${filepath2} == 'none' ]]
 then
-	echo -p ${alignment_settings} >> ${pathdata}/${filename1%$extension*}'_log.txt'
+	echo ${alignment_settings} >> ${pathdata}/${filename1%$extension*}'_log.txt'
 else
 	echo ${alignment_settings} >> ${pathdata}/${filename1%$extension*}'_log.txt'
 fi
