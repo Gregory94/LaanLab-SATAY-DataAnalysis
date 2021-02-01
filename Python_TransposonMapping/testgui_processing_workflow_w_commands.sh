@@ -29,9 +29,21 @@ then
 	echo "- 'file primary reads' and 'file secondary reads': Show the selected file(s). If only one file is chosen, the 'file secondary reads' will show 'none'."
 	echo "- 'Data type': Select whether the reads are paired-end or single-end. If two data files were chosen but this setting is set to 'Single-end', the secondary reads file will be ignored."
 	echo "- 'which trimming to use': Select whether to use bbduk or trimmomatic for trimming the reads or select 'Do_not_trim' to prevent trimming of the reads."
-	echo "- 'trimming settings': Input trimming settings. See the documentation of the selected trimming software which settings can be applied. When 'which trimming to use' is set to 'Do_not_trim', this field will be ignored. NOTE: For bbduk do not input 'interleaved=t' when using interleaved data. For trimmomatic do not input 'SE' or 'PE' to indicate single-end or paired-end data. This will all be automatically set depending on your selection in the 'Data type'-field."
+	echo "- 'trimming settings': Input trimming settings. See the documentation of the selected trimming software which settings can be applied. When 'which trimming to use' is set to 'Do_not_trim', this field will be ignored. Sequences that need to trimmed (e.g. adapter or primer sequences) have to be entered in the adapters file which can be accessed using the 'Open adapters file' button on the bottom of the window. NOTE: For bbduk do not input 'interleaved=t' when using interleaved data. For trimmomatic do not input 'SE' or 'PE' to indicate single-end or paired-end data. This will all be automatically set depending on your selection in the 'Data type'-field."
 	echo "- 'alignment settings': Input alignment settings. See the documentation of BWA MEM which settings can be applied. NOTE: Do not set -p for smart pairing (i.e. interleaved paired-end data). This will be automatically set depending on your selection in the 'Data type'-field."
+	echo "- 'Quality checking raw data': Perform a fastqc quality check on the raw reads."
+	echo "- 'Quality checking trimmed data': Perform a fastqc quality check on the trimmed reads. This setting is ignored if 'which trimming to use' it set to 'Do_not_trim'."
+	echo "- 'Quality check interrupt': This quits the program after performing the quality report on the raw dataset and creating a temporary file with your settings. This allows you to check the quality report before continuing. To continue the program, restart the program (using bash processing_workflow.sh). It will automatically set the options you have chosen the first time, but these can be changed if this is necessary depending on the outcome of the quality report. This option can be useful if you have no idea how the dataset looks. This requires 'Quality checking raw data'."
+	echo "- 'Delete sam file': After alignment the .sam file is converted to its binary equivalent and only this .bam file is used for downstream processing. Since the .sam file typically requires a lot of memory, this is can be deleted. It is recommended to keep the .sam file only for manual checking te alignment results."
+	echo "- 'Sort and index bam files.': This is needed for transposon-mapping and for many other downstream processes. It is recommended to always leave this on."
+	echo "- 'Transposon mapping': This custom python script requires sorting and indexing of the .bam file and creates the following files:"
+	echo "	- .bed file: Creates list of all insertion locations with the number of reads in each location in bed-format."
+	echo "	- .wig file: Creates list of all insertion locations with the number of reads in each location in wig-format. Small difference with the bed-file is that here reads from insertions at the same location but with different orientation are added up. In the bed-file these are regarded two separate insertions."
+	echo "	- 4 .txt-files: List of all genes with the number of insertions and reads in each gene. The files are different in whether they show all genes or all annotated essential genes and whether they also show the distribution of insertions within the genes."
+	echo "- 'Create flagstat report': Creates a flagstat report based on the .bam file."
+	echo "- 'Open adapters file': Opens the text file where the adapter and primer sequences can be entered that will be trimmed. Enter the sequences in fasta format."
 	echo
+	echo "Questions, recommendations and issues can be noted at https://www.github.com/Gregory94/LaanLab-SATAY-DataAnalysis/issues/33"
 	echo
 	exit 0
 fi
