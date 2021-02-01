@@ -17,7 +17,7 @@ then
 	echo "- alignment: BWA MEM"
 	echo "- create flagstat report after alignment: SAMTools"
 	echo "- sort and index .bam-files: SAMBamba"
-	echo "- transposon-mapping: Python3 together with custom python software (https://www.github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Python_TranpsosonMapping/transposonmapping_satay.py)"
+	echo "- transposon-mapping: Python3 together with custom python software (https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/dev_Gregory/Python_TransposonMapping/transposonmapping_satay.py)"
 	echo
 	echo "The program does not take inputs from the command line, except for the help text which can be accessed with the arguments --help or -h. It can handle both single-end data, paired-end data and paired-end interleaved data."
 	echo
