@@ -67,7 +67,7 @@ then
 	echo "	- transposonmapping_satay.py [https://www.github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Python_TransposonMapping/transposonmapping_satay.py]"
 	echo "	- numpy"
 	echo "	- pysam"
-	echo "	- python_modules [https://www.github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/master/Python-TransposonMapping/python_modules]"
+	echo "	- python_modules [https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/master/Python_TransposonMapping/python_modules]"
 	exit 0
 fi
 
