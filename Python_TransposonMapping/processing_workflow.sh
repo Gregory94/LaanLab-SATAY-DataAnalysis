@@ -1,5 +1,18 @@
 #!/bin/bash
 
+#######################
+#__Author__ = Gregory van Beek. LaanLab, department of Bionanoscience, Delft University of Technology
+#__version__ = 1.1
+#__Date last update__ = 2021-02-02
+#
+#Version history:
+#	1.0; First working version of the workflow where the user had to open the script to change the parameters and file paths [2021-07-27]
+#	1.1; Integration of a Graphical User Interface and help text (accessible via --help or -h) [2021-02-01]
+#######################
+
+
+
+
 if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]
 then
 	echo
@@ -42,22 +55,52 @@ then
 	echo
 	echo "Questions, recommendations and issues can be noted at https://www.github.com/Gregory94/LaanLab-SATAY-DataAnalysis/issues/33"
 	echo
+	echo
+	echo "Dependencies:"
+	echo "- fastqc"
+	echo "- bbmap"
+	echo "- trimmomatic"
+	echo "- bwa"
+	echo "- samtools"
+	echo "- sambamba"
+	echo "- python3"
+	echo "	- transposonmapping_satay.py [https://www.github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Python_TransposonMapping/transposonmapping_satay.py]"
+	echo "	- numpy"
+	echo "	- pysam"
+	echo "	- python_modules [https://www.github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/master/Python-TransposonMapping/python_modules]"
 	exit 0
 fi
 
 
-# Define paths.
-cachefile="/home/gregoryvanbeek/Desktop/processing_workflow_cache.txt"
-#cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
-adapterfile="/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/resources/adapters.fa"
-path_refgenome='/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa'
-#path_refgenome=/home/laanlab/Documents/satay/reference_sequences/Cerevisiae_S288C_reference/S288C_reference_sequence_R64-2-1_20150113.fsa
-path_bbduk_software=/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/
-#path_bbduk_software=/home/laanlab/Documents/satay/software/bbmap/
-path_trimm_software=/home/gregoryvanbeek/Documents/Software/Trimmomatic-0.39/
-#path_trimm_software=/home/laanlab/Documents/satay/software/Trimmomatic-0.39/
-path_python_codes=/home/gregoryvanbeek/Documents/Software/python_codes/
-#path_python_codes=/home/laanlab/Documents/satay/software/python_codes/
+################### Define paths ###########################
+
+#CACHEFILE (this is a temporary file that is created to store user settings when 'Quality check interrupt is set to true).
+#cachefile="/home/gregoryvanbeek/Desktop/processing_workflow_cache.txt"
+cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
+
+#ADAPTERFILE (this refers to the file with adapter sequences that are used for trimming).
+#adapterfile="/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/resources/adapters.fa"
+adapterfile="/home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa"
+
+#REFERENCE GENOME (path to the fasta file of the reference genome).
+#path_refgenome='/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa'
+path_refgenome=/home/laanlab/Documents/satay/reference_sequences/Cerevisiae_S288C_reference/S288C_reference_sequence_R64-2-1_20150113.fsa
+
+#DDBUK SOFTWARE (path to bbduk for trimming).
+#path_bbduk_software=/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/
+path_bbduk_software=/home/laanlab/Documents/satay/software/bbmap/
+
+#TRIMMOMATIC (path to trimmomatic for trimming).
+#path_trimm_software=/home/gregoryvanbeek/Documents/Software/Trimmomatic-0.39/
+path_trimm_software=/home/laanlab/Documents/satay/software/Trimmomatic-0.39/
+
+#PYTHON CODES (path to python code for transposon_mapping).
+#path_python_codes=/home/gregoryvanbeek/Documents/Software/python_codes/
+path_python_codes=/home/laanlab/Documents/satay/software/python_codes/
+
+############################################################
+
+
 
 
 if [ ! -f $cachefile ];
@@ -153,70 +196,53 @@ then
 	fi
 fi
 
-####################### USER SETTINGS ######################
-# Define whether data is paired-end ('t' for paired-end, 'f' for single end)
+
+############################################################
+
+# Define whether data is paired-end
 paired=$(echo $settings | awk 'BEGIN {FS="|" } { print $3 }')
 echo 'paired ' $paired
 
-###### Set options for trimming software ######
-# set 'b' for bbduk, set 't' for trimmomatic
+# Define which trimming tool to use
 trimming_software=$(echo $settings | awk 'BEGIN {FS="|" } { print $4 }')
 echo 'trimming_software ' $trimming_software
 
 ###    bbduk    ###
 trimming_settings=$(echo $settings | awk 'BEGIN {FS="|" } { print $5 }')
 echo 'trimming_settings bbduk ' $trimming_settings
-#trimming_settings='k=20 mink=8 ktrim=l restrictleft=50 hdist=3 hdist2=1 qtrim=r trimq=10 minlen=25 tpe=t tbo=t'
-## Set adapter sequences
-## Open file using xdg-open /home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa
-###################
 
 ### trimmomatic ###
 trimmomatic_initialization='-phred33'
 trimming_settings=$(echo $settings | awk 'BEGIN {FS="|" } { print $5 }')
 echo 'trimming_settings trimmomatic ' $trimming_settings
-## Set adapter sequences
-## Open file using xdg-open /home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa
-###################
-###############################################
 
-
-# Set options for alignment software (bwa mem) (note that for paired end data the parameter -p does not need to be set as long as paired=Paired-end)
+# Set options for alignment software (bwa mem)
 alignment_settings=$(echo $settings | awk 'BEGIN {FS="|" } { print $6 }')
 echo 'alignment_settings ' $alignment_settings
-
-# Trim the reads with the options set in trimming software section above ('T' for yes, 'F' for no)?
-#trimming=T
 
 # Create sorted and indexed bam file ('TRUE' or 'FALSE')
 sort_and_index=$(echo $settings | awk 'BEGIN {FS="|" } { print $11 }')
 echo 'sort_and_index ' $sort_and_index
 
-
-# Apply transposon mapping (requires sort_and_index=TRUE)
+# Apply transposon mapping ('TRUE' or 'FALSE') (requires sort_and_index=TRUE)
 mapping=$(echo $settings | awk 'BEGIN {FS="|" } { print $12 }')
 echo 'mapping ' $mapping
-
 
 # Delete sam file ('TRUE' or 'FALSE')? This file is always converted to its binary equivalent (.bam ) and the sam file is rarely used but takes up relatively a lot of memory.
 delete_sam=$(echo $settings | awk 'BEGIN {FS="|" } { print $10 }')
 echo 'delete_sam ' $delete_sam
 
-
-# Create a quality report of the alignment based on the sam file (this also works when the sam file is being deleted, i.e delete_sam=TRUE)
+# Create a quality report of the alignment based on the sam file ('TRUE' or 'FALSE')
 flagstat_report=$(echo $settings | awk 'BEGIN {FS="|" } { print $13 }')
 echo 'flagstat_report ' $flagstat_report
-
 
 # Create quality report of raw data (before trimming) ('TRUE' or 'FALSE')?
 quality_check_raw=$(echo $settings | awk 'BEGIN {FS="|" } { print $7 }')
 echo 'quality_check_raw ' $quality_check_raw
 
-
 # Create quality report of trimmed data (after trimming) ('TRUE' or 'FALSE')?
 quality_check_trim=$(echo $settings | awk 'BEGIN {FS="|" } { print $8 }')
 echo 'quality_check_trim ' $quality_check_trim
-
 
 # Determine whether the script should automatically continue after creating the first quality report. Set to True if you might want to make changes depending on the quality report of the raw data ('TRUE' or 'FALSE').
 qualitycheck_interrupt=$(echo $settings | awk 'BEGIN {FS="|" } { print $9 }')
@@ -335,7 +361,6 @@ else
 fi
 
 # Define path bbduk software
-path_bbduk_adapters=${path_bbduk_software}/resources/adapters.fa
 [ ! -d ${path_ddbuk_software} ] && echo 'WARNING: Path to bbduk software does not exists.'
 
 # Define path trimmomatic software
@@ -395,20 +420,20 @@ then
 		if [[ ${paired} == 'Single-end' ]]
 		then
 			echo 'Data trimming using bbduk single end reads...'
-			${path_bbduk_software}bbduk.sh -Xmx2g in=${pathdata}/${filename1} out=${path_trimm_out}/${filename_trimmed1} ref=${path_bbduk_adapters} ${trimming_settings}
+			${path_bbduk_software}bbduk.sh -Xmx2g in=${pathdata}/${filename1} out=${path_trimm_out}/${filename_trimmed1} ref=${adapterfile} ${trimming_settings}
 			echo 'Trimming with bbduk is completed. Results are stored in' ${path_trimm_out}/${filename_trimmed1}
 			echo ''
 		elif [[ ${paired} == 'Paired-end' ]] && ! [[ ${filepath2} == 'none' ]]
 		then
 			echo 'Data trimming using bbduk paired end reads...'
-			${path_bbduk_software}bbduk.sh -Xmx2g in1=${pathdata}/${filename1} out1=${path_trimm_out}/${filename_trimmed1} in2=${pathdata}/${filename2} out2=${path_trimm_out}/${filename_trimmed2} ref=${path_bbduk_adapters} ${trimming_settings}
+			${path_bbduk_software}bbduk.sh -Xmx2g in1=${pathdata}/${filename1} out1=${path_trimm_out}/${filename_trimmed1} in2=${pathdata}/${filename2} out2=${path_trimm_out}/${filename_trimmed2} ref=${adapterfile} ${trimming_settings}
 			echo 'Trimming with bbduk is completed. Results are stored in' ${path_trimm_out}/${filename_trimmed1} 'and for the paired end reads in' ${path_trimm_out}/${filename_trimmed2}
 			echo ''
 
 		elif [[ ${paired} == 'Paired-end' ]] && [[ ${filepath2} == 'none' ]]
 		then
 			echo 'Data trimming using bbduk paired end reads...'
-			${path_bbduk_software}bbduk.sh -Xmx2g interleaved=t in=${pathdata}/${filename1} out=${path_trimm_out}/${filename_trimmed1} ref=${path_bbduk_adapters} ${trimming_settings}
+			${path_bbduk_software}bbduk.sh -Xmx2g interleaved=t in=${pathdata}/${filename1} out=${path_trimm_out}/${filename_trimmed1} ref=${adapterfile} ${trimming_settings}
 			echo 'Trimming with bbduk is completed. Results are stored in' ${path_trimm_out}/${filename_trimmed1}
 			echo ''
 		fi
@@ -579,7 +604,7 @@ echo '' >> ${pathdata}/${filename1%$extension*}'_log.txt'
 echo 'Reference genome used:' ${name_refgenome} >> ${pathdata}/${filename1%$extension*}'_log.txt'
 echo '' >> ${pathdata}/${filename1%$extension*}'_log.txt'
 echo 'Adapter sequences from adapters.fa:' >> ${pathdata}/${filename1%$extension*}'_log.txt'
-cat ${path_bbduk_adapters} >> ${pathdata}/${filename1%$extension*}'_log.txt'
+cat ${adapterfile} >> ${pathdata}/${filename1%$extension*}'_log.txt'
 
 
 
