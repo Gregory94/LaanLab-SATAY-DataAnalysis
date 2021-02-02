@@ -21,7 +21,7 @@ then
 	echo "The program can be used by running the following command: bash [path]/processing_workflow.sh, where [path] is the path to the processing_workflow.sh file."
 	echo
 	echo "The program can trim sequencing reads, create quality reports of raw data and of the trimmed data, align the reads to a reference genome (S288C yeast genome, downloaded from the SGD) in .sam- and .bam-format, sort and index the bam file and perform transposon-mapping."
-	echo "The following dependicies are used:"
+	echo "The following tools are used:"
 	echo "- quality report: FASTQC"
 	echo "- trimming: BBDuk or Trimmomatic"
 	echo "- alignment: BWA MEM"
