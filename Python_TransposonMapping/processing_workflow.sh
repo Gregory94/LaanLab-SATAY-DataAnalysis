@@ -39,8 +39,11 @@ then
 	echo "- 'file primary reads' and 'file secondary reads': Show the selected file(s). If only one file is chosen, the 'file secondary reads' will show 'none'."
 	echo "- 'Data type': Select whether the reads are paired-end or single-end. If two data files were chosen but this setting is set to 'Single-end', the secondary reads file will be ignored."
 	echo "- 'which trimming to use': Select whether to use bbduk or trimmomatic for trimming the reads or select 'Do_not_trim' to prevent trimming of the reads."
-	echo "- 'trimming settings': Input trimming settings. See the documentation of the selected trimming software which settings can be applied. When 'which trimming to use' is set to 'Do_not_trim', this field will be ignored. Sequences that need to trimmed (e.g. adapter or primer sequences) have to be entered in the adapters file which can be accessed using the 'Open adapters file' button on the bottom of the window. NOTE: For bbduk do not input 'interleaved=t' when using interleaved data. For trimmomatic do not input 'SE' or 'PE' to indicate single-end or paired-end data. This will all be automatically set depending on your selection in the 'Data type'-field."
-	echo "- 'alignment settings': Input alignment settings. See the documentation of BWA MEM which settings can be applied. NOTE: Do not set -p for smart pairing (i.e. interleaved paired-end data). This will be automatically set depending on your selection in the 'Data type'-field."
+	echo "- 'trimming settings': Input trimming settings. See the documentation of the selected trimming software which settings can be applied. When 'which trimming to use' is set to 'Do_not_trim', this field will be ignored. Sequences that need to trimmed (e.g. adapter or primer sequences) have to be entered in the adapters file which can be accessed using the 'Open adapters file' button on the bottom of the window. NOTE 1: For bbduk do not input 'interleaved=t' when using interleaved data. For trimmomatic do not input 'SE' or 'PE' to indicate single-end or paired-end data. This will all be automatically set depending on your selection in the 'Data type'-field. NOTE 2: For trimmomatic, when using ILLUMINACLIP, do not specify the path to the adapters file as this is inserted automatically (see example settings below)."
+	echo "EXAMPLE SETTINGS:"
+	echo "	- Trimmmomatic: ILLUMINACLIPPING:1:30:10 TRAILING:20 SLIDINGWINDOW:5:10 MINLEN:15 [http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf]"
+	echo "	- bbduk: ktrim=l k=15 mink=10 hdist=1 qtrim=r trimq=10 minlen=30 [https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/]"
+	echo "- 'alignment settings': Input alignment settings. See the documentation of BWA MEM which settings can be applied. NOTE: Do not set -p for smart pairing (i.e. interleaved paired-end data). This will be automatically set depending on your selection in the 'Data type'-field. [http://bio-bwa.sourceforge.net/bwa.shtml]"
 	echo "- 'Quality checking raw data': Perform a fastqc quality check on the raw reads."
 	echo "- 'Quality checking trimmed data': Perform a fastqc quality check on the trimmed reads. This setting is ignored if 'which trimming to use' it set to 'Do_not_trim'."
 	echo "- 'Quality check interrupt': This quits the program after performing the quality report on the raw dataset and creating a temporary file with your settings. This allows you to check the quality report before continuing. To continue the program, restart the program (using bash processing_workflow.sh). It will automatically set the options you have chosen the first time, but these can be changed if this is necessary depending on the outcome of the quality report. This option can be useful if you have no idea how the dataset looks. This requires 'Quality checking raw data'."
@@ -70,6 +73,7 @@ then
 	echo "	- numpy"
 	echo "	- pysam"
 	echo "	- python_modules [https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/master/Python_TransposonMapping/python_modules]"
+	echo "	- data_files [https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/master/Data_Files]"
 	exit 0
 fi
 
@@ -442,9 +446,15 @@ then
 
 	elif [[ ${trimming_software} == 'trimmomatic' ]]
 	then
-		clip_startlocation=$(echo ${trimming_settings} | grep -b -o ILLUMINACLIP | awk 'BEGIN {FS=":"}{print $1}')
-		clip_endlocation=$(echo ${clip_startlocation}+12 | bc)
-		trimming_settings_trimmomatic=$(echo ${trimming_settings:0:${clip_startlocation}}${trimming_settings:${clip_startlocation}:12}:${adapterfile}${trimming_settings:${clip_endlocation}})
+		if [[ ${test} == *'ILLUMINACLIP'* ]]
+		then
+			clip_startlocation=$(echo ${trimming_settings} | grep -b -o ILLUMINACLIP | awk 'BEGIN {FS=":"}{print $1}')
+			clip_endlocation=$(echo ${clip_startlocation}+12 | bc)
+			trimming_settings_trimmomatic=$(echo ${trimming_settings:0:${clip_startlocation}}${trimming_settings:${clip_startlocation}:12}:${adapterfile}${trimming_settings:${clip_endlocation}})
+		else
+			trimming_settings_trimmomatic=${trimming_settings}
+		fi
+
 		echo 'Trimming settings trimmomatic: '${trimming_settings_trimmomatic}
 
 		if [[ ${paired} == 'Single-end' ]]
