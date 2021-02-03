@@ -57,6 +57,8 @@ then
 	echo
 	echo
 	echo "Dependencies:"
+	echo "- Zenity"
+	echo "- YAD"
 	echo "- fastqc"
 	echo "- bbmap"
 	echo "- trimmomatic"
@@ -75,28 +77,28 @@ fi
 ################### Define paths ###########################
 
 #CACHEFILE (this is a temporary file that is created to store user settings when 'Quality check interrupt is set to true).
-#cachefile="/home/gregoryvanbeek/Desktop/processing_workflow_cache.txt"
-cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
+cachefile="/home/gregoryvanbeek/Desktop/processing_workflow_cache.txt"
+#cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
 
 #ADAPTERFILE (this refers to the file with adapter sequences that are used for trimming).
-#adapterfile="/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/resources/adapters.fa"
-adapterfile="/home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa"
+adapterfile="/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/resources/adapters.fa"
+#adapterfile="/home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa"
 
 #REFERENCE GENOME (path to the fasta file of the reference genome).
-#path_refgenome='/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa'
-path_refgenome=/home/laanlab/Documents/satay/reference_sequences/Cerevisiae_S288C_reference/S288C_reference_sequence_R64-2-1_20150113.fsa
+path_refgenome='/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa'
+#path_refgenome=/home/laanlab/Documents/satay/reference_sequences/Cerevisiae_S288C_reference/S288C_reference_sequence_R64-2-1_20150113.fsa
 
 #DDBUK SOFTWARE (path to bbduk for trimming).
-#path_bbduk_software=/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/
-path_bbduk_software=/home/laanlab/Documents/satay/software/bbmap/
+path_bbduk_software=/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/
+#path_bbduk_software=/home/laanlab/Documents/satay/software/bbmap/
 
 #TRIMMOMATIC (path to trimmomatic for trimming).
-#path_trimm_software=/home/gregoryvanbeek/Documents/Software/Trimmomatic-0.39/
-path_trimm_software=/home/laanlab/Documents/satay/software/Trimmomatic-0.39/
+path_trimm_software=/home/gregoryvanbeek/Documents/Software/Trimmomatic-0.39/
+#path_trimm_software=/home/laanlab/Documents/satay/software/Trimmomatic-0.39/
 
 #PYTHON CODES (path to python code for transposon_mapping).
-#path_python_codes=/home/gregoryvanbeek/Documents/Software/python_codes/
-path_python_codes=/home/laanlab/Documents/satay/software/python_codes/
+path_python_codes=/home/gregoryvanbeek/Documents/Software/python_codes/
+#path_python_codes=/home/laanlab/Documents/satay/software/python_codes/
 
 ############################################################
 
@@ -130,10 +132,10 @@ then
 	--field="Open adapters file":FBTN \
 	$filepath1 \
 	$filepath2 \
-	"Paired-end!Single-end" \
+	"Single-end!Paired-end" \
 	"bbduk!trimmomatic!Do_not_trim" \
-	"ktrim=l k=15 mink=10 hdist=1 tpe tbo qtrim=r trimq=10 minlen=30" \
-	" -M -S -P -v 2" \
+	"ktrim=l k=15 mink=10 hdist=1 qtrim=r trimq=10 minlen=30" \
+	" -v 2" \
 	"False" \
 	"TRUE" \
 	"FALSE" \
@@ -304,7 +306,7 @@ if ! [[ ${trimming_software} == 'Do_not_trim' ]] && [[ ${trimming_settings} == '
 then
 	echo 'trimming settings:' ${trimming_settings}
 	echo 'WARNING: No trimming setting were specified. Trimming set to Do_not_trim'
-	trimming_software=Do_not_trim
+	trimming_software='Do_not_trim'
 fi
 
 if ! [[ ${trimming_software} =~ 'Do_not_trim' ]]
@@ -440,12 +442,17 @@ then
 
 	elif [[ ${trimming_software} == 'trimmomatic' ]]
 	then
+		clip_startlocation=$(echo ${trimming_settings} | grep -b -o ILLUMINACLIP | awk 'BEGIN {FS=":"}{print $1}')
+		clip_endlocation=$(echo ${clip_startlocation}+12 | bc)
+		trimming_settings_trimmomatic=$(echo ${trimming_settings:0:${clip_startlocation}}${trimming_settings:${clip_startlocation}:12}:${adapterfile}${trimming_settings:${clip_endlocation}})
+		echo 'Trimming settings trimmomatic: '${trimming_settings_trimmomatic}
+
 		if [[ ${paired} == 'Single-end' ]]
 		then
 			echo 'Data trimming using trimmomatic ...'
 			currentpath=$(pwd)
 			cd ${path_bbduk_software}/resources/
-			java -jar ${path_trimm_software}trimmomatic-0.39.jar SE ${trimmomatic_initialization} ${pathdata}/${filename1} ${path_trimm_out}/${filename_trimmed1} ${trimming_settings}
+			java -jar ${path_trimm_software}trimmomatic-0.39.jar SE ${trimmomatic_initialization} ${pathdata}/${filename1} ${path_trimm_out}/${filename_trimmed1} ${trimming_settings_trimmomatic}
 			cd ${currentpath}
 
 		elif [[ ${paired} == 'Paired-end' ]] && ! [[ ${filepath2} == 'none' ]]
@@ -453,7 +460,7 @@ then
 			echo 'Data trimming using trimmomatic ...'
 			currentpath=$(pwd)
 			cd ${path_bbduk_software}/resources/
-			java -jar ${path_trimm_software}trimmomatic-0.39.jar PE ${trimmomatic_initialization} ${pathdata}/${filename1} ${pathdata}/${filename2} ${path_trimm_out}/${filename_trimmed1} ${path_trimm_out}/${filename_trimmed1%_trimmed.fastq*}'_trimmedorphanedreads.fastq' ${path_trimm_out}/${filename_trimmed2} ${path_trimm_out}/${filename_trimmed1%_trimmed.fastq*}'_trimmedorphanedreads.fastq' ${trimming_settings}
+			java -jar ${path_trimm_software}trimmomatic-0.39.jar PE ${trimmomatic_initialization} ${pathdata}/${filename1} ${pathdata}/${filename2} ${path_trimm_out}/${filename_trimmed1} ${path_trimm_out}/${filename_trimmed1%_trimmed.fastq*}'_trimmedorphanedreads.fastq' ${path_trimm_out}/${filename_trimmed2} ${path_trimm_out}/${filename_trimmed1%_trimmed.fastq*}'_trimmedorphanedreads.fastq' ${trimming_settings_trimmomatic}
 			cd ${currentpath}
 
 		elif [[ ${paired} = 'Paired-end' ]] && [[ ${filepath2} == 'none' ]]
