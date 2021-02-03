@@ -81,28 +81,28 @@ fi
 ################### Define paths ###########################
 
 #CACHEFILE (this is a temporary file that is created to store user settings when 'Quality check interrupt is set to true).
-cachefile="/home/gregoryvanbeek/Desktop/processing_workflow_cache.txt"
-#cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
+#cachefile="/home/gregoryvanbeek/Desktop/processing_workflow_cache.txt"
+cachefile="/home/laanlab/Documents/satay/software/processing_workflow_cache.txt"
 
 #ADAPTERFILE (this refers to the file with adapter sequences that are used for trimming).
-adapterfile="/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/resources/adapters.fa"
-#adapterfile="/home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa"
+#adapterfile="/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/resources/adapters.fa"
+adapterfile="/home/laanlab/Documents/satay/software/bbmap/resources/adapters.fa"
 
 #REFERENCE GENOME (path to the fasta file of the reference genome).
-path_refgenome='/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa'
-#path_refgenome=/home/laanlab/Documents/satay/reference_sequences/Cerevisiae_S288C_reference/S288C_reference_sequence_R64-2-1_20150113.fsa
+#path_refgenome='/home/gregoryvanbeek/Documents/Reference_Sequences/Reference_Sequence_S288C/S288C_reference_sequence_R64-2-1_20150113.fsa'
+path_refgenome=/home/laanlab/Documents/satay/reference_sequences/Cerevisiae_S288C_reference/S288C_reference_sequence_R64-2-1_20150113.fsa
 
 #DDBUK SOFTWARE (path to bbduk for trimming).
-path_bbduk_software=/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/
-#path_bbduk_software=/home/laanlab/Documents/satay/software/bbmap/
+#path_bbduk_software=/home/gregoryvanbeek/Documents/Software/BBMap/bbmap/
+path_bbduk_software=/home/laanlab/Documents/satay/software/bbmap/
 
 #TRIMMOMATIC (path to trimmomatic for trimming).
-path_trimm_software=/home/gregoryvanbeek/Documents/Software/Trimmomatic-0.39/
-#path_trimm_software=/home/laanlab/Documents/satay/software/Trimmomatic-0.39/
+#path_trimm_software=/home/gregoryvanbeek/Documents/Software/Trimmomatic-0.39/
+path_trimm_software=/home/laanlab/Documents/satay/software/Trimmomatic-0.39/
 
 #PYTHON CODES (path to python code for transposon_mapping).
-path_python_codes=/home/gregoryvanbeek/Documents/Software/python_codes/
-#path_python_codes=/home/laanlab/Documents/satay/software/python_codes/
+#path_python_codes=/home/gregoryvanbeek/Documents/Software/python_codes/
+path_python_codes=/home/laanlab/Documents/satay/software/python_codes/
 
 ############################################################
 
@@ -446,7 +446,7 @@ then
 
 	elif [[ ${trimming_software} == 'trimmomatic' ]]
 	then
-		if [[ ${test} == *'ILLUMINACLIP'* ]]
+		if [[ ${trimming_settings} == *'ILLUMINACLIP'* ]]
 		then
 			clip_startlocation=$(echo ${trimming_settings} | grep -b -o ILLUMINACLIP | awk 'BEGIN {FS=":"}{print $1}')
 			clip_endlocation=$(echo ${clip_startlocation}+12 | bc)
