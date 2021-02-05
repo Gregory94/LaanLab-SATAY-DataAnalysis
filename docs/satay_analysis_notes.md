@@ -1159,6 +1159,10 @@ The files include all genes (or only all annotated essential genes in case of _p
 In case of _pergene.txt and _peressential.txt, these files contain three tab separated columns where in the first column the gene name is given (standard name is, e.g. Cdc42 or Bem1), the second column contains the number of insertions within the gene and the third column includes the number of reads.
 In case of the _insertions.txt files, they consist of six columns where the first represent the gene name, the second the chromosome where the gene is located and the third and fourth the start and end position of the gene, respectively.
 The fifth column includes a list of all insertion locations within the gene and the sixth column represents the number of reads for all insertions shown in the fifth column.
+Note that in _pergene.txt (and _peressential.txt) the sum of reads is determined by substracting the highest number of reads in that gene.
+This is done to reduce the noise during analysis as sometimes a single transposon could account for a large increase in the total number of reads in that gene.
+This is discussed in more detail at [the satay forum here](https://groups.google.com/forum/#!category-topic/satayusers/bioinformatics/uaTpKsmgU6Q).
+Therefore, if the reads in _insertions.txt files are added up, this does not directly match the value that is stored in _pergene.txt (and _peressential.txt) file but instead the highest read count should be ignored.
 
 # Bibliography
 

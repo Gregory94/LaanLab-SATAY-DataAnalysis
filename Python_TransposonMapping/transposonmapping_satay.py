@@ -8,14 +8,15 @@ For more information about this code and the project, see github.com/Gregory94/L
 This code is based on the Matlab code created by the Kornmann lab which is available at: sites.google.com/site/satayusers/
 
 __Author__ = Gregory van Beek. LaanLab, department of Bionanoscience, Delft University of Technology
-__version__ = 1.4
-__Date last update__ = 2020-08-09
+__version__ = 1.5
+__Date last update__ = 2021-01-11
 
 Version history:
     1.1; Added code for creating two text files for storing insertion locations per gene and per essential gene [2020-07-27]
     1.2; Improved searching algorithm for essential genes [2020-08-06]
     1.3; Load file containing all essential genes so that a search for essential genes in multiple file is not needed anymore. This file is created using Create_EssentialGenes_list.py located in the same directory as this code [2020-08-07]
     1.4; Fixed bug where the gene position and transposon insertion location did not start at zero for each chromosome, causing confusing values to be stored in the _pergene_insertions.txt and _peressential_insertions.txt files [2020-08-09]
+    1.5; Added functionality to handle all possible sam flags in the alignment file (bam-file) instead of only flag=0 or flag=16. This is needed for the function to handle paired-end sequencing data [2021-01-11]
 """
 
 import os, sys
@@ -28,7 +29,7 @@ dirname = os.path.dirname(os.path.abspath('__file__'))
 sys.path.insert(1,os.path.join(dirname,'python_modules'))
 from chromosome_and_gene_positions import chromosomename_roman_to_arabic, gene_position
 from gene_names import gene_aliases
-
+from samflag import samflags
 
 bam_arg = sys.argv[1]
 
@@ -73,35 +74,27 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
         path = bamfile.replace(filename,'')
 
 
-    if os.path.isfile(bamfile):
-        print('Running: ', bamfile)
-    else:
-        raise ValueError('Bam file not found at: ', bamfile)
-
+    assert os.path.isfile(bamfile), 'Bam file not found at: %s' % bamfile #check if given bam file exists
 
 
 #%% LOADING ADDITIONAL FILES
-    files_path = os.path.join(dirname,'..','..','data_files')
+    files_path = os.path.join(dirname,'..','data_files')
 
     #LOADING GFF-FILE
     if gfffile is None:
         gfffile = os.path.join(files_path,'Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    if not os.path.isfile(gfffile):
-        raise ValueError('Path to GFF-file does not exist.')
+    assert os.path.isfile(gfffile), 'Path to GFF-file does not exist.'
 
     #LOADING TEXT FILES WITH ESSENTIAL GENES
     if essentialfiles is None:
         essentialfiles = os.path.join(files_path,'Cerevisiae_AllEssentialGenes_List.txt')
-    if not os.path.isfile(essentialfiles):
-        raise ValueError('Following path does not exist: ' + essentialfiles)
+    assert os.path.isfile(essentialfiles), 'Following path does not exist: %s' % essentialfiles
     del essentialfiles
 
     #LOADING TEXT FILE WITH GENE NAME ALIASES
     if genenamesfile is None:
         genenamesfile = os.path.join(files_path,'Yeast_Protein_Names.txt')
-    if not os.path.isfile(genenamesfile):
-        raise ValueError('Following path does not exist: ' + genenamesfile)
-
+    assert os.path.isfile(genenamesfile), 'Following path does not exist: %s' % genenamesfile
 
 
 #%% READ BAM FILE
@@ -178,23 +171,44 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
         flag_array = np.empty(shape=(N_reads_kk), dtype=int)
         readlength_array = np.empty(shape=(N_reads_kk), dtype=int)
 
-
         #RETREIVING ALL THE READS FROM THE CURRENT CHROMOSOME.
         print('Getting reads for chromosome %s ...' % kk)
         for reads in bam.fetch(kk, 0, chr_length_dict[kk], until_eof=True):
             read = str(reads).split('\t')
 
             start_array[read_counter] = int(read[3]) + 1
-            flag_array[read_counter] = int(read[1])
-            readlength_array[read_counter] = int(len(read[9]))
+
+            #GET FLAG FOR EACH READ. IF READ ON FORWARD STRAND, ASSIGN VALUE 1, IF READ ON REVERSE STRAND ASSIGN VALUE -1, IF READ UNMAPPED OR SECONDARY ALIGNMENT ASSIGN VALUE 0
+#            flag_array[read_counter] = int(read[1])
+            samprop = samflags(flag = int(read[1]), verbose=False)[1]
+            if 'read reverse strand' in samprop:
+                flag_array[read_counter] = -1
+            else:
+                flag_array[read_counter] = 1
+            if 'not primary alignment' in samprop or 'read unmapped' in samprop:
+                flag_array[read_counter] = 0
+
+
+            cigarmatch_list = []
+            if not reads.cigartuples == None:
+                for cigar_type, cigar_length in reads.cigartuples:
+                    if cigar_type == 0:
+                        cigarmatch_list.append(cigar_length)
+                    elif cigar_type == 2:
+                        cigarmatch_list.append(cigar_length)
+            match_length = sum(cigarmatch_list)
+
+            readlength_array[read_counter] = match_length #int(len(read[9]))
 
             read_counter += 1
 
 
 
         #CORRECT STARTING POSITION FOR READS WITH REVERSED ORIENTATION
-        flag0coor_array = np.where(flag_array==0) #coordinates reads 5' -> 3'
-        flag16coor_array = np.where(flag_array==16) # coordinates reads 3' -> 5'
+#        flag0coor_array = np.where(flag_array==0) #coordinates reads 5' -> 3'
+#        flag16coor_array = np.where(flag_array==16) # coordinates reads 3' -> 5'
+        flag0coor_array = np.where(flag_array==1) #coordinates reads 5' -> 3'
+        flag16coor_array = np.where(flag_array==-1) # coordinates reads 3' -> 5'
 
         startdirect_array = start_array[flag0coor_array]
         flagdirect_array = flag_array[flag0coor_array]
@@ -389,6 +403,9 @@ def transposonmapper(bamfile=bam_arg, gfffile=None, essentialfiles=None, genenam
     del (bedfile, coordinates_counter, refname)
 
 #%% CREATE TEXT FILE WITH TRANSPOSONS AND READS PER GENE
+# NOTE THAT THE TRANSPOSON WITH THE HIGHEST READ COUNT IS IGNORED.
+# E.G. IF THIS FILE IS COMPARED WITH THE _PERGENE_INSERTIONS.TXT FILE THE READS DON'T ADD UP (SEE https://groups.google.com/forum/#!category-topic/satayusers/bioinformatics/uaTpKsmgU6Q)
+# TOO REMOVE THIS HACK, CHANGE THE INITIALIZATION OF THE VARIABLE readpergene
     pergenefile = bamfile+'_pergene.txt'
     print('Writing pergene.txt file at: ', pergenefile)
     print('')
