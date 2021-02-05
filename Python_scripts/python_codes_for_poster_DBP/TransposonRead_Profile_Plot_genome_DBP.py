@@ -127,9 +127,9 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
 #        labelbottom=False) # labels along the bottom edge are off
     ax.set_xticks(middle_chr_position)
     ax.set_xticklabels(chrom_list, fontsize=textsize)
-    ax.tick_params(axis='x', which='major', pad=10)
-    plt.ylabel('Transposon \n Count', fontsize=textsize, color=textcolor, labelpad=30)
-    plt.yticks([], [])
+    ax.tick_params(axis='x', which='major', pad=30)
+    plt.ylabel('Transposon Count', fontsize=textsize, color=textcolor)#, labelpad=30)
+#    plt.yticks([], [])
 #    ax.axis("off")
 
     axc = plt.subplot(grid[19,0])
@@ -164,4 +164,6 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
 
 #%%
 if __name__ == '__main__':
-    transposon_profile(bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
+#    transposon_profile(bed_file=r"V:\tnw\bn\ll\Shared\Gregory\Labmeetings\Labmeeting_presentations\Labmeeting20210209_dataset\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.bed")
+#    transposon_profile(bed_file=r"V:\tnw\bn\ll\Shared\Gregory\Labmeetings\Labmeeting_presentations\Labmeeting20210209_dataset\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.bed")
+    transposon_profile(bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
