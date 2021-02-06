@@ -621,16 +621,25 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features(region = 1,#['xiii', 0, 14790],
-                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
-                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
+#    dna_df2 = dna_features(region = 1,#['xiii', 0, 14790],
+#                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
+#                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
+#                 variable="reads",
+#                 normalization_window_size=20000,
+#                 normalize=True,
+#                 plotting=False,
+#                 savefigure=False,
+#                 verbose=False)
+
+    dna_df2 = dna_features(region = 3,#['xiii', 0, 14790],
+                 wig_file = r"V:\tnw\bn\ll\Shared\Gregory\Labmeetings\Labmeeting_presentations\Labmeeting20210209_dataset\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig",
+                 pergene_insertions_file = r"V:\tnw\bn\ll\Shared\Gregory\Labmeetings\Labmeeting_presentations\Labmeeting20210209_dataset\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt",
                  variable="reads",
                  normalization_window_size=20000,
                  normalize=True,
                  plotting=False,
                  savefigure=False,
-                 verbose=False)
-
+                 verbose=True)
 
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
 #        dna_df2 = dna_features(region = chrom,

@@ -322,7 +322,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
             N_reads_list.append(sum(N_reads))
             N_insrt_list.append(len([ins for ins in N_reads if not ins == 0]))
             if not f_type == None and f_type.startswith('Gene'):
-                N10percent = 100#int(len(N_reads) * 0.1)
+                N10percent = int(len(N_reads) * 0.1) #TRUNCATED GENE DEFINITION
                 N_reads_truncatedgene_list.append(sum(N_reads[N10percent:-N10percent]))
                 N_insrt_truncatedgene_list.append(len([ins for ins in N_reads[N10percent:-N10percent] if not ins == 0]))
             else:
@@ -582,9 +582,9 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 #%%
 if __name__ == '__main__':
     dna_df2 = dna_features(region = 3,#['xiii', 0, 14790],
-                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
-                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-                 variable="reads",
+                 wig_file = r"V:\tnw\bn\ll\Shared\Gregory\Labmeetings\Labmeeting_presentations\Labmeeting20210209_dataset\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig",
+                 pergene_insertions_file = r"V:\tnw\bn\ll\Shared\Gregory\Labmeetings\Labmeeting_presentations\Labmeeting20210209_dataset\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt",
+                 variable="reads", #for plotting
                  plotting=False,
                  savefigure=False,
                  verbose=True)
