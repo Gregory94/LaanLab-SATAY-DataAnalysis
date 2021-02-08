@@ -5,11 +5,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
+sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
 from chromosome_and_gene_positions import chromosome_position, gene_position
 from essential_genes_names import list_known_essentials
 from chromosome_names_in_files import chromosome_name_bedfile, chromosome_name_wigfile
 
+
+#%%
+#SOLVE ISSUE WHERE GENE BARCODE PLOT IS DIFFERENT BETWEEN DIFFERENT PLOTS #???
 #%%
 def transposon_profile(chrom=None, bar_width=None, bed_file=None):
     '''This function creates a bar plot along the entire genome.
@@ -293,3 +296,4 @@ if __name__ == '__main__':
 
 #    read_profile(wig_file=r"V:\tnw\bn\ll\Shared\Gregory\Labmeetings\Labmeeting_presentations\Labmeeting20210209_dataset\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig")
 #    read_profile(wig_file=r"V:\tnw\bn\ll\Shared\Gregory\Labmeetings\Labmeeting_presentations\Labmeeting20210209_dataset\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.wig")
+#     read_profile(wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig")
