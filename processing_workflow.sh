@@ -6,7 +6,7 @@
 #__Date last update__ = 2021-02-02
 #
 #Version history:
-#	1.0; First working version of the workflow where the user had to open the script to change the parameters and file paths [2021-07-27]
+#	1.0; First working version of the workflow where the user had to open the script to change the parameters and file paths [2020-07-27]
 #	1.1; Integration of a Graphical User Interface and help text (accessible via --help or -h) [2021-02-01]
 #######################
 
