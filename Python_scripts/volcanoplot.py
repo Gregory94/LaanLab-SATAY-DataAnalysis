@@ -29,7 +29,6 @@ del (datafile_a, datafile_b, file_dirname)
 assert (len(read_gene_df_a) == len(read_gene_df_b)), "Lengths dataframe_a and dataframe_b are not the same. Please check data."
 
 
-fc = read_gene_df_a.Nreadsperinsrt - read_gene_df_b.Nreadsperinsrt
-
-
+fc = read_gene_df_a[['gene_names']]
+fc['fold_change'] = read_gene_df_a.Nreadsperinsrt - read_gene_df_b.Nreadsperinsrt
 
