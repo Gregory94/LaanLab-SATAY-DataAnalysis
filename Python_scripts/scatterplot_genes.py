@@ -17,8 +17,8 @@ The main difference between the two files is that in the .bam_pergene.txt file t
 Therefore the graphs between the essentialgene_plot() and essentialgene_plot_frompergenefile() look slightly different, but the main distribution of the data should look similar.
 Also the essentialgene_plot_frompergenefile() function typically has more genes with zero reads per insertion because of this feature.
 
-When both files are available, it is adviced to start with the essentialgene_plot() to get the full dataset.
-If this looks too noisy, then try the essentialgene_plot_frompergenefile() function.
+When both files are available, it is adviced to start with the essentialgene_plot_frompergenefile().
+To have the full dataset without the feature of removing the highest read count, use essentialgene_plot().
 """
 
 import os, sys
