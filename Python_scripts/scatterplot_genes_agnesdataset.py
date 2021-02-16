@@ -12,18 +12,22 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-#%% define file path
-### WILD TYPE
-filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing"
-filename = "WT-a_pergene.txt"
+#%% data files for essentialgene_plot_frompergenefile()
+### WILD TYPE leila
+#filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing"
+#filename = "WT-a_pergene.txt"
 #filename = "WT-b_pergene.txt"
 
-### dNRP1
+### dNRP1 leila
 #filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
 #filename = "dnrp1-1-a_pergene.txt"
 #filename = "dnrp1-1-b_pergene.txt"
 #filename = "dnrp1-2-a_pergene.txt"
 #filename = "dnrp1-2-b_pergene.txt"
+
+### dBEM1dBEM2dBEM3dNRP1 enzo
+filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1"
+filename = "D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene.txt"
 
 
 datafile = os.path.join(filepath, filename)
@@ -58,7 +62,7 @@ def essentialgene_plot(datafile):
 
     line_counter = 0
     for line in lines:
-        l = line.strip('\n').split(' ')
+        l = line.strip('\n').split('\t')
 
         genenames_list[line_counter] = l[0]
         tnpergene_list[line_counter] = int(l[1])
@@ -138,6 +142,9 @@ def essentialgene_plot(datafile):
 
 
 #%%
+    return(read_gene_df)
+
+#%%
 if __name__ == '__main__':
-    essentialgene_plot(datafile)
+    read_gene_df = essentialgene_plot(datafile)
 
