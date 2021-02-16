@@ -22,6 +22,7 @@ If this looks too noisy, then try the essentialgene_plot_frompergenefile() funct
 """
 
 import os, sys
+import re
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -35,8 +36,8 @@ def essentialgene_plot(wigfile, pergeneinsertionsfile):
     The genes are sorted based on the number of reads per insertion and are color coded based on the annotated essentiality in wild type.
 
     Input:
-        - path to wigfile
-        - path to pergeneinsertionsfile as created by transposonmapping_satay.py
+        - path to .wig file
+        - path to _pergene_insertions.txt file as created by transposonmapping_satay.py
 
     Requirements:
         - essential_genes_names.py located in python_modules directory (the python_modules directory is expected to be located in the same directory as this script).
@@ -125,8 +126,9 @@ def essentialgene_plot_frompergenefile(datafile):
     This code creates a scatterplot of the number of reads per insertion per gene combined with a histogram.
     The genes are sorted based on the number of reads per insertion and are color coded based on the annotated essentiality in wild type.
     
-    Input is a datafile as created by the Kornmann-lab.
-    
+    Input:
+        - path to _pergene.txt (each line containing a gene with corresponding number of insertions and reads seperated either by a space or tab)
+
     Requirements:
         - essential_genes_names.py located in python_modules directory (the python_modules directory is expected to be located in the same directory as this script).
         - Cerevisiae_EssentialGenes_List_1.txt and Cerevisiae_EssentialGenes_List_2.txt, located in the Data_Files directory (the Data_Files directory is expected to be located in the parent directory of this script).
@@ -149,7 +151,8 @@ def essentialgene_plot_frompergenefile(datafile):
 
     line_counter = 0
     for line in lines:
-        l = line.strip('\n').split(' ')
+#        l = line.strip('\n').split(' ')
+        l = re.split(' |\t', line.strip('\n'))
 
         genenames_list[line_counter] = l[0]
         tnpergene_list[line_counter] = int(l[1])
@@ -244,8 +247,8 @@ def essentialgene_plot_frompergenefile(datafile):
 #%% example inputs for data files for essentialgene_plot()
 
 ### dBEM1dBEM2dBEM3dNRP1 enzo
-#wigfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig"
-#pergeneinsertionsfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt"
+wigfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig"
+pergeneinsertionsfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt"
 
 ### WILD TYPE enzo
 #wigfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample2_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.wig"
@@ -254,7 +257,7 @@ def essentialgene_plot_frompergenefile(datafile):
 #%% example inputs for data files for essentialgene_plot_frompergenefile()
 
 ### WILD TYPE leila
-datafile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\WT-a_pergene.txt"
+#datafile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\WT-a_pergene.txt"
 #datafile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\WT-b_pergene.txt"
 
 ### dNRP1 leila
@@ -271,9 +274,9 @@ datafile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_l
 
 #%%
 if __name__ == '__main__':
-#    read_gene_df = essentialgene_plot(wigfile, pergeneinsertionsfile)
+    read_gene_df = essentialgene_plot(wigfile, pergeneinsertionsfile)
 
-    read_gene_df = essentialgene_plot_frompergenefile(datafile)
+#    read_gene_df = essentialgene_plot_frompergenefile(datafile)
 
 
 
