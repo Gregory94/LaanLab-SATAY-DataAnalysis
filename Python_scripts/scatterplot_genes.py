@@ -24,6 +24,18 @@ pergeneinsertionsfile = r"\\?\N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\
 
 #%%
 def essentialgene_plot(wigfile, pergeneinsertionsfile):
+    '''
+    This code creates a scatterplot of the number of reads per insertion per gene combined with a histogram.
+    The genes are sorted based on the number of reads per insertion and are color coded based on the annotated essentiality in wild type.
+    
+    Input:
+        - path to wigfile
+        - path to pergeneinsertionsfile as created by transposonmapping_satay.py
+    
+    Requirements:
+        - essential_genes_names.py located in python_modules directory (the python_modules directory is expected to be located in the same directory as this script).
+        - Cerevisiae_EssentialGenes_List_1.txt and Cerevisiae_EssentialGenes_List_2.txt, located in the Data_Files directory (the Data_Files directory is expected to be located in the parent directory of this script).
+    '''
 
     assert os.path.isfile(wigfile), 'Wig file not found at: %s' % wigfile
     assert os.path.isfile(pergeneinsertionsfile), 'pergeneinsertionsfile file not found at: %s' % pergeneinsertionsfile
