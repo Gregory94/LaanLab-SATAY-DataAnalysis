@@ -247,8 +247,8 @@ def essentialgene_plot_frompergenefile(datafile):
 #%% example inputs for data files for essentialgene_plot()
 
 ### dBEM1dBEM2dBEM3dNRP1 enzo
-wigfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig"
-pergeneinsertionsfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt"
+#wigfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig"
+#pergeneinsertionsfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt"
 
 ### WILD TYPE enzo
 #wigfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample2_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.wig"
@@ -257,7 +257,7 @@ pergeneinsertionsfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_en
 #%% example inputs for data files for essentialgene_plot_frompergenefile()
 
 ### WILD TYPE leila
-#datafile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\WT-a_pergene.txt"
+datafile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\WT-a_pergene.txt"
 #datafile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\WT-b_pergene.txt"
 
 ### dNRP1 leila
@@ -274,9 +274,9 @@ pergeneinsertionsfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_en
 
 #%%
 if __name__ == '__main__':
-    read_gene_df = essentialgene_plot(wigfile, pergeneinsertionsfile)
+#    read_gene_df = essentialgene_plot(wigfile, pergeneinsertionsfile)
 
-#    read_gene_df = essentialgene_plot_frompergenefile(datafile)
+    read_gene_df = essentialgene_plot_frompergenefile(datafile)
 
 
 
