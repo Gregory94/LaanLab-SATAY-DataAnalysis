@@ -139,6 +139,21 @@ def essentialgene_plot_frompergenefile(datafile):
     from essential_genes_names import list_known_essentials #import essential_genes_names from python modules directory
 
 
+#%%
+#THIS COMMENT IS FOR THE FOLLOWING SECTIONS:
+#    - READ FILE
+#    - DETERMINE NUMBER OF READS PER INSERTION PER GENE
+#    - DETERMINE ESSENTIAL GENES
+#    - CREATE DATAFRAME
+#
+#THIS CAN BE REPLACED BY THE FOLLOWNG CODE:
+#    file_dirname = os.path.dirname(os.path.abspath('__file__'))
+#    sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
+#    from dataframe_from_pergene import dataframe_from_pergenefile
+#    
+#    read_gene_df_a = dataframe_from_pergenefile(datafile_a)
+
+
 #%% read file
     assert os.path.isfile(datafile), 'File not found at: %s' % datafile
 
