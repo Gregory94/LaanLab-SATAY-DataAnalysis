@@ -32,11 +32,13 @@ sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
 from dataframe_from_pergene import dataframe_from_pergenefile
 
 
+
 #%% define file paths and names. Two samples called a and b.
 datapath_a = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing"
 filenames_a = ["WT-a_pergene.txt", "WT-b_pergene.txt"]
 datapath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
 filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt"]
+
 
 
 #%% Check files
@@ -56,13 +58,15 @@ del (files, datafile, datapath_a, datapath_b, filenames_a, filenames_b)
 
 
 #%% Get number of reads per insertion all datasets
+variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
+print('Plotting: %s' % variable)
 for count, datafile_a in enumerate(datafiles_list_a):
     read_gene_a = dataframe_from_pergenefile(datafile_a)
     if count == 0:
         readsperinsrt_df = read_gene_a[['gene_names']] #initialize new dataframe with gene_names
-        Nreadsperinsrt_a_array = read_gene_a[['Nreadsperinsrt']].to_numpy() #create numpy array to store raw data
+        Nreadsperinsrt_a_array = read_gene_a[[variable]].to_numpy() #create numpy array to store raw data
     else:
-        Nreadsperinsrt_a_array = np.append(Nreadsperinsrt_a_array, read_gene_a[['Nreadsperinsrt']].to_numpy(), axis=1) #append raw data
+        Nreadsperinsrt_a_array = np.append(Nreadsperinsrt_a_array, read_gene_a[[variable]].to_numpy(), axis=1) #append raw data
 N_a = count+1 #save number of samples
 
 
@@ -70,9 +74,9 @@ N_a = count+1 #save number of samples
 for count, datafile_b in enumerate(datafiles_list_b):
     read_gene_b = dataframe_from_pergenefile(datafile_b)
     if count == 0:
-        Nreadsperinsrt_b_array = read_gene_b[['Nreadsperinsrt']].to_numpy()
+        Nreadsperinsrt_b_array = read_gene_b[[variable]].to_numpy()
     else:
-        Nreadsperinsrt_b_array = np.append(Nreadsperinsrt_b_array, read_gene_b[['Nreadsperinsrt']].to_numpy(), axis=1)
+        Nreadsperinsrt_b_array = np.append(Nreadsperinsrt_b_array, read_gene_b[[variable]].to_numpy(), axis=1)
 N_b = count+1
 
 
@@ -80,7 +84,7 @@ if not N_a == N_b:
     print("WARNING: Length of dataset a is NOT the same as the length of dataset b.")
 N = count+1
 
-del (datafile_a, datafile_b, count, read_gene_a, read_gene_b, N_a, N_b)
+del (datafile_a, datafile_b, count, N_a, N_b, variable) #, read_gene_a, read_gene_b)
 
 
 
@@ -113,7 +117,8 @@ for ss in range(len(var_Nreadsperinsrt_a_list)): #determine standard deviation a
         tstat_Nreadsperinsrt_list[ss] = 0
     else:
         tstat_Nreadsperinsrt_list[ss] = (mean_Nreadsperinsrt_a_list[ss] - mean_Nreadsperinsrt_b_list[ss]) / (std_Nreadsperinsrt_list[ss] * np.sqrt(2/N))
-    p_Nreadsperinsrt_list[ss] = -1*np.log10(1 - stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df))
+    p_Nreadsperinsrt_list[ss] = -1*np.log10(stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df))
+    # p_Nreadsperinsrt_list[ss] = 1 - stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df)
 
 readsperinsrt_df['mean_Nreadsperinsrt_a'] = mean_Nreadsperinsrt_a_list
 readsperinsrt_df['mean_Nreadsperinsrt_b'] = mean_Nreadsperinsrt_b_list
@@ -126,18 +131,25 @@ del (mean_Nreadsperinsrt_a_list, mean_Nreadsperinsrt_b_list, var_Nreadsperinsrt_
      std_Nreadsperinsrt_list, tstat_Nreadsperinsrt_list, p_Nreadsperinsrt_list, df, N)
 
 
+
 #%% Determine fold change of mean_Nreadsperinsrt
 fc_list = [np.nan]*len(readsperinsrt_df) #initialize list for storing fold changes
 
 for count, avg in enumerate(readsperinsrt_df.itertuples()):
     if not avg.mean_Nreadsperinsrt_a == 0 and not avg.mean_Nreadsperinsrt_b == 0:
-        fc_list[count] = np.log2(avg.mean_Nreadsperinsrt_a / avg.mean_Nreadsperinsrt_b) - 1 #DIVIDE DATASET A BY DATASET B
+        fc_list[count] = np.log2((avg.mean_Nreadsperinsrt_b / avg.mean_Nreadsperinsrt_a)) #DIVIDE DATASET A BY DATASET B
+        # fc_list[count] = (avg.mean_Nreadsperinsrt_a / avg.mean_Nreadsperinsrt_b)-1
     else:
-        fc_list[count] = 0
+        fc_list[count] = np.log2(max([avg.mean_Nreadsperinsrt_a, avg.mean_Nreadsperinsrt_b]))
 
 readsperinsrt_df['log2_fold_change'] = fc_list #add fc_list to dataframe
 
 del (avg, count, fc_list)
+
+
+#print specific geness
+# readsperinsrt_df[readsperinsrt_df['gene_names'].str.contains("NRP1")]
+
 
 
 #%% Volcanoplot
@@ -150,8 +162,6 @@ ax.scatter(x=readsperinsrt_df.log2_fold_change, y=readsperinsrt_df.pval_Nreadspe
 ax.grid(True, which='major', axis='both', alpha=0.4)
 ax.set_xlabel('Log2 FC')
 ax.set_ylabel('-Log10 p-value')
-
-
 
 
 
