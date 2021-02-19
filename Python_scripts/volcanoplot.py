@@ -62,6 +62,8 @@ del (files, datafile, datapath_a, datapath_b, filenames_a, filenames_b)
 variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 print('Plotting: %s' % variable)
 
+#!!! NORMALIZE FOR TOTAL NUMBER OF INSERTIONS?
+
 for count, datafile_a in enumerate(datafiles_list_a):
     read_gene_a = dataframe_from_pergenefile(datafile_a)
     if count == 0:
@@ -82,8 +84,8 @@ for count, datafile_b in enumerate(datafiles_list_b):
 N_b = count+1
 
 
-if not N_a == N_b:
-    print("WARNING: Length of dataset a is NOT the same as the length of dataset b.")
+# if not N_a == N_b:
+    # print("WARNING: Length of dataset a is NOT the same as the length of dataset b.")
 N = count+1 #!!!THIS N IS NEEDED IN NEXT SECTION, BUT DOES NOT WORK WHEN DATASETS DO NOT INCLUDE THE SAME NUMBER OF DATA FILES.
 
 del (datafile_a, datafile_b, count, variable) #, read_gene_a, read_gene_b)
@@ -165,6 +167,50 @@ ax.scatter(x=readsperinsrt_df.log2_fold_change, y=readsperinsrt_df.pval_Nreadspe
 ax.grid(True, which='major', axis='both', alpha=0.4)
 ax.set_xlabel('Log2 FC')
 ax.set_ylabel('-Log10 p-value')
+
+
+
+#%%THIS IS AN ALTERNATIVE APPROACH FOR THE ABOVE CALCULATION. START FROM "Extract information from datasets"
+#%% TEST INDEPENDENT T-TEST
+## https://www.statisticshowto.com/independent-samples-t-test/
+
+# test1=[541, 664]
+# test2=[799,396,711,567]
+
+# len_test1 = len(test1)
+# len_test2 = len(test2)
+
+# sum_test1 = sum(test1)
+# sum_test2 = sum(test2)
+
+# mean_test1 = np.mean(test1)
+# mean_test2 = np.mean(test2)
+
+# sum_sqrt_test1 = 0
+# sum_sqrt_test2 = 0
+# for val in test1:
+#     sum_sqrt_test1 += val**2
+# for val in test2:
+#     sum_sqrt_test2 += val**2
+
+# t1 = mean_test1 - mean_test2
+# t2 = (sum_sqrt_test1 - (sum_test1**2 / len_test1)) + (sum_sqrt_test2 - (sum_test2**2 / len_test2))
+# t3 = len_test1 + len_test2 - 2
+# t4 = (1/len_test1) + (1/len_test2)
+# t = t1 / np.sqrt((t2/t3)*t4)
+
+# print(t)
+# print(stats.ttest_ind(test1,test2))
+
+#%% APPLY stats.ttest_ind(A,B)
+
+
+
+
+
+
+
+
 
 
 
