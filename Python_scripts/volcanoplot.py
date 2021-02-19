@@ -15,6 +15,7 @@ The following steps are taken:
     - plot log fold change vs negative log p value
 This is based on this website:
     - https://towardsdatascience.com/inferential-statistics-series-t-test-using-numpy-2718f8f9bf2f
+    - https://www.statisticshowto.com/independent-samples-t-test/
 
 T-test is measuring the number of standard
 deviations our measured mean is from the baseline mean, while taking into
@@ -37,7 +38,7 @@ from dataframe_from_pergene import dataframe_from_pergenefile
 datapath_a = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing"
 filenames_a = ["WT-a_pergene.txt", "WT-b_pergene.txt"]
 datapath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
-filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt"]
+filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
 
 
 
@@ -57,9 +58,10 @@ del (files, datafile, datapath_a, datapath_b, filenames_a, filenames_b)
 
 
 
-#%% Get number of reads per insertion all datasets
+#%% Extract information from datasets
 variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 print('Plotting: %s' % variable)
+
 for count, datafile_a in enumerate(datafiles_list_a):
     read_gene_a = dataframe_from_pergenefile(datafile_a)
     if count == 0:
@@ -82,15 +84,15 @@ N_b = count+1
 
 if not N_a == N_b:
     print("WARNING: Length of dataset a is NOT the same as the length of dataset b.")
-N = count+1
+N = count+1 #!!!THIS N IS NEEDED IN NEXT SECTION, BUT DOES NOT WORK WHEN DATASETS DO NOT INCLUDE THE SAME NUMBER OF DATA FILES.
 
-del (datafile_a, datafile_b, count, N_a, N_b, variable) #, read_gene_a, read_gene_b)
+del (datafile_a, datafile_b, count, variable) #, read_gene_a, read_gene_b)
 
 
 
 
 #%% Determine mean and p value of reads per insertion for each gene
-df = 2*N - 2 #degrees of freedom
+df = N_a + N_b - 2 #degrees of freedom
 
 mean_Nreadsperinsrt_a_list = [np.nan]*len(Nreadsperinsrt_a_array)
 mean_Nreadsperinsrt_b_list = [np.nan]*len(Nreadsperinsrt_b_array)
@@ -116,6 +118,7 @@ for ss in range(len(var_Nreadsperinsrt_a_list)): #determine standard deviation a
     if std_Nreadsperinsrt_list[ss] == 0.0:
         tstat_Nreadsperinsrt_list[ss] = 0
     else:
+        #!!! Check tstat. WHAT TO DO WITH THE N AT THE END?
         tstat_Nreadsperinsrt_list[ss] = (mean_Nreadsperinsrt_a_list[ss] - mean_Nreadsperinsrt_b_list[ss]) / (std_Nreadsperinsrt_list[ss] * np.sqrt(2/N))
     p_Nreadsperinsrt_list[ss] = -1*np.log10(stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df))
     # p_Nreadsperinsrt_list[ss] = 1 - stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df)
