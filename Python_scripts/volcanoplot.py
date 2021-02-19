@@ -4,7 +4,19 @@ Created on Tue Feb 16 14:06:48 2021
 
 @author: gregoryvanbeek
 
-What we are doing when we do a t test is measuring the number of standard
+This script creates a volcanoplot to show the significance of fold change between two datasets.
+The following steps are taken:
+    - Load all datafiles from two samples, called a and b
+    - For each gene in each sample, determine the mean and the unbiased variance
+    - For each gene determine the standard deviation based on the variances in each sample.
+    - For each gene determine the t-statistic
+    - For each gene determine the negative log_10 of the p-value corresponding to the t-statistic
+    - For each gene determine the log_2 fold change between the means of number of reads per insertion of both samples: log2((mean_a-mean_b)/mean_b)
+    - plot log fold change vs negative log p value
+This is based on this website:
+    - https://towardsdatascience.com/inferential-statistics-series-t-test-using-numpy-2718f8f9bf2f
+
+T-test is measuring the number of standard
 deviations our measured mean is from the baseline mean, while taking into
 account that the standard deviation of the mean can change as we get more data
 """
@@ -12,6 +24,8 @@ account that the standard deviation of the mean can change as we get more data
 import os, sys
 import numpy as np
 from scipy import stats
+# import seaborn as sns
+import matplotlib.pyplot as plt
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
 sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
@@ -99,7 +113,7 @@ for ss in range(len(var_Nreadsperinsrt_a_list)): #determine standard deviation a
         tstat_Nreadsperinsrt_list[ss] = 0
     else:
         tstat_Nreadsperinsrt_list[ss] = (mean_Nreadsperinsrt_a_list[ss] - mean_Nreadsperinsrt_b_list[ss]) / (std_Nreadsperinsrt_list[ss] * np.sqrt(2/N))
-    p_Nreadsperinsrt_list[ss] = 1 - stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df)
+    p_Nreadsperinsrt_list[ss] = -1*np.log10(1 - stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df))
 
 readsperinsrt_df['mean_Nreadsperinsrt_a'] = mean_Nreadsperinsrt_a_list
 readsperinsrt_df['mean_Nreadsperinsrt_b'] = mean_Nreadsperinsrt_b_list
@@ -109,15 +123,15 @@ readsperinsrt_df['pval_Nreadsperinsrt'] = p_Nreadsperinsrt_list
 
 
 del (mean_Nreadsperinsrt_a_list, mean_Nreadsperinsrt_b_list, var_Nreadsperinsrt_a_list, var_Nreadsperinsrt_b_list, ii, ss,
-     std_Nreadsperinsrt_list, tstat_Nreadsperinsrt_list, p_Nreadsperinsrt_list)
+     std_Nreadsperinsrt_list, tstat_Nreadsperinsrt_list, p_Nreadsperinsrt_list, df, N)
 
 
 #%% Determine fold change of mean_Nreadsperinsrt
 fc_list = [np.nan]*len(readsperinsrt_df) #initialize list for storing fold changes
 
 for count, avg in enumerate(readsperinsrt_df.itertuples()):
-    if not avg.mean_Nreadsperinsrt_b == 0:
-        fc_list[count] = np.log2(avg.mean_Nreadsperinsrt_a / avg.mean_Nreadsperinsrt_b) #DIVIDE DATASET A BY DATASET B
+    if not avg.mean_Nreadsperinsrt_a == 0 and not avg.mean_Nreadsperinsrt_b == 0:
+        fc_list[count] = np.log2(avg.mean_Nreadsperinsrt_a / avg.mean_Nreadsperinsrt_b) - 1 #DIVIDE DATASET A BY DATASET B
     else:
         fc_list[count] = 0
 
@@ -127,8 +141,15 @@ del (avg, count, fc_list)
 
 
 #%% Volcanoplot
+plt.figure(figsize=(19.0,9.0))#(27.0,3))
+grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
+ax = plt.subplot(grid[0,0])
 
-
+# sns.scatterplot(data=readsperinsrt_df, x='log2_fold_change', y='pval_Nreadsperinsrt', alpha=0.6)
+ax.scatter(x=readsperinsrt_df.log2_fold_change, y=readsperinsrt_df.pval_Nreadsperinsrt, alpha=0.4, marker='.', c='k')
+ax.grid(True, which='major', axis='both', alpha=0.4)
+ax.set_xlabel('Log2 FC')
+ax.set_ylabel('-Log10 p-value')
 
 
 
