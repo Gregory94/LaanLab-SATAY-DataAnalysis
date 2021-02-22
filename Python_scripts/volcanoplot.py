@@ -59,101 +59,81 @@ del (files, datafile, datapath_a, datapath_b, filenames_a, filenames_b)
 
 
 #%% Extract information from datasets
-variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
+variable = 'tn_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 print('Plotting: %s' % variable)
 
 #!!! NORMALIZE FOR TOTAL NUMBER OF INSERTIONS?
 
 for count, datafile_a in enumerate(datafiles_list_a):
-    read_gene_a = dataframe_from_pergenefile(datafile_a)
+    read_gene_a = dataframe_from_pergenefile(datafile_a, verbose=False)
     if count == 0:
         readsperinsrt_df = read_gene_a[['gene_names']] #initialize new dataframe with gene_names
         Nreadsperinsrt_a_array = read_gene_a[[variable]].to_numpy() #create numpy array to store raw data
     else:
         Nreadsperinsrt_a_array = np.append(Nreadsperinsrt_a_array, read_gene_a[[variable]].to_numpy(), axis=1) #append raw data
-N_a = count+1 #save number of samples
+# N_a = count+1 #save number of samples
 
-
+print('')
 
 for count, datafile_b in enumerate(datafiles_list_b):
-    read_gene_b = dataframe_from_pergenefile(datafile_b)
+    read_gene_b = dataframe_from_pergenefile(datafile_b, verbose=False)
     if count == 0:
         Nreadsperinsrt_b_array = read_gene_b[[variable]].to_numpy()
     else:
         Nreadsperinsrt_b_array = np.append(Nreadsperinsrt_b_array, read_gene_b[[variable]].to_numpy(), axis=1)
-N_b = count+1
+# N_b = count+1
 
 
 # if not N_a == N_b:
     # print("WARNING: Length of dataset a is NOT the same as the length of dataset b.")
-N = count+1 #!!!THIS N IS NEEDED IN NEXT SECTION, BUT DOES NOT WORK WHEN DATASETS DO NOT INCLUDE THE SAME NUMBER OF DATA FILES.
+# N = count+1 #!!!THIS N IS NEEDED IN NEXT SECTION, BUT DOES NOT WORK WHEN DATASETS DO NOT INCLUDE THE SAME NUMBER OF DATA FILES.
 
-del (datafile_a, datafile_b, count, variable) #, read_gene_a, read_gene_b)
-
-
-
-
-#%% Determine mean and p value of reads per insertion for each gene
-df = N_a + N_b - 2 #degrees of freedom
-
-mean_Nreadsperinsrt_a_list = [np.nan]*len(Nreadsperinsrt_a_array)
-mean_Nreadsperinsrt_b_list = [np.nan]*len(Nreadsperinsrt_b_array)
-var_Nreadsperinsrt_a_list = [np.nan]*len(Nreadsperinsrt_a_array)
-var_Nreadsperinsrt_b_list = [np.nan]*len(Nreadsperinsrt_b_array)
-
-for ii in range(len(Nreadsperinsrt_a_array)): #determine mean and variance
-    mean_Nreadsperinsrt_a_list[ii] = Nreadsperinsrt_a_array[ii].mean()
-    mean_Nreadsperinsrt_b_list[ii] = Nreadsperinsrt_b_array[ii].mean()
-
-    #For unbiased max likelihood estimate we have to divide the var by N-1, and therefore the parameter ddof = 1
-    var_Nreadsperinsrt_a_list[ii] = Nreadsperinsrt_a_array[ii].var(ddof=1)
-    var_Nreadsperinsrt_b_list[ii] = Nreadsperinsrt_b_array[ii].var(ddof=1)
+### printing specific genes
+# gene = "EFB1"
+# print(read_gene_a.loc[read_gene_a['gene_names'] == gene])
+# print(read_gene_b.loc[read_gene_b['gene_names'] == gene])
 
 
+del (datafile_a, datafile_b, count, variable, read_gene_a, read_gene_b)
 
-std_Nreadsperinsrt_list = [np.nan]*len(Nreadsperinsrt_a_array)
-tstat_Nreadsperinsrt_list = [np.nan]*len(Nreadsperinsrt_a_array)
-p_Nreadsperinsrt_list = [np.nan]*len(Nreadsperinsrt_a_array)
 
-for ss in range(len(var_Nreadsperinsrt_a_list)): #determine standard deviation and t statistic
-    std_Nreadsperinsrt_list[ss] = np.sqrt((var_Nreadsperinsrt_a_list[ss] + var_Nreadsperinsrt_b_list[ss])/2)
-    if std_Nreadsperinsrt_list[ss] == 0.0:
-        tstat_Nreadsperinsrt_list[ss] = 0
+#%% APPLY stats.ttest_ind(A,B)
+fc_list = [np.nan]*len(Nreadsperinsrt_a_array) #initialize list for storing fold changes
+ttest_tval_list = [np.nan]*len(Nreadsperinsrt_a_array) #initialize list for storing t statistics
+ttest_pval_list = [np.nan]*len(Nreadsperinsrt_a_array) #initialize list for storing p-values
+
+for count, val in enumerate(Nreadsperinsrt_a_array):
+    # if count == 81:
+    #     print(Nreadsperinsrt_a_array[count])
+    #     print(Nreadsperinsrt_b_array[count])
+
+    ttest_val = stats.ttest_ind(Nreadsperinsrt_a_array[count], Nreadsperinsrt_b_array[count])
+    ttest_tval_list[count] = ttest_val[0]
+    if not ttest_val[1] == 0:
+        ttest_pval_list[count] = -1*np.log10(ttest_val[1])
     else:
-        #!!! Check tstat. WHAT TO DO WITH THE N AT THE END?
-        tstat_Nreadsperinsrt_list[ss] = (mean_Nreadsperinsrt_a_list[ss] - mean_Nreadsperinsrt_b_list[ss]) / (std_Nreadsperinsrt_list[ss] * np.sqrt(2/N))
-    p_Nreadsperinsrt_list[ss] = -1*np.log10(stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df))
-    # p_Nreadsperinsrt_list[ss] = 1 - stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df)
+        ttest_pval_list[count] = 0
 
-readsperinsrt_df['mean_Nreadsperinsrt_a'] = mean_Nreadsperinsrt_a_list
-readsperinsrt_df['mean_Nreadsperinsrt_b'] = mean_Nreadsperinsrt_b_list
-readsperinsrt_df['std_Nreadsperinsrt'] = std_Nreadsperinsrt_list
-readsperinsrt_df['tstat_Nreadsperinsrt'] = tstat_Nreadsperinsrt_list
-readsperinsrt_df['pval_Nreadsperinsrt'] = p_Nreadsperinsrt_list
+    # if count == 81:
+    #     print(ttest_val)
+    #     print('mean a', np.mean(Nreadsperinsrt_a_array[count]))
+    #     print('mean b', np.mean(Nreadsperinsrt_b_array[count]))
 
-
-del (mean_Nreadsperinsrt_a_list, mean_Nreadsperinsrt_b_list, var_Nreadsperinsrt_a_list, var_Nreadsperinsrt_b_list, ii, ss,
-     std_Nreadsperinsrt_list, tstat_Nreadsperinsrt_list, p_Nreadsperinsrt_list, df, N)
-
-
-
-#%% Determine fold change of mean_Nreadsperinsrt
-fc_list = [np.nan]*len(readsperinsrt_df) #initialize list for storing fold changes
-
-for count, avg in enumerate(readsperinsrt_df.itertuples()):
-    if not avg.mean_Nreadsperinsrt_a == 0 and not avg.mean_Nreadsperinsrt_b == 0:
-        fc_list[count] = np.log2((avg.mean_Nreadsperinsrt_b / avg.mean_Nreadsperinsrt_a)) #DIVIDE DATASET A BY DATASET B
-        # fc_list[count] = (avg.mean_Nreadsperinsrt_a / avg.mean_Nreadsperinsrt_b)-1
+    if np.mean(Nreadsperinsrt_b_array[count]) == 0 and np.mean(Nreadsperinsrt_a_array[count]) == 0:
+        fc_list[count] = 0
+    elif np.mean(Nreadsperinsrt_b_array[count]) == 0 or np.mean(Nreadsperinsrt_a_array[count]) == 0:
+        fc_list[count] = np.log2(max(np.mean(Nreadsperinsrt_a_array[count]), np.mean(Nreadsperinsrt_b_array[count])))
+        # if count == 81:
+        #     print('if2', fc_list[count])
     else:
-        fc_list[count] = np.log2(max([avg.mean_Nreadsperinsrt_a, avg.mean_Nreadsperinsrt_b]))
-
-readsperinsrt_df['log2_fold_change'] = fc_list #add fc_list to dataframe
-
-del (avg, count, fc_list)
+        fc_list[count] = np.log2(np.mean(Nreadsperinsrt_a_array[count]) / np.mean(Nreadsperinsrt_b_array[count]))
 
 
-#print specific geness
-# readsperinsrt_df[readsperinsrt_df['gene_names'].str.contains("NRP1")]
+readsperinsrt_df['fold_change'] = fc_list
+readsperinsrt_df['t-statistic'] = ttest_tval_list
+readsperinsrt_df['p_value'] = ttest_pval_list
+
+del(count, val, ttest_val, ttest_tval_list, ttest_pval_list, fc_list)
 
 
 
@@ -162,14 +142,94 @@ plt.figure(figsize=(19.0,9.0))#(27.0,3))
 grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
 ax = plt.subplot(grid[0,0])
 
-# sns.scatterplot(data=readsperinsrt_df, x='log2_fold_change', y='pval_Nreadsperinsrt', alpha=0.6)
-ax.scatter(x=readsperinsrt_df.log2_fold_change, y=readsperinsrt_df.pval_Nreadsperinsrt, alpha=0.4, marker='.', c='k')
+ax.scatter(x=readsperinsrt_df.fold_change, y=readsperinsrt_df.p_value, alpha=0.4, marker='.', c='k')
 ax.grid(True, which='major', axis='both', alpha=0.4)
 ax.set_xlabel('Log2 FC')
-ax.set_ylabel('-Log10 p-value')
+ax.set_ylabel('-1*Log10 p-value')
+
+del (ax, grid)
+
+
+#%% #####START TEST 1#####
+#%% Determine mean and p value of reads per insertion for each gene
+# df = N_a + N_b - 2 #degrees of freedom
+
+# mean_Nreadsperinsrt_a_list = [np.nan]*len(Nreadsperinsrt_a_array)
+# mean_Nreadsperinsrt_b_list = [np.nan]*len(Nreadsperinsrt_b_array)
+# var_Nreadsperinsrt_a_list = [np.nan]*len(Nreadsperinsrt_a_array)
+# var_Nreadsperinsrt_b_list = [np.nan]*len(Nreadsperinsrt_b_array)
+
+# for ii in range(len(Nreadsperinsrt_a_array)): #determine mean and variance
+#     mean_Nreadsperinsrt_a_list[ii] = Nreadsperinsrt_a_array[ii].mean()
+#     mean_Nreadsperinsrt_b_list[ii] = Nreadsperinsrt_b_array[ii].mean()
+
+#     #For unbiased max likelihood estimate we have to divide the var by N-1, and therefore the parameter ddof = 1
+#     var_Nreadsperinsrt_a_list[ii] = Nreadsperinsrt_a_array[ii].var(ddof=1)
+#     var_Nreadsperinsrt_b_list[ii] = Nreadsperinsrt_b_array[ii].var(ddof=1)
 
 
 
+# std_Nreadsperinsrt_list = [np.nan]*len(Nreadsperinsrt_a_array)
+# tstat_Nreadsperinsrt_list = [np.nan]*len(Nreadsperinsrt_a_array)
+# p_Nreadsperinsrt_list = [np.nan]*len(Nreadsperinsrt_a_array)
+
+# for ss in range(len(var_Nreadsperinsrt_a_list)): #determine standard deviation and t statistic
+#     std_Nreadsperinsrt_list[ss] = np.sqrt((var_Nreadsperinsrt_a_list[ss] + var_Nreadsperinsrt_b_list[ss])/2)
+#     if std_Nreadsperinsrt_list[ss] == 0.0:
+#         tstat_Nreadsperinsrt_list[ss] = 0
+#     else:
+#         #!!! Check tstat. WHAT TO DO WITH THE N AT THE END?
+#         tstat_Nreadsperinsrt_list[ss] = (mean_Nreadsperinsrt_a_list[ss] - mean_Nreadsperinsrt_b_list[ss]) / (std_Nreadsperinsrt_list[ss] * np.sqrt(2/N))
+#     p_Nreadsperinsrt_list[ss] = -1*np.log10(stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df))
+#     # p_Nreadsperinsrt_list[ss] = 1 - stats.t.cdf(tstat_Nreadsperinsrt_list[ss], df=df)
+
+# readsperinsrt_df['mean_Nreadsperinsrt_a'] = mean_Nreadsperinsrt_a_list
+# readsperinsrt_df['mean_Nreadsperinsrt_b'] = mean_Nreadsperinsrt_b_list
+# readsperinsrt_df['std_Nreadsperinsrt'] = std_Nreadsperinsrt_list
+# readsperinsrt_df['tstat_Nreadsperinsrt'] = tstat_Nreadsperinsrt_list
+# readsperinsrt_df['pval_Nreadsperinsrt'] = p_Nreadsperinsrt_list
+
+
+# del (mean_Nreadsperinsrt_a_list, mean_Nreadsperinsrt_b_list, var_Nreadsperinsrt_a_list, var_Nreadsperinsrt_b_list, ii, ss,
+#      std_Nreadsperinsrt_list, tstat_Nreadsperinsrt_list, p_Nreadsperinsrt_list, df, N)
+
+
+
+# #%% Determine fold change of mean_Nreadsperinsrt
+# fc_list = [np.nan]*len(readsperinsrt_df) #initialize list for storing fold changes
+
+# for count, avg in enumerate(readsperinsrt_df.itertuples()):
+#     if not avg.mean_Nreadsperinsrt_a == 0 and not avg.mean_Nreadsperinsrt_b == 0:
+#         fc_list[count] = np.log2((avg.mean_Nreadsperinsrt_b / avg.mean_Nreadsperinsrt_a)) #DIVIDE DATASET A BY DATASET B
+#         # fc_list[count] = (avg.mean_Nreadsperinsrt_a / avg.mean_Nreadsperinsrt_b)-1
+#     else:
+#         fc_list[count] = np.log2(max([avg.mean_Nreadsperinsrt_a, avg.mean_Nreadsperinsrt_b]))
+
+# readsperinsrt_df['log2_fold_change'] = fc_list #add fc_list to dataframe
+
+# del (avg, count, fc_list)
+
+
+# #print specific geness
+# # readsperinsrt_df[readsperinsrt_df['gene_names'].str.contains("NRP1")]
+
+
+
+# #%% Volcanoplot
+# plt.figure(figsize=(19.0,9.0))#(27.0,3))
+# grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
+# ax = plt.subplot(grid[0,0])
+
+# # sns.scatterplot(data=readsperinsrt_df, x='log2_fold_change', y='pval_Nreadsperinsrt', alpha=0.6)
+# ax.scatter(x=readsperinsrt_df.log2_fold_change, y=readsperinsrt_df.pval_Nreadsperinsrt, alpha=0.4, marker='.', c='k')
+# ax.grid(True, which='major', axis='both', alpha=0.4)
+# ax.set_xlabel('Log2 FC')
+# ax.set_ylabel('-Log10 p-value')
+
+
+#%% ######END TEST 1######
+
+#%% #####START TEST 2#####
 #%%THIS IS AN ALTERNATIVE APPROACH FOR THE ABOVE CALCULATION. START FROM "Extract information from datasets"
 #%% TEST INDEPENDENT T-TEST
 ## https://www.statisticshowto.com/independent-samples-t-test/
@@ -203,6 +263,36 @@ ax.set_ylabel('-Log10 p-value')
 # print(stats.ttest_ind(test1,test2))
 
 #%% APPLY stats.ttest_ind(A,B)
+
+# fc_list = [np.nan]*len(Nreadsperinsrt_a_array) #initialize list for storing fold changes
+# ttest_tval_list = [np.nan]*len(Nreadsperinsrt_a_array)
+# ttest_pval_list = [np.nan]*len(Nreadsperinsrt_a_array)
+# for count, val in enumerate(Nreadsperinsrt_a_array):
+#     ttest_val = stats.ttest_ind(Nreadsperinsrt_a_array[count], Nreadsperinsrt_b_array[count])
+#     ttest_tval_list[count] = ttest_val[0]
+#     if not ttest_val[1] == 0:
+#         ttest_pval_list[count] = -1*np.log10(ttest_val[1])
+#     else:
+#         ttest_pval_list[count] = 0
+
+#     if not np.mean(Nreadsperinsrt_b_array[count]) == 0 and not np.mean(Nreadsperinsrt_a_array[count]) == 0:
+#         fc_list[count] = np.log2(np.mean(Nreadsperinsrt_a_array[count]) / np.mean(Nreadsperinsrt_b_array[count]))
+#     else:
+#         fc_list[count] = np.log2(max(np.mean(Nreadsperinsrt_a_array[0]), np.mean(Nreadsperinsrt_b_array[0])))
+
+
+# #%% Volcanoplot
+# plt.figure(figsize=(19.0,9.0))#(27.0,3))
+# grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
+# ax = plt.subplot(grid[0,0])
+
+# ax.scatter(x=fc_list, y=ttest_pval_list, alpha=0.4, marker='.', c='k')
+# ax.grid(True, which='major', axis='both', alpha=0.4)
+# ax.set_xlabel('Log2 FC')
+# ax.set_ylabel('-1*Log10 p-value')
+
+
+#%% ######END TEST 1######
 
 
 
