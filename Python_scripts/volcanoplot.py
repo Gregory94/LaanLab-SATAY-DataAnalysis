@@ -41,7 +41,9 @@ filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_perg
 
 
 variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
-track_gene = ""# "CDC42" or set to "" to disable
+significance_threshold = 0.01 #set threshold above which p-values are regarded significant
+
+track_gene = ""# "CDC42" or set to "" to disable (set for debugging)
 
 
 #%% Check files
@@ -72,7 +74,6 @@ for count, datafile_a in enumerate(datafiles_list_a):
         variable_a_array = tnread_gene_a[[variable]].to_numpy() #create numpy array to store raw data
     else:
         variable_a_array = np.append(variable_a_array, tnread_gene_a[[variable]].to_numpy(), axis=1) #append raw data
-# N_a = count+1 #save number of samples
 
 print('')
 
@@ -99,16 +100,18 @@ del (datafile_a, datafile_b, count, variable, tnread_gene_a, tnread_gene_b)
 fc_list = [np.nan]*len(variable_a_array) #initialize list for storing fold changes
 ttest_tval_list = [np.nan]*len(variable_a_array) #initialize list for storing t statistics
 ttest_pval_list = [np.nan]*len(variable_a_array) #initialize list for storing p-values
-
+signif_thres_list = [False]*len(variable_a_array) #initialize boolean list for indicating datapoints with p-value above threshold
 
 for count, val in enumerate(variable_a_array):
 
-    ttest_val = stats.ttest_ind(variable_a_array[count], variable_b_array[count])
+    ttest_val = stats.ttest_ind(variable_a_array[count], variable_b_array[count]) #T-test
     ttest_tval_list[count] = ttest_val[0]
-    if not ttest_val[1] == 0:
+    if not ttest_val[1] == 0: #prevent p=0 to be inputted in log
         ttest_pval_list[count] = -1*np.log10(ttest_val[1])
     else:
         ttest_pval_list[count] = 0
+    if ttest_pval_list[count] > -1*np.log10(significance_threshold):
+        signif_thres_list[count] = True
 
     if np.mean(variable_b_array[count]) == 0 and np.mean(variable_a_array[count]) == 0:
         fc_list[count] = 0
@@ -126,9 +129,11 @@ for count, val in enumerate(variable_a_array):
         print("mean b:", np.mean(variable_b_array[count]))
         print("fold change:", fc_list[count])
 
+
 volcano_df['fold_change'] = fc_list
 volcano_df['t_statistic'] = ttest_tval_list
 volcano_df['p_value'] = ttest_pval_list
+volcano_df['significance'] = signif_thres_list
 
 del(count, val, ttest_val, ttest_tval_list, ttest_pval_list, fc_list, track_gene)
 
@@ -139,10 +144,13 @@ plt.figure(figsize=(19.0,9.0))#(27.0,3))
 grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
 ax = plt.subplot(grid[0,0])
 
-ax.scatter(x=volcano_df.fold_change, y=volcano_df.p_value, alpha=0.4, marker='.', c='k')
+# ax.scatter(x=volcano_df.fold_change, y=volcano_df.p_value, alpha=0.4, marker='.', c='k')
+ax.scatter(x=volcano_df.loc[volcano_df['significance'] == False, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == False, 'p_value'], alpha=0.4, marker='.', c='k', label='p-value < {}'.format(significance_threshold))
+ax.scatter(x=volcano_df.loc[volcano_df['significance'] == True, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == True, 'p_value'], alpha=0.4, marker='.', c='r', label='p-value > {}'.format(significance_threshold))
 ax.grid(True, which='major', axis='both', alpha=0.4)
 ax.set_xlabel('Log2 FC')
 ax.set_ylabel('-1*Log10 p-value')
+ax.legend()
 
 del (ax, grid)
 
