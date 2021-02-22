@@ -9,7 +9,7 @@ import os, sys
 import pandas as pd
 import re
 
-def dataframe_from_pergenefile(datafile):
+def dataframe_from_pergenefile(datafile, verbose=True):
 
     file_dirname = os.path.dirname(os.path.abspath('__file__'))
     sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
@@ -52,7 +52,8 @@ def dataframe_from_pergenefile(datafile):
 
 # determine essential genes
     known_essential_gene_list = list_known_essentials(input_files=[os.path.join(file_dirname,'..','Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
-                                                                   os.path.join(file_dirname,'..','Data_Files','Cerevisiae_EssentialGenes_List_2.txt')])
+                                                                   os.path.join(file_dirname,'..','Data_Files','Cerevisiae_EssentialGenes_List_2.txt')],
+                                                      verbose=verbose)
 
     geneessentiality_list = [None]*len(lines)
     for i in range(len(genenames_list)):

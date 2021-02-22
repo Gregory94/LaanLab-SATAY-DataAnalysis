@@ -6,7 +6,7 @@
 # =============================================================================
 
 
-def list_known_essentials(input_files = None, headerlines=3):
+def list_known_essentials(input_files = None, headerlines=3, verbose=True):
     ''' Get all known essential genes from two different files and combine them in one list.
         Input is a list of of paths where files can be found with the known essential genes.
         A default list is implemented using two files present in the same folder as this file.
@@ -29,7 +29,8 @@ def list_known_essentials(input_files = None, headerlines=3):
     known_essential_gene_list = []
     
     for files in essential_genes_files:
-        print('Reading file :',files)
+        if verbose == True:
+            print('Reading file :',files)
         with open(files) as f:
             for header_lines in range(headerlines):
                 next(f)
