@@ -42,6 +42,7 @@ filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_perg
 
 variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
+normalize=True
 
 track_gene = ""# "CDC42" or set to "" to disable (set for debugging)
 
@@ -69,31 +70,54 @@ print('Plotting: %s' % variable)
 
 for count, datafile_a in enumerate(datafiles_list_a):
     tnread_gene_a = dataframe_from_pergenefile(datafile_a, verbose=False)
+    if normalize == True:
+        if variable == 'tn_per_gene':
+            norm_a = sum(tnread_gene_a.tn_per_gene)*10**-4
+        elif variable == 'read_per_gene':
+            norm_a = sum(tnread_gene_a.read_per_gene)*10**-7
+
     if count == 0:
         volcano_df = tnread_gene_a[['gene_names']] #initialize new dataframe with gene_names
-        variable_a_array = tnread_gene_a[[variable]].to_numpy() #create numpy array to store raw data
+        if normalize == True:
+            variable_a_array = np.divide(tnread_gene_a[[variable]].to_numpy(), norm_a) #create numpy array to store raw data
+        else:
+            variable_a_array = tnread_gene_a[[variable]].to_numpy()
     else:
-        variable_a_array = np.append(variable_a_array, tnread_gene_a[[variable]].to_numpy(), axis=1) #append raw data
+        if normalize == True:
+            variable_a_array = np.append(variable_a_array, np.divide(tnread_gene_a[[variable]].to_numpy(), norm_a), axis=1) #append raw data
+        else:
+            variable_a_array = np.append(variable_a_array, tnread_gene_a[[variable]].to_numpy(), axis=1)
 
-print('')
 
 for count, datafile_b in enumerate(datafiles_list_b):
     tnread_gene_b = dataframe_from_pergenefile(datafile_b, verbose=False)
+    if normalize == True:
+        if variable == 'tn_per_gene':
+            norm_b = sum(tnread_gene_b.tn_per_gene)*10**-4
+        elif variable == 'read_per_gene':
+            norm_b = sum(tnread_gene_b.read_per_gene)*10**-7
+
     if count == 0:
-        variable_b_array = tnread_gene_b[[variable]].to_numpy()
+        if normalize == True:
+            variable_b_array = np.divide(tnread_gene_b[[variable]].to_numpy(), norm_b)
+        else:
+            variable_b_array = tnread_gene_b[[variable]].to_numpy()
     else:
-        variable_b_array = np.append(variable_b_array, tnread_gene_b[[variable]].to_numpy(), axis=1)
+        if normalize == True:
+            variable_b_array = np.append(variable_b_array, np.divide(tnread_gene_b[[variable]].to_numpy(), norm_b), axis=1)
+        else:
+            variable_b_array = np.append(variable_b_array, tnread_gene_b[[variable]].to_numpy(), axis=1)
 
 
 ### printing specific genes
 if not track_gene == "":
     print("TRACKING VARIABLE %s" % track_gene)
     track_gene_index = tnread_gene_a.loc[tnread_gene_a['gene_names'] == track_gene].index[0]
-    print("tnread_gene_a:", tnread_gene_a.loc[tnread_gene_a['gene_names'] == track_gene].index[0])
+    print("tnread_gene_a:", tnread_gene_a.loc[tnread_gene_a['gene_names'] == track_gene])
     print("tnread_gene_b:", tnread_gene_b.loc[tnread_gene_b['gene_names'] == track_gene])
 
 
-del (datafile_a, datafile_b, count, variable, tnread_gene_a, tnread_gene_b)
+del (datafile_a, datafile_b, count, tnread_gene_a, tnread_gene_b)
 
 
 #%% APPLY stats.ttest_ind(A,B)
@@ -118,9 +142,10 @@ for count, val in enumerate(variable_a_array):
     elif np.mean(variable_b_array[count]) == 0 or np.mean(variable_a_array[count]) == 0:
         fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
     else:
-        fc_list[count] = np.log2(np.mean(variable_a_array[count]) / np.mean(variable_b_array[count]))
+        fc_list[count] = np.log2(np.mean(variable_b_array[count]) / np.mean(variable_a_array[count]))
 
 
+    ### printing specific genes
     if not track_gene == "" and count == track_gene_index:
         print("variable_a_array:", variable_a_array[count])
         print("variable_b_index:", variable_b_array[count])
@@ -135,7 +160,7 @@ volcano_df['t_statistic'] = ttest_tval_list
 volcano_df['p_value'] = ttest_pval_list
 volcano_df['significance'] = signif_thres_list
 
-del(count, val, ttest_val, ttest_tval_list, ttest_pval_list, fc_list, track_gene)
+del(count, val, ttest_val, ttest_tval_list, ttest_pval_list, fc_list, signif_thres_list, track_gene)
 
 
 
@@ -150,6 +175,7 @@ ax.scatter(x=volcano_df.loc[volcano_df['significance'] == True, 'fold_change'], 
 ax.grid(True, which='major', axis='both', alpha=0.4)
 ax.set_xlabel('Log2 FC')
 ax.set_ylabel('-1*Log10 p-value')
+ax.set_title(variable)
 ax.legend()
 
 del (ax, grid)
