@@ -54,7 +54,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     This can be used for identifying neutral regions (i.e. genomic regions that, if inhibited, do not influence the fitness of the cells).
     This function can be used for normalizing the transposon insertions per gene using the neutral regions.
     
-    Input:
+    Input (see last section in script):
         - Region: e.g. chromosome number (either a normal number between 1 and 16 or in roman numerals between I and XVI), a list like ['V', 0, 14790] which creates a barplot between basepair 0 and 14790) or a genename.
         - wig_file: wiggle file from the output of transposonmapping.py that is used in the processing workflow.
         - pergene_insertions_file: text file from the output of transposonsmapping.py
@@ -632,8 +632,8 @@ if __name__ == '__main__':
 #                 verbose=False)
 
     dna_df2 = dna_features(region = 3,#['xiii', 0, 14790],
-                 wig_file = r"V:\tnw\bn\ll\Shared\Gregory\Labmeetings\Labmeeting_presentations\Labmeeting20210209_dataset\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig",
-                 pergene_insertions_file = r"V:\tnw\bn\ll\Shared\Gregory\Labmeetings\Labmeeting_presentations\Labmeeting20210209_dataset\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt",
+                 wig_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig",
+                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt",
                  variable="reads",
                  normalization_window_size=20000,
                  normalize=True,
