@@ -44,7 +44,7 @@ variable = 'tn_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
-track_gene = "nrp1"# "CDC42" or set to "" to disable
+track_gene = "yal069w"# "CDC42" or set to "" to disable
 
 
 #%% Check files
@@ -194,6 +194,7 @@ ax.legend()
 if not track_gene == "":
     ax.annotate(volcano_df.iloc[track_gene_index,:]['gene_names'], (volcano_df.iloc[track_gene_index,:]['fold_change'], volcano_df.iloc[track_gene_index,:]['p_value']),
                 size=16, c='b')
+    ax.scatter(x=volcano_df.iloc[track_gene_index,:]['fold_change'] ,y=volcano_df.iloc[track_gene_index,:]['p_value'], marker='X', c='b')
 
 del (ax, grid)
 
