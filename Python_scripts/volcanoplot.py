@@ -40,11 +40,11 @@ datapath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset
 filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
 
 
-variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
+variable = 'tn_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
-track_gene = "VTI1"# "CDC42" or set to "" to disable (set for debugging)
+track_gene = "nrp1"# "CDC42" or set to "" to disable
 
 
 #%% Check files
@@ -66,8 +66,8 @@ del (files, datafile, datapath_a, datapath_b, filenames_a, filenames_b)
 #%% Extract information from datasets
 print('Plotting: %s' % variable)
 
-norm_a = 0
-norm_b = 0
+# norm_a = 0
+# norm_b = 0
 for count, datafile_a in enumerate(datafiles_list_a):
     tnread_gene_a = dataframe_from_pergenefile(datafile_a, verbose=False)
     if normalize == True:
@@ -113,6 +113,7 @@ for count, datafile_b in enumerate(datafiles_list_b):
 
 ### printing specific genes
 if not track_gene == "":
+    track_gene = track_gene.upper()
     print("TRACKING VARIABLE %s" % track_gene)
     track_gene_index = tnread_gene_a.loc[tnread_gene_a['gene_names'] == track_gene].index[0]
     print("tnread_gene_a:", tnread_gene_a.loc[tnread_gene_a['gene_names'] == track_gene])
@@ -171,7 +172,7 @@ volcano_df['t_statistic'] = ttest_tval_list
 volcano_df['p_value'] = ttest_pval_list
 volcano_df['significance'] = signif_thres_list
 
-del(count, val, ttest_val, ttest_tval_list, ttest_pval_list, fc_list, signif_thres_list, track_gene)
+del(count, val, ttest_val, ttest_tval_list, ttest_pval_list, fc_list, signif_thres_list)
 if normalize == True:
     del (norm_a, norm_b)
 
@@ -190,6 +191,9 @@ ax.set_xlabel('Log2 FC')
 ax.set_ylabel('-1*Log10 p-value')
 ax.set_title(variable)
 ax.legend()
+if not track_gene == "":
+    ax.annotate(volcano_df.iloc[track_gene_index,:]['gene_names'], (volcano_df.iloc[track_gene_index,:]['fold_change'], volcano_df.iloc[track_gene_index,:]['p_value']),
+                size=16, c='b')
 
 del (ax, grid)
 
