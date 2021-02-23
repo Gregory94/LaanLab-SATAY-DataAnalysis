@@ -42,9 +42,9 @@ filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_perg
 
 variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
-normalize=True
+normalize=False
 
-track_gene = ""# "CDC42" or set to "" to disable (set for debugging)
+track_gene = "ALG1"# "CDC42" or set to "" to disable (set for debugging)
 
 
 #%% Check files
@@ -66,47 +66,49 @@ del (files, datafile, datapath_a, datapath_b, filenames_a, filenames_b)
 #%% Extract information from datasets
 print('Plotting: %s' % variable)
 
-#!!! NORMALIZE FOR TOTAL NUMBER OF INSERTIONS?
-
+norm_a = 0
+norm_b = 0
 for count, datafile_a in enumerate(datafiles_list_a):
     tnread_gene_a = dataframe_from_pergenefile(datafile_a, verbose=False)
-    if normalize == True:
-        if variable == 'tn_per_gene':
-            norm_a = sum(tnread_gene_a.tn_per_gene)*10**-4
-        elif variable == 'read_per_gene':
-            norm_a = sum(tnread_gene_a.read_per_gene)*10**-7
+    # if normalize == True:
+    #     if variable == 'tn_per_gene':
+    #         norm_a = sum(tnread_gene_a.tn_per_gene)*10**-4
+    #     elif variable == 'read_per_gene':
+    #         norm_a = sum(tnread_gene_a.read_per_gene)*10**-7
+    norm_a += sum(tnread_gene_a.tn_per_gene)
 
     if count == 0:
         volcano_df = tnread_gene_a[['gene_names']] #initialize new dataframe with gene_names
-        if normalize == True:
-            variable_a_array = np.divide(tnread_gene_a[[variable]].to_numpy(), norm_a) #create numpy array to store raw data
-        else:
-            variable_a_array = tnread_gene_a[[variable]].to_numpy()
+        # if normalize == True:
+        #     variable_a_array = np.divide(tnread_gene_a[[variable]].to_numpy(), norm_a) #create numpy array to store raw data
+        # else:
+        variable_a_array = tnread_gene_a[[variable]].to_numpy()
     else:
-        if normalize == True:
-            variable_a_array = np.append(variable_a_array, np.divide(tnread_gene_a[[variable]].to_numpy(), norm_a), axis=1) #append raw data
-        else:
-            variable_a_array = np.append(variable_a_array, tnread_gene_a[[variable]].to_numpy(), axis=1)
+        # if normalize == True:
+        #     variable_a_array = np.append(variable_a_array, np.divide(tnread_gene_a[[variable]].to_numpy(), norm_a), axis=1) #append raw data
+        # else:
+        variable_a_array = np.append(variable_a_array, tnread_gene_a[[variable]].to_numpy(), axis=1)
 
 
 for count, datafile_b in enumerate(datafiles_list_b):
     tnread_gene_b = dataframe_from_pergenefile(datafile_b, verbose=False)
-    if normalize == True:
-        if variable == 'tn_per_gene':
-            norm_b = sum(tnread_gene_b.tn_per_gene)*10**-4
-        elif variable == 'read_per_gene':
-            norm_b = sum(tnread_gene_b.read_per_gene)*10**-7
+    # if normalize == True:
+    #     if variable == 'tn_per_gene':
+    #         norm_b = sum(tnread_gene_b.tn_per_gene)*10**-4
+    #     elif variable == 'read_per_gene':
+    #         norm_b = sum(tnread_gene_b.read_per_gene)*10**-7
+    norm_b += sum(tnread_gene_b.tn_per_gene)
 
     if count == 0:
-        if normalize == True:
-            variable_b_array = np.divide(tnread_gene_b[[variable]].to_numpy(), norm_b)
-        else:
-            variable_b_array = tnread_gene_b[[variable]].to_numpy()
+        # if normalize == True:
+        #     variable_b_array = np.divide(tnread_gene_b[[variable]].to_numpy(), norm_b)
+        # else:
+        variable_b_array = tnread_gene_b[[variable]].to_numpy()
     else:
-        if normalize == True:
-            variable_b_array = np.append(variable_b_array, np.divide(tnread_gene_b[[variable]].to_numpy(), norm_b), axis=1)
-        else:
-            variable_b_array = np.append(variable_b_array, tnread_gene_b[[variable]].to_numpy(), axis=1)
+        # if normalize == True:
+        #     variable_b_array = np.append(variable_b_array, np.divide(tnread_gene_b[[variable]].to_numpy(), norm_b), axis=1)
+        # else:
+        variable_b_array = np.append(variable_b_array, tnread_gene_b[[variable]].to_numpy(), axis=1)
 
 
 ### printing specific genes
@@ -137,12 +139,26 @@ for count, val in enumerate(variable_a_array):
     if ttest_pval_list[count] > -1*np.log10(significance_threshold):
         signif_thres_list[count] = True
 
-    if np.mean(variable_b_array[count]) == 0 and np.mean(variable_a_array[count]) == 0:
+    #Take mean of number of insertions per library
+    # if np.mean(variable_b_array[count]) == 0 and np.mean(variable_a_array[count]) == 0:
+    #     fc_list[count] = 0
+    # elif np.mean(variable_b_array[count]) == 0 or np.mean(variable_a_array[count]) == 0:
+    #     fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
+    # else:
+    #     fc_list[count] = np.log2(np.mean(variable_b_array[count]) / np.mean(variable_a_array[count]))
+
+    #Take sum of number of insertions per library 
+    # if sum(variable_a_array[count]) == 0 or sum(variable_b_array[count]) == 0:
+    #     if sum(variable_a_array[count]) >= sum(variable_b_array[count]):
+    #         fc_list[count] = np.log2((sum(variable_a_array[count]) / norm_a))
+    #     else:
+    #         fc_list[count] = np.log2((sum(variable_b_array[count]) / norm_b))
+    if sum(variable_a_array[count]) == 0 and sum(variable_b_array[count]) == 0:
         fc_list[count] = 0
-    elif np.mean(variable_b_array[count]) == 0 or np.mean(variable_a_array[count]) == 0:
-        fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
+    elif sum(variable_a_array[count]) == 0 or sum(variable_b_array[count]) == 0:
+        fc_list[count] = np.log2(max(sum(variable_a_array[count]) / norm_a, sum(variable_b_array[count]) / norm_b))
     else:
-        fc_list[count] = np.log2(np.mean(variable_b_array[count]) / np.mean(variable_a_array[count]))
+        fc_list[count] = np.log2((sum(variable_a_array[count]) / norm_a) / (sum(variable_b_array[count]) / norm_b))
 
 
     ### printing specific genes
@@ -160,11 +176,13 @@ volcano_df['t_statistic'] = ttest_tval_list
 volcano_df['p_value'] = ttest_pval_list
 volcano_df['significance'] = signif_thres_list
 
-del(count, val, ttest_val, ttest_tval_list, ttest_pval_list, fc_list, signif_thres_list, track_gene)
-
+del(count, val, ttest_val, ttest_tval_list, ttest_pval_list, fc_list, signif_thres_list, track_gene, norm_a, norm_b)
+# if normalize == True:
+#     del (norm_a, norm_b)
 
 
 #%% Volcanoplot
+#!!! INDICATE ESSENTIAL GENES USING DIFFERENT MARKER
 plt.figure(figsize=(19.0,9.0))#(27.0,3))
 grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
 ax = plt.subplot(grid[0,0])
