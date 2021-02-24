@@ -44,7 +44,7 @@ variable = 'tn_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
-track_gene = "yal069w"# "CDC42" or set to "" to disable
+track_gene = "cmd1"# "CDC42" or set to "" to disable
 
 
 #%% Check files
@@ -114,6 +114,7 @@ for count, datafile_b in enumerate(datafiles_list_b):
 ### printing specific genes
 if not track_gene == "":
     track_gene = track_gene.upper()
+    print('')
     print("TRACKING VARIABLE %s" % track_gene)
     track_gene_index = tnread_gene_a.loc[tnread_gene_a['gene_names'] == track_gene].index[0]
     print("tnread_gene_a:", tnread_gene_a.loc[tnread_gene_a['gene_names'] == track_gene])
@@ -140,11 +141,16 @@ for count, val in enumerate(variable_a_array):
     if ttest_pval_list[count] > -1*np.log10(significance_threshold):
         signif_thres_list[count] = True
 
-    #Take mean of number of insertions per library
+    #Determine fold change per gene between libraries
     if np.mean(variable_b_array[count]) == 0 and np.mean(variable_a_array[count]) == 0:
         fc_list[count] = 0
+    # elif np.mean(variable_b_array[count]) == 0 and np.mean(variable_a_array[count]) != 0:
+    #     fc_list[count] = np.log2(0.01 / np.mean(variable_a_array[count]))
+    # elif np.mean(variable_b_array[count]) != 0 and np.mean(variable_a_array[count]) == 0:
+    #     fc_list[count] = np.log2(np.mean(variable_b_array[count]) / 0.01)
     elif np.mean(variable_b_array[count]) == 0 or np.mean(variable_a_array[count]) == 0:
-        fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
+        fc_list[count] = np.nan
+        # fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
     else:
         fc_list[count] = np.log2(np.mean(variable_b_array[count]) / np.mean(variable_a_array[count]))
 
@@ -178,7 +184,6 @@ if normalize == True:
 
 
 #%% Volcanoplot
-#!!! INDICATE ESSENTIAL GENES USING DIFFERENT MARKER
 plt.figure(figsize=(19.0,9.0))#(27.0,3))
 grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
 ax = plt.subplot(grid[0,0])
