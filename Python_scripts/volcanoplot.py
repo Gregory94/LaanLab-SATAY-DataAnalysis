@@ -62,7 +62,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         - trackgene_list: Enter a single gene name for which statistics will be printed and it will be highlighted in the plot. If empty string, no gene will be tracked. (default='')
 
     Output:
-        - volcano_df = pandas dataframe containing:
+        - volcano_df: pandas dataframe containing:
             - gene_names
             - fold change
             - t statistic
@@ -278,7 +278,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
-#%% return
+#%% return function
     return(volcano_df)
 
 
@@ -293,8 +293,7 @@ if __name__ == '__main__':
 
 
 
-#%%THIS IS AN ALTERNATIVE APPROACH FOR THE ABOVE CALCULATION.
-### TEST INDEPENDENT T-TEST
+#%% TEST INDEPENDENT T-TEST
 ### https://www.statisticshowto.com/independent-samples-t-test/
 
 # test1=[541, 664]
