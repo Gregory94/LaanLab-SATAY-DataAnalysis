@@ -44,12 +44,10 @@ variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.05 #set threshold above which p-values are regarded significant
 normalize=True
 
-track_gene = "nrp1"# "CDC42" or set to "" to disable
-Ngenenames=20
-
+track_gene = ""# "CDC42" or set to "" to disable
 
 #%%
-def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', significance_threshold=0.01, normalize=True, track_gene='', Ngenenames=10):
+def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', significance_threshold=0.01, normalize=True, track_gene=''):
     '''
     This creates a volcano plot that shows the fold change between two libraries and the corresponding p-values.
     Input:
@@ -59,10 +57,15 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         - significance_threshold: Treshold value above which the fold change is regarded significant, only for plotting (default=0.01)
         - normalize: Whether to normalize variable. If set to True, each gene is normalized based on the total count in each dataset (i.e. each file in filelist_) (default=True)
         - track_gene: Enter a single gene name for which statistics will be printed and it will be highlighted in the plot. If empty string, no gene will be tracked. (default='')
-        - Ngenenames: N genes with the largest p-values are inidicated in the plot (default=10)
 
     Output:
-        Volcanoplot with the log2 fold change between the two libraries and the -log10 p-value.
+        - volcano_df = pandas dataframe containing:
+            - gene_names
+            - fold change
+            - t statistic
+            - p value
+            - whether p value is above threshold
+        - volcanoplot with the log2 fold change between the two libraries and the -log10 p-value.
 
     Fold change is determined by the mean of dataset b (experimental set) divided by the mean of dataset a (reference set).
     The datasets can be of different length.
@@ -211,41 +214,73 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         del (norm_a, norm_b)
 
 
-#%% Volcanoplot
-    plt.figure(figsize=(19.0,9.0))#(27.0,3))
-    grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
-    ax = plt.subplot(grid[0,0])
-
-    # ax.scatter(x=volcano_df.fold_change, y=volcano_df.p_value, alpha=0.4, marker='.', c='k')
-    ax.scatter(x=volcano_df.loc[volcano_df['significance'] == False, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == False, 'p_value'], alpha=0.4, marker='.', c='k', label='p-value > {}'.format(significance_threshold))
-    ax.scatter(x=volcano_df.loc[volcano_df['significance'] == True, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == True, 'p_value'], alpha=0.4, marker='.', c='r', label='p-value < {}'.format(significance_threshold))
-    ax.grid(True, which='major', axis='both', alpha=0.4)
-    ax.set_xlabel('Log2 FC')
-    ax.set_ylabel('-1*Log10 p-value')
-    ax.set_title(variable)
-    ax.legend()
-    for ann in volcano_df.nlargest(Ngenenames,'p_value').itertuples(): #annotate the 10 genes with the highest p-value
-        ax.annotate(ann.gene_names, xy=(ann.fold_change, ann.p_value), size=10, c='k')
-    if not track_gene == "":
-        ax.annotate(volcano_df.iloc[track_gene_index,:]['gene_names'], (volcano_df.iloc[track_gene_index,:]['fold_change'], volcano_df.iloc[track_gene_index,:]['p_value']),
-                    size=10, c='b')
-        # ax.scatter(x=volcano_df.iloc[track_gene_index,:]['fold_change'] ,y=volcano_df.iloc[track_gene_index,:]['p_value'], marker='X', c='b')
-
-    del (ax, grid)
-
+    return(volcano_df)
 
 
 #%%
 if __name__ == '__main__':
-    volcano(path_a=datapath_a, filelist_a=filenames_a,
+    volcano_df = volcano(path_a=datapath_a, filelist_a=filenames_a,
             path_b=datapath_b, filelist_b=filenames_b,
             variable=variable,
             significance_threshold=significance_threshold,
             normalize=normalize,
-            track_gene=track_gene,
-            Ngenenames=Ngenenames)
+            track_gene=track_gene)
 
 
+#%% Volcanoplot
+fig = plt.figure(figsize=(19.0,9.0))#(27.0,3))
+grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
+ax = plt.subplot(grid[0,0])
+
+# ax.scatter(x=volcano_df.fold_change, y=volcano_df.p_value, alpha=0.4, marker='.', c='k')
+ax.scatter(x=volcano_df.loc[volcano_df['significance'] == False, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == False, 'p_value'], alpha=0.4, marker='.', c='k', label='p-value > {}'.format(significance_threshold))
+sc = ax.scatter(x=volcano_df.loc[volcano_df['significance'] == True, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == True, 'p_value'], alpha=0.4, marker='.', c='r', label='p-value < {}'.format(significance_threshold))
+ax.grid(True, which='major', axis='both', alpha=0.4)
+ax.set_xlabel('Log2 FC')
+ax.set_ylabel('-1*Log10 p-value')
+ax.set_title(variable)
+ax.legend()
+# if not track_gene == "":
+#     ax.annotate(volcano_df.iloc[track_gene_index,:]['gene_names'], (volcano_df.iloc[track_gene_index,:]['fold_change'], volcano_df.iloc[track_gene_index,:]['p_value']),
+#                 size=10, c='b')
+# for ann in volcano_df.nlargest(Nannotations,'p_value').itertuples(): #annotate the 10 genes with the highest p-value
+#     ax.annotate(ann.gene_names, xy=(ann.fold_change, ann.p_value), size=10, c='k')
+
+
+
+
+names = volcano_df['gene_names'].to_numpy()
+annot = ax.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
+                    bbox=dict(boxstyle="round", fc="w"),
+                    arrowprops=dict(arrowstyle="->"))
+annot.set_visible(False)
+
+def update_annot(ind):
+
+    pos = sc.get_offsets()[ind["ind"][0]]
+    annot.xy = pos
+    # text = "{}, {}".format(" ".join(list(map(str,ind["ind"]))), 
+    #                         " ".join([names[n] for n in ind["ind"]]))
+    text = "{}".format(" ".join([names[n] for n in ind["ind"]]))
+    annot.set_text(text)
+    # annot.get_bbox_patch().set_facecolor(cmap(norm(c[ind["ind"][0]])))
+    # annot.get_bbox_patch().set_alpha(0.4)
+
+
+def hover(event):
+    vis = annot.get_visible()
+    if event.inaxes == ax:
+        cont, ind = sc.contains(event)
+        if cont:
+            update_annot(ind)
+            annot.set_visible(True)
+            fig.canvas.draw_idle()
+        else:
+            if vis:
+                annot.set_visible(False)
+                fig.canvas.draw_idle()
+
+fig.canvas.mpl_connect("motion_notify_event", hover)
 #%%THIS IS AN ALTERNATIVE APPROACH FOR THE ABOVE CALCULATION.
 ### TEST INDEPENDENT T-TEST
 ### https://www.statisticshowto.com/independent-samples-t-test/
