@@ -44,10 +44,10 @@ filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_perg
 
 
 variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
-significance_threshold = 0.05 #set threshold above which p-values are regarded significant
+significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
-trackgene_list = ['nrp1', 'cdc42', 'bem1', 'cmd1']# ["CDC42"] or set to [] to disable
+trackgene_list = ['nrp1']# ["CDC42"] or set to [] to disable
 
 #%%
 def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', significance_threshold=0.01, normalize=True, trackgene_list=[]):
