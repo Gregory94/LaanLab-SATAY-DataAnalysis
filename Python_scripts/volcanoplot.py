@@ -39,15 +39,21 @@ from dataframe_from_pergene import dataframe_from_pergenefile
 #%% define file paths and names. Two samples called a and b.
 datapath_a = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing"
 filenames_a = ["WT-a_pergene.txt", "WT-b_pergene.txt"]
+# datapath_a = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
+# filenames_a = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt"]
+# datapath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
+# filenames_b = ["dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
 datapath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
-filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
+filenames_a = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
 
 
-variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
+variable = 'tn_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
-trackgene_list = ['nrp1']# ["CDC42"] or set to [] to disable
+trackgene_list = ['nrp1']
+#['bsd2', 'mtf2', 'abd1', 'pmp3','yjr087w','rpa49','osw7','atg23','gef1','mec1','yor293c-a']
+#['cpr1','def1', 'rbt1', 'ssc1', 'rsc3','cup2']
 
 #%%
 def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', significance_threshold=0.01, normalize=True, trackgene_list=[]):
@@ -59,7 +65,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         - variable: tn_per_gene, read_per_gene or Nreadsperinsrt (default='read_per_gene')
         - significance_threshold: Treshold value above which the fold change is regarded significant, only for plotting (default=0.01)
         - normalize: Whether to normalize variable. If set to True, each gene is normalized based on the total count in each dataset (i.e. each file in filelist_) (default=True)
-        - trackgene_list: Enter a single gene name for which statistics will be printed and it will be highlighted in the plot. If empty string, no gene will be tracked. (default='')
+        - trackgene_list: Enter a list of gene name(s) which will be highlighted in the plot (e.g. ['cdc42', 'nrp1']). If empty list, no gene will be tracked. (default=[])
 
     Output:
         - volcano_df: pandas dataframe containing:
@@ -236,12 +242,17 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
     ax.scatter(x=[],y=[],marker='.',color='red', label='p-value < {}'.format(significance_threshold)) #set empty scatterplot for legend
     ax.legend()
     if not trackgene_list == []:
+        genenames_array = volcano_df['gene_names'].to_numpy()
         for trackgene in trackgene_list:
             trackgene = trackgene.upper()
-            trackgene_index = tnread_gene_a.loc[tnread_gene_a['gene_names'] == trackgene].index[0]
-            ax.annotate(volcano_df.iloc[trackgene_index,:]['gene_names'], (volcano_df.iloc[trackgene_index,:]['fold_change'], volcano_df.iloc[trackgene_index,:]['p_value']),
-                        size=10, c='b')
-        del tnread_gene_a
+            if trackgene in genenames_array:
+                trackgene_index = tnread_gene_a.loc[tnread_gene_a['gene_names'] == trackgene].index[0]
+                trackgene_annot = ax.annotate(volcano_df.iloc[trackgene_index,:]['gene_names'], (volcano_df.iloc[trackgene_index,:]['fold_change'], volcano_df.iloc[trackgene_index,:]['p_value']),
+                            size=10, c='green', bbox=dict(boxstyle="round", fc="w"))
+                trackgene_annot.get_bbox_patch().set_alpha(0.6)
+            else:
+                print('WARNING: %s not found' % trackgene)
+        del (tnread_gene_a, genenames_array)
 
 
     names = volcano_df['gene_names'].to_numpy()
