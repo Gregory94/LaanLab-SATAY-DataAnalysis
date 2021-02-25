@@ -17,6 +17,9 @@ This is based on this website:
     - https://towardsdatascience.com/inferential-statistics-series-t-test-using-numpy-2718f8f9bf2f
     - https://www.statisticshowto.com/independent-samples-t-test/
 
+Code for showing gene name when hovering over datapoint is based on:
+    - https://stackoverflow.com/questions/7908636/possible-to-make-labels-appear-when-hovering-over-a-point-in-matplotlib
+
 T-test is measuring the number of standard
 deviations our measured mean is from the baseline mean, while taking into
 account that the standard deviation of the mean can change as we get more data
@@ -44,10 +47,10 @@ variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.05 #set threshold above which p-values are regarded significant
 normalize=True
 
-track_gene = ""# "CDC42" or set to "" to disable
+trackgene_list = ['nrp1', 'cdc42', 'bem1', 'cmd1']# ["CDC42"] or set to [] to disable
 
 #%%
-def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', significance_threshold=0.01, normalize=True, track_gene=''):
+def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', significance_threshold=0.01, normalize=True, trackgene_list=[]):
     '''
     This creates a volcano plot that shows the fold change between two libraries and the corresponding p-values.
     Input:
@@ -56,7 +59,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         - variable: tn_per_gene, read_per_gene or Nreadsperinsrt (default='read_per_gene')
         - significance_threshold: Treshold value above which the fold change is regarded significant, only for plotting (default=0.01)
         - normalize: Whether to normalize variable. If set to True, each gene is normalized based on the total count in each dataset (i.e. each file in filelist_) (default=True)
-        - track_gene: Enter a single gene name for which statistics will be printed and it will be highlighted in the plot. If empty string, no gene will be tracked. (default='')
+        - trackgene_list: Enter a single gene name for which statistics will be printed and it will be highlighted in the plot. If empty string, no gene will be tracked. (default='')
 
     Output:
         - volcano_df = pandas dataframe containing:
@@ -143,16 +146,18 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
 
 
     ### printing specific genes
-    if not track_gene == "":
-        track_gene = track_gene.upper()
-        print('')
-        print("TRACKING VARIABLE %s" % track_gene)
-        track_gene_index = tnread_gene_a.loc[tnread_gene_a['gene_names'] == track_gene].index[0]
-        print("tnread_gene_a:", tnread_gene_a.loc[tnread_gene_a['gene_names'] == track_gene])
-        print("tnread_gene_b:", tnread_gene_b.loc[tnread_gene_b['gene_names'] == track_gene])
+    # if not trackgene_list == "":
+    #     trackgene_list = trackgene_list.upper()
+    #     print('')
+    #     print("TRACKING VARIABLE %s" % trackgene_list)
+    #     trackgene_list_index = tnread_gene_a.loc[tnread_gene_a['gene_names'] == trackgene_list].index[0]
+    #     print("tnread_gene_a:", tnread_gene_a.loc[tnread_gene_a['gene_names'] == trackgene_list])
+    #     print("tnread_gene_b:", tnread_gene_b.loc[tnread_gene_b['gene_names'] == trackgene_list])
 
 
-    del (datafile_a, datafile_b, count, tnread_gene_a, tnread_gene_b)
+    del (datafile_a, datafile_b, count, tnread_gene_b)
+    if trackgene_list == []:
+        del tnread_gene_a
 
 
 #%% APPLY stats.ttest_ind(A,B)
@@ -180,8 +185,8 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         # elif np.mean(variable_b_array[count]) != 0 and np.mean(variable_a_array[count]) == 0:
         #     fc_list[count] = np.log2(np.mean(variable_b_array[count]) / 0.01)
         elif np.mean(variable_b_array[count]) == 0 or np.mean(variable_a_array[count]) == 0:
-            fc_list[count] = np.nan
-            # fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
+            # fc_list[count] = np.nan
+            fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
         else:
             fc_list[count] = np.log2(np.mean(variable_b_array[count]) / np.mean(variable_a_array[count]))
 
@@ -195,13 +200,13 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
 
 
         ### printing specific genes
-        if not track_gene == "" and count == track_gene_index:
-            print("variable_a_array:", variable_a_array[count])
-            print("variable_b_index:", variable_b_array[count])
-            print("t-test value:", ttest_val)
-            print("mean a:", np.mean(variable_a_array[count]))
-            print("mean b:", np.mean(variable_b_array[count]))
-            print("fold change:", fc_list[count])
+        # if not trackgene_list == "" and count == trackgene_list_index:
+        #     print("variable_a_array:", variable_a_array[count])
+        #     print("variable_b_index:", variable_b_array[count])
+        #     print("t-test value:", ttest_val)
+        #     print("mean a:", np.mean(variable_a_array[count]))
+        #     print("mean b:", np.mean(variable_b_array[count]))
+        #     print("fold change:", fc_list[count])
 
 
     volcano_df['fold_change'] = fc_list
@@ -214,6 +219,66 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         del (norm_a, norm_b)
 
 
+#%% Volcanoplot
+    fig = plt.figure(figsize=(19.0,9.0))#(27.0,3))
+    grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
+    ax = plt.subplot(grid[0,0])
+
+    # ax.scatter(x=volcano_df.loc[volcano_df['significance'] == False, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == False, 'p_value'], alpha=0.4, marker='.', c='k', label='p-value > {}'.format(significance_threshold))
+    # sc = ax.scatter(x=volcano_df.loc[volcano_df['significance'] == True, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == True, 'p_value'], alpha=0.4, marker='.', c='r', label='p-value < {}'.format(significance_threshold))
+    colors = {False:'black', True:'red'}
+    sc = ax.scatter(x=volcano_df['fold_change'], y=volcano_df['p_value'], alpha=0.4, marker='.', c=volcano_df['significance'].apply(lambda x:colors[x]))
+    ax.grid(True, which='major', axis='both', alpha=0.4)
+    ax.set_xlabel('Log2 FC')
+    ax.set_ylabel('-1*Log10 p-value')
+    ax.set_title(variable)
+    ax.scatter(x=[],y=[],marker='.',color='black', label='p-value > {}'.format(significance_threshold)) #set empty scatterplot for legend
+    ax.scatter(x=[],y=[],marker='.',color='red', label='p-value < {}'.format(significance_threshold)) #set empty scatterplot for legend
+    ax.legend()
+    if not trackgene_list == []:
+        for trackgene in trackgene_list:
+            trackgene = trackgene.upper()
+            trackgene_index = tnread_gene_a.loc[tnread_gene_a['gene_names'] == trackgene].index[0]
+            ax.annotate(volcano_df.iloc[trackgene_index,:]['gene_names'], (volcano_df.iloc[trackgene_index,:]['fold_change'], volcano_df.iloc[trackgene_index,:]['p_value']),
+                        size=10, c='b')
+        del tnread_gene_a
+
+
+    names = volcano_df['gene_names'].to_numpy()
+    annot = ax.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
+                        bbox=dict(boxstyle="round", fc="w"),
+                        arrowprops=dict(arrowstyle="->"))
+    annot.set_visible(False)
+
+    def update_annot(ind):
+
+        pos = sc.get_offsets()[ind["ind"][0]]
+        annot.xy = pos
+        # text = "{}, {}".format(" ".join(list(map(str,ind["ind"]))), 
+        #                         " ".join([names[n] for n in ind["ind"]]))
+        text = "{}".format(" ".join([names[n] for n in ind["ind"]]))
+        annot.set_text(text)
+        # annot.get_bbox_patch().set_facecolor(cmap(norm(c[ind["ind"][0]])))
+        # annot.get_bbox_patch().set_alpha(0.4)
+
+
+    def hover(event):
+        vis = annot.get_visible()
+        if event.inaxes == ax:
+            cont, ind = sc.contains(event)
+            if cont:
+                update_annot(ind)
+                annot.set_visible(True)
+                fig.canvas.draw_idle()
+            else:
+                if vis:
+                    annot.set_visible(False)
+                    fig.canvas.draw_idle()
+
+    fig.canvas.mpl_connect("motion_notify_event", hover)
+
+
+#%% return
     return(volcano_df)
 
 
@@ -224,63 +289,10 @@ if __name__ == '__main__':
             variable=variable,
             significance_threshold=significance_threshold,
             normalize=normalize,
-            track_gene=track_gene)
-
-
-#%% Volcanoplot
-fig = plt.figure(figsize=(19.0,9.0))#(27.0,3))
-grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
-ax = plt.subplot(grid[0,0])
-
-# ax.scatter(x=volcano_df.fold_change, y=volcano_df.p_value, alpha=0.4, marker='.', c='k')
-ax.scatter(x=volcano_df.loc[volcano_df['significance'] == False, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == False, 'p_value'], alpha=0.4, marker='.', c='k', label='p-value > {}'.format(significance_threshold))
-sc = ax.scatter(x=volcano_df.loc[volcano_df['significance'] == True, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == True, 'p_value'], alpha=0.4, marker='.', c='r', label='p-value < {}'.format(significance_threshold))
-ax.grid(True, which='major', axis='both', alpha=0.4)
-ax.set_xlabel('Log2 FC')
-ax.set_ylabel('-1*Log10 p-value')
-ax.set_title(variable)
-ax.legend()
-# if not track_gene == "":
-#     ax.annotate(volcano_df.iloc[track_gene_index,:]['gene_names'], (volcano_df.iloc[track_gene_index,:]['fold_change'], volcano_df.iloc[track_gene_index,:]['p_value']),
-#                 size=10, c='b')
-# for ann in volcano_df.nlargest(Nannotations,'p_value').itertuples(): #annotate the 10 genes with the highest p-value
-#     ax.annotate(ann.gene_names, xy=(ann.fold_change, ann.p_value), size=10, c='k')
+            trackgene_list=trackgene_list)
 
 
 
-
-names = volcano_df['gene_names'].to_numpy()
-annot = ax.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
-                    bbox=dict(boxstyle="round", fc="w"),
-                    arrowprops=dict(arrowstyle="->"))
-annot.set_visible(False)
-
-def update_annot(ind):
-
-    pos = sc.get_offsets()[ind["ind"][0]]
-    annot.xy = pos
-    # text = "{}, {}".format(" ".join(list(map(str,ind["ind"]))), 
-    #                         " ".join([names[n] for n in ind["ind"]]))
-    text = "{}".format(" ".join([names[n] for n in ind["ind"]]))
-    annot.set_text(text)
-    # annot.get_bbox_patch().set_facecolor(cmap(norm(c[ind["ind"][0]])))
-    # annot.get_bbox_patch().set_alpha(0.4)
-
-
-def hover(event):
-    vis = annot.get_visible()
-    if event.inaxes == ax:
-        cont, ind = sc.contains(event)
-        if cont:
-            update_annot(ind)
-            annot.set_visible(True)
-            fig.canvas.draw_idle()
-        else:
-            if vis:
-                annot.set_visible(False)
-                fig.canvas.draw_idle()
-
-fig.canvas.mpl_connect("motion_notify_event", hover)
 #%%THIS IS AN ALTERNATIVE APPROACH FOR THE ABOVE CALCULATION.
 ### TEST INDEPENDENT T-TEST
 ### https://www.statisticshowto.com/independent-samples-t-test/
