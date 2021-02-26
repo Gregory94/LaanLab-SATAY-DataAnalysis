@@ -37,23 +37,24 @@ from dataframe_from_pergene import dataframe_from_pergenefile
 
 
 #%% define file paths and names. Two samples called a and b.
+# datapath_a = 
+# filenames_a = []
+# datapath_b = 
+# filenames_b = []
 datapath_a = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing"
 filenames_a = ["WT-a_pergene.txt", "WT-b_pergene.txt"]
-# datapath_a = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
-# filenames_a = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt"]
-# datapath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
-# filenames_b = ["dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
 datapath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
-filenames_a = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
+filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
 
 
-variable = 'tn_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
+variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
 trackgene_list = ['nrp1']
-#['bsd2', 'mtf2', 'abd1', 'pmp3','yjr087w','rpa49','osw7','atg23','gef1','mec1','yor293c-a']
-#['cpr1','def1', 'rbt1', 'ssc1', 'rsc3','cup2']
+# trackgene_list = ['bsd2', 'mtf2', 'abd1', 'pmp3','yjr087w','rpa49','osw7','atg23','gef1','mec1','yor293c-a']
+# trackgene_list = ['cpr1','def1', 'rrt1', 'ssc1', 'rsc3','cup2']
+# trackgene_list = ['cdc42', 'bem1', 'bem3', 'bem2', 'nrp1', 'cdc24', 'cla4', 'ste20']
 
 #%%
 def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', significance_threshold=0.01, normalize=True, trackgene_list=[]):
@@ -195,6 +196,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
             fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
         else:
             fc_list[count] = np.log2(np.mean(variable_b_array[count]) / np.mean(variable_a_array[count]))
+            # fc_list[count] = np.mean(variable_b_array[count]) - np.mean(variable_a_array[count])
 
         #Take sum of number of insertions per library 
         # if sum(variable_a_array[count]) == 0 and sum(variable_b_array[count]) == 0:
