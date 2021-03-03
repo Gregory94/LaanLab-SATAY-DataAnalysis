@@ -27,14 +27,17 @@ def total_mapped_reads(file, verbose=False):
                 lines = f.readlines()
 
             total_reads = 0
+            total_ins = 0
             chrom_line = 'variablestep'
             for line in lines[1:]:
                 if not line.lower().startswith(chrom_line):
                     line_split = line.strip('\n').split(' ')
                     total_reads += int(line_split[1])
+                    total_ins += 1
 
             if verbose == True:
                 print('Number of mapped reads found = %i' % total_reads)
+                print('Number of insertions found = %i' % total_ins)
             return(total_reads)
 
 
@@ -45,12 +48,15 @@ def total_mapped_reads(file, verbose=False):
                 lines = f.readlines()
 
             total_reads = 0
+            total_ins = 0
             for line in lines[1:]:
                 line_split = line.strip('\n').split(' ')
                 total_reads += (int(line_split[4]) - 100)/20
+                total_ins += 1
 
             if verbose == True:
                 print('Number of mapped reads found = %i' % total_reads)
+                print('Number of insertions found = %i' % total_ins)
             return(total_reads)
 
 
