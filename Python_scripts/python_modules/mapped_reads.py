@@ -3,6 +3,7 @@
 """
 
 import os
+import numpy as np
 
 #%%
 def total_mapped_reads(file, verbose=False):
@@ -28,16 +29,19 @@ def total_mapped_reads(file, verbose=False):
 
             total_reads = 0
             total_ins = 0
+            reads_list = []
             chrom_line = 'variablestep'
             for line in lines[1:]:
                 if not line.lower().startswith(chrom_line):
                     line_split = line.strip('\n').split(' ')
+                    reads_list.append(int(line_split[1]))
                     total_reads += int(line_split[1])
                     total_ins += 1
 
             if verbose == True:
                 print('Number of mapped reads found = %i' % total_reads)
                 print('Number of insertions found = %i' % total_ins)
+                print('Median read per transposon = %i' % np.median(reads_list))
             return(total_reads)
 
 
@@ -49,14 +53,17 @@ def total_mapped_reads(file, verbose=False):
 
             total_reads = 0
             total_ins = 0
+            reads_list = []
             for line in lines[1:]:
                 line_split = line.strip('\n').split(' ')
+                reads_list.append((int(line_split[4]) - 100)/20)
                 total_reads += (int(line_split[4]) - 100)/20
                 total_ins += 1
 
             if verbose == True:
                 print('Number of mapped reads found = %i' % total_reads)
                 print('Number of insertions found = %i' % total_ins)
+                print('Median read per transposon = %i' % np.median(reads_list))
             return(total_reads)
 
 
@@ -67,5 +74,6 @@ def total_mapped_reads(file, verbose=False):
 
 #%%
 if __name__ == '__main__':
-    total_mapped_reads(file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig", verbose=True)
-#    total_mapped_reads(file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed", verbose=True)
+    # total_mapped_reads(file=r"C:\Users\gregoryvanbeek\Desktop\test_matlab_benoit\test_matlab_benoit_wt1\E-MTAB-4885.WT1.bam.wig", verbose=True)
+    # total_mapped_reads(file=r"C:\Users\gregoryvanbeek\Desktop\test_matlab_benoit\test_matlab_benoit_wt1\E-MTAB-4885.WT1.bam.bed", verbose=True)
+    total_mapped_reads(file=r"C:\Users\gregoryvanbeek\Desktop\test_matlab_benoit\test_matlab_benoit_wt2\E-MTAB-4885.WT2.bam.bed", verbose=True)
