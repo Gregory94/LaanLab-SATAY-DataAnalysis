@@ -30,13 +30,14 @@ __Author__: Gregory van Beek
 """
 
 #%%
-import os
+import os, sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
+sys.path.insert(1,file_dirname)
 #sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from chromosome_names_in_files import chromosome_name_wigfile
@@ -640,6 +641,7 @@ if __name__ == '__main__':
                  plotting=False,
                  savefigure=False,
                  verbose=True)
+    print(dna_df2)
 
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
 #        dna_df2 = dna_features(region = chrom,
