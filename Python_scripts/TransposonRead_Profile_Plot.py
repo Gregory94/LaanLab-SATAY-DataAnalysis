@@ -19,7 +19,7 @@ from chromosome_names_in_files import chromosome_name_bedfile, chromosome_name_w
 
 #%%
 
-def transposon_profile(chrom='I',bar_width=None,bed_file = None):
+def transposon_profile(chrom='I',bar_width=None,bed_file = None, savefig=False):
     '''This function creates a bar plot along a specified chromosome for the number of transposons.
     The height of each bar represents the number of transposons at the genomic position indicated on the x-axis.
     The input is as follows: which chromosome (indicated by roman numeral), bar_width, bed_file.
@@ -185,15 +185,19 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
         right=False,       # ticks along the top edge are off
         labelleft=False)   # labels along the bottom edge are off
 
-    #plt.show()
-    fig.savefig('../../Processed-data/WT-dnrp1-sequencing-analysis-plots/chrom_'+c+'-counts.png',dpi=300,format='png')
-
+    if savefig == True:
+        savepath = os.path.splitext(bed_file)
+        print('saving figure at %s' % savepath[0]+'_transposonplot_chrom'+chrom+'.png')
+        plt.savefig(savepath[0]+'_transposonplot_chrom'+chrom+'.png', dpi=400)
+        plt.close()
+    else:
+        plt.show()
 
 
 
 
 #%%
-def read_profile(chrom='I',bar_width=None,wig_file = None):
+def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
     '''This function creates a bar plot along a specified chromosome for the number of reads.
     The height of each bar represents the number of reads at the genomic position indicated on the x-axis.
     The input is as follows: which chromosome (indicated by roman numeral), bar_width, wig_file.
@@ -348,7 +352,11 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     textsize = 18
     textcolor = "#000000"
 
+<<<<<<< HEAD
     fig=plt.figure(figsize=(19,9))
+=======
+    fig = plt.figure(figsize=(19,9))
+>>>>>>> 34e8a76608d6be46da995366d1cceb6dc16bf108
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
     
     binsize = bar_width
@@ -399,24 +407,26 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
         right=False,       # ticks along the top edge are off
         labelleft=False)   # labels along the bottom edge are off
 
+<<<<<<< HEAD
     #plt.show()
     
+=======
+    if savefig == True:
+        savepath = os.path.splitext(wig_file)
+        print('saving figure at %s' % savepath[0]+'_readplot_chrom'+chrom+'.png')
+        plt.savefig(savepath[0]+'_readplot_chrom'+chrom+'.png', dpi=400)
+        plt.close()
+    else:
+        plt.show()
+>>>>>>> 34e8a76608d6be46da995366d1cceb6dc16bf108
 
 
 
 
 #%%
 if __name__ == '__main__':
-
-#    chrom = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
-    chrom = ["XIV"]
-    wig_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT.wig'
-    bed_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT.bed'
-
+    chrom = ['I','II','III']#,'IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
+    # chrom = ["I"]
     for c in chrom:
-        read_profile(chrom=c,wig_file=wig_file)
-        #fig.savefig('../../Processed-data/WT-dnrp1-sequencing-analysis-plots/chrom_'+c+'-reads.png',dpi=300,format='png')
-
-        transposon_profile(chrom=c,bed_file=bed_file)
-
-
+        read_profile(chrom=c,wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig", savefig=True)
+        transposon_profile(chrom=c, bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.bed", savefig=True)
