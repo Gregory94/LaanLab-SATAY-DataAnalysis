@@ -65,7 +65,20 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
         - Verbose: Either True of False. Determines how much textual feedback is given. When set to False, only warnings will be shown.
 
     Output:
-        - dna_df2: Dataframe containing information about the selected chromosome.
+        - dna_df2: Dataframe containing information about the selected chromosome. This includes the following columns:
+            - Feature name
+            - Standard name of the feature
+            - Aliases of feature name (if any)
+            - Feature type (e.g. gene, telomere, centromere, etc. If None, this region is not defined)
+            - Position of feature type in terms of bp relative to chromosome.
+            - Length of region in terms of basepairs
+            - Number of insertions in region
+            - Number of insertions in truncated region where truncated region is the region without the first and last 100bp.
+            - Number of reads in region
+            - Number of reads in truncated region.
+            - Number of reads per insertion (defined by Nreads/Ninsertions)
+            - Number of reads per insertion in truncated region (defined by Nreads_truncatedgene/Ninsertions_truncatedgene)
+            NOTE: truncated regions are only determined for genes. For the other regions the truncated region values are the same as the non-truncated region values.
     
     Required files (see next section):
         - essentials_file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Cerevisiae_AllEssentialGenes_List.txt
@@ -322,7 +335,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
             N_reads_list.append(sum(N_reads))
             N_insrt_list.append(len([ins for ins in N_reads if not ins == 0]))
             if not f_type == None and f_type.startswith('Gene'):
-                N10percent = 100#int(len(N_reads) * 0.1)
+                N10percent = 100#int(len(N_reads) * 0.1) #TRUNCATED GENE DEFINITION
                 N_reads_truncatedgene_list.append(sum(N_reads[N10percent:-N10percent]))
                 N_insrt_truncatedgene_list.append(len([ins for ins in N_reads[N10percent:-N10percent] if not ins == 0]))
             else:
@@ -582,9 +595,9 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 #%%
 if __name__ == '__main__':
     dna_df2 = dna_features(region = 3,#['xiii', 0, 14790],
-                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
-                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
-                 variable="reads",
+                 wig_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig",
+                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt",
+                 variable="reads", #for plotting
                  plotting=False,
                  savefigure=False,
                  verbose=True)

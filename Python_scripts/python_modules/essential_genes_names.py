@@ -6,7 +6,7 @@
 # =============================================================================
 
 
-def list_known_essentials(input_files = None, headerlines=3):
+def list_known_essentials(input_files = None, headerlines=3, verbose=True):
     ''' Get all known essential genes from two different files and combine them in one list.
         Input is a list of of paths where files can be found with the known essential genes.
         A default list is implemented using two files present in the same folder as this file.
@@ -20,8 +20,8 @@ def list_known_essentials(input_files = None, headerlines=3):
     if input_files == None:
         import os
         file_dirname = os.path.dirname(os.path.abspath('__file__'))
-        essential_genes_files = [os.path.join(file_dirname,'..','Data_Files','Cervisiae_EssentialGenes_List_1.txt'),
-                                os.path.join(file_dirname,'..','Data_Files','Cervisiae_EssentialGenes_List_2.txt')]
+        essential_genes_files = [os.path.join(file_dirname,'..','Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
+                                os.path.join(file_dirname,'..','Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
     else:
         essential_genes_files = input_files
 
@@ -29,7 +29,8 @@ def list_known_essentials(input_files = None, headerlines=3):
     known_essential_gene_list = []
     
     for files in essential_genes_files:
-        print('Reading file :',files)
+        if verbose == True:
+            print('Reading file :',files)
         with open(files) as f:
             for header_lines in range(headerlines):
                 next(f)

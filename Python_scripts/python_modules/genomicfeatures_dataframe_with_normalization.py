@@ -54,7 +54,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", no
     This can be used for identifying neutral regions (i.e. genomic regions that, if inhibited, do not influence the fitness of the cells).
     This function can be used for normalizing the transposon insertions per gene using the neutral regions.
     
-    Input:
+    Input (see last section in script):
         - Region: e.g. chromosome number (either a normal number between 1 and 16 or in roman numerals between I and XVI), a list like ['V', 0, 14790] which creates a barplot between basepair 0 and 14790) or a genename.
         - wig_file: wiggle file from the output of transposonmapping.py that is used in the processing workflow.
         - pergene_insertions_file: text file from the output of transposonsmapping.py
@@ -691,6 +691,7 @@ chromosomes=['I',"II","III",'IV','V','IV','V','VI','VII','VIII','IX','X',
              'XI','XII','XIII','XIV','XV','XVI']
 if __name__ == '__main__':
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:Python_scripts/fitness_from SATAY_codes/genomicfeatures_dataframe_with_normalization.py
     dna_df2 = dna_features(region = 'iv', #["V", 0, 14790],
                  wig_file = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing_dDpl1_Kornmannlab\E-MTAB-4885.Dpl1Kan.sorted.bam.wig",
@@ -772,14 +773,33 @@ reads_non_normalize_pd=pd.concat(dna_df2_false,keys=chromosomes)
     dna_df2 = dna_features(region = 1,#['xiii', 0, 14790],
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
+=======
+#    dna_df2 = dna_features(region = 1,#['xiii', 0, 14790],
+#                 wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig",
+#                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam_pergene_insertions.txt",
+#                 variable="reads",
+#                 normalization_window_size=20000,
+#                 normalize=True,
+#                 plotting=False,
+#                 savefigure=False,
+#                 verbose=False)
+
+    dna_df2 = dna_features(region = 3,#['xiii', 0, 14790],
+                 wig_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig",
+                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt",
+>>>>>>> 411f1043386a0a7269f8b4334a45c6b76a9251a5
                  variable="reads",
                  normalization_window_size=20000,
                  normalize=True,
                  plotting=False,
                  savefigure=False,
+<<<<<<< HEAD
 >>>>>>> f948be1a886b070fa240fedc224e81ac06b9841b
                  verbose=False)
 
+=======
+                 verbose=True)
+>>>>>>> 411f1043386a0a7269f8b4334a45c6b76a9251a5
 
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
 #        dna_df2 = dna_features(region = chrom,
