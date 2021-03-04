@@ -134,7 +134,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
     textsize = 18
     textcolor = "#000000"
 
-    plt.figure(figsize=(19,9))#(17,6))
+    fig=plt.figure(figsize=(19,9))#(17,6))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
     
     binsize = bar_width
@@ -185,7 +185,9 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None):
         right=False,       # ticks along the top edge are off
         labelleft=False)   # labels along the bottom edge are off
 
-    plt.show()
+    #plt.show()
+    fig.savefig('../../Processed-data/WT-dnrp1-sequencing-analysis-plots/chrom_'+c+'-counts.png',dpi=300,format='png')
+
 
 
 
@@ -346,7 +348,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
     textsize = 18
     textcolor = "#000000"
 
-    plt.figure(figsize=(19,9))
+    fig=plt.figure(figsize=(19,9))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
     
     binsize = bar_width
@@ -397,48 +399,24 @@ def read_profile(chrom='I',bar_width=None,wig_file = None):
         right=False,       # ticks along the top edge are off
         labelleft=False)   # labels along the bottom edge are off
 
-    plt.show()
+    #plt.show()
+    
 
 
 
 
 #%%
 if __name__ == '__main__':
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-#    read_profile(chrom='xv',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
-    transposon_profile(chrom='II', bar_width=None, bed_file=r"N:\tnw\BN\LL\Shared\Gregory\testing_site\Benoit_test_data\wt1_KornmannLab_20200812\ERR1533148_trimmed.sorted.bam.bed")
-=======
-    read_profile(chrom='IX',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
-#    transposon_profile(chrom='IX', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
->>>>>>> 02723fc28becaa0428d64ab6978185f5da1aa080
-=======
-#    read_profile(chrom='IX',wig_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.wig")
-    transposon_profile(chrom='V', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
->>>>>>> 5183930047024746128f4e376e4177d31be8e315
-=======
-#    read_profile(chrom='I',wig_file=r"C:\Users\gregoryvanbeek\Documents\TRANSIT\transit_testfile.Dpl1Kan.sorted.bam.wig")
-    read_profile(chrom='I',wig_file=r"C:\Users\gregoryvanbeek\Documents\TRANSIT\transit_testfile_outputnormalizationtransit.Dpl1Kan.sorted.bam.wig")
-#    transposon_profile(chrom='V', bar_width=None, bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
->>>>>>> f948be1a886b070fa240fedc224e81ac06b9841b
-=======
-    c = "ix"
-    read_profile(chrom=c,wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig")
-#    read_profile(chrom="I",wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\wt1_dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample1_trim2\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_pairs_trimmed.sorted.bam.wig")
-    read_profile(chrom=c,wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\wt1_dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample2_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.wig")
->>>>>>> 7e46b7951f051694b35f6a1859ab29a735c80794
-=======
+
 #    chrom = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
-    chrom = ["XII"]
+    chrom = ["XIV"]
+    wig_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT.wig'
+    bed_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT.bed'
+
     for c in chrom:
-        read_profile(chrom=c,wig_file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample1\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim20210127\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig")
-#        read_profile(chrom=c,wig_file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample2\wt1_enzo_dataset_demultiplexed_singleend_sample2_trim20210122\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.wig")
-#        read_profile(chrom=c,wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig")
-        
-#        transposon_profile(chrom=c, bed_file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample1\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim20210127\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.bed")
-#        transposon_profile(chrom=c, bed_file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample2\wt1_enzo_dataset_demultiplexed_singleend_sample2_trim20210122\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.bed")
-#        transposon_profile(chrom=c,bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
->>>>>>> 411f1043386a0a7269f8b4334a45c6b76a9251a5
+        read_profile(chrom=c,wig_file=wig_file)
+        #fig.savefig('../../Processed-data/WT-dnrp1-sequencing-analysis-plots/chrom_'+c+'-reads.png',dpi=300,format='png')
+
+        transposon_profile(chrom=c,bed_file=bed_file)
+
+
