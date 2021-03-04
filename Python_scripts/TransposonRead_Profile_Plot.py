@@ -97,10 +97,10 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None, savefig=False):
 
 #%% GET ALL TRANSPOSON COUNTS
 #    allinsertionsites_list = list(range(0,chr_length_dict.get(chrom)))
-    alltransposoncounts_list = np.zeros(chr_length_dict.get(chrom))
+    alltransposoncounts_list = np.zeros(chr_length_dict.get(chrom) + 1)
     for line in lines[chrom_start_index_dict.get(chrom):chrom_end_index_dict.get(chrom)+1]:
         line = line.strip('\n').split()
-        alltransposoncounts_list[int(line[1])] += 1
+        alltransposoncounts_list[int(line[1]) - 1] += 1
     
     
     
@@ -275,11 +275,11 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
 
 
 #    allinsertionsites_list = list(range(0,chr_length_dict.get(chrom))) #CREATE LIST OF ALL POSIBLE INSERTION SITES IN THE CURRENT CHROMOSOME
-    allreadscounts_list = np.zeros(chr_length_dict.get(chrom)) #FOR EACH INSERTION SITE LIST THE NUMBER OF read INSERTION. BY DEFAULT THIS 0 AND IS LATER UPDATED IF AN INSERTION SITE IS PRESENT IN THE WIG FILE
+    allreadscounts_list = np.zeros(chr_length_dict.get(chrom)+1) #FOR EACH INSERTION SITE LIST THE NUMBER OF read INSERTION. BY DEFAULT THIS 0 AND IS LATER UPDATED IF AN INSERTION SITE IS PRESENT IN THE WIG FILE
     #GET ALL read COUNTS FOR THE CURRENT CHROMOSOME
     for line in lines[wigfile_start_index:wigfile_end_index]:
         line = line.strip(' \n').split()
-        allreadscounts_list[int(line[0])] = int(line[1])
+        allreadscounts_list[int(line[0]) - 1] = int(line[1])
     
 #%%    
     
@@ -416,8 +416,8 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
 
 #%%
 if __name__ == '__main__':
-    chrom = ['I','II','III']#,'IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
-    # chrom = ["I"]
+    # chrom = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
+    chrom = ["IV"]
     for c in chrom:
-        read_profile(chrom=c,wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig", savefig=True)
-        transposon_profile(chrom=c, bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.bed", savefig=True)
+        # read_profile(chrom=c,wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\a-b_pooled\WT.wig", savefig=True)
+        transposon_profile(chrom=c, bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\a-b_pooled\WT.bed", savefig=True)
