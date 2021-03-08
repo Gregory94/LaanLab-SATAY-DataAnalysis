@@ -105,6 +105,6 @@ def strip_redundant_ins(filepath=None):
 
 #%%
 if __name__ == '__main__':
-    strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dnrp1.wig")
+    strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig")
     # strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dnrp1.bed")
 

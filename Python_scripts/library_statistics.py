@@ -45,8 +45,8 @@ def library_stats(bedfile=None):
 
 #%%
 if __name__ == '__main__':
-#    file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample1\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim20210127\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.bed"
+    file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.bed"
 #    file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample2\wt1_enzo_dataset_demultiplexed_singleend_sample2_trim20210122\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.bed"
 #    file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed"
-    file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder\analysis_matlab_kornmanncode\ERR1533147_trimmed.sorted.bam.bed"
+    # file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder\analysis_matlab_kornmanncode\ERR1533147_trimmed.sorted.bam.bed"
     read_list, avg_ins_list = library_stats(bedfile=file)

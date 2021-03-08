@@ -452,7 +452,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
         nonessential_color = "#d9252e"
         codingdna_color = '#29a7e6'
         textcolor = "#000000"
-        textsize = 20
+        textsize = 14
 
 
         feature_middle_pos_list = []
@@ -595,10 +595,10 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 #%%
 if __name__ == '__main__':
     dna_df2 = dna_features(region = 4,#['xiii', 0, 14790],
-                 wig_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\a-b_pooled\WT.wig",
-                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\a-b_pooled\WT_pergene.txt",
+                 wig_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig",
+                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt",
                  variable="reads", #for plotting
-                 plotting=False,
+                 plotting=True,
                  savefigure=False,
                  verbose=True)
 
