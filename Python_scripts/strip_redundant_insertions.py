@@ -9,10 +9,10 @@ This script if for removing transposon insertions in .bed and .wig files that we
 
 import os, sys
 
-file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
-from chromosome_and_gene_positions import chromosome_position
-from chromosome_names_in_files import chromosome_name_bedfile, chromosome_name_wigfile
+# file_dirname = os.path.dirname(os.path.abspath('__file__'))
+# sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
+from Python_scripts.python_modules.chromosome_and_gene_positions import chromosome_position
+from Python_scripts.python_modules.chromosome_names_in_files import chromosome_name_bedfile, chromosome_name_wigfile
 
 
 
@@ -105,6 +105,8 @@ def strip_redundant_ins(filepath=None):
 
 #%%
 if __name__ == '__main__':
-    strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dnrp1.wig")
+    nrp1_dataset_bed=r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_dnrp1\leila_dataset_dnrp1_processing\dnrp1_merged_dnrp1-1_dnrp1-2_processing\align_out\dnrp1_merged_dnrp1-1_dnrp1-2_trimmed.sorted.bam.bed'
+    wt_dataset_bed=r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig'
+    strip_redundant_ins(filepath = wt_dataset_bed)
     # strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dnrp1.bed")
 
