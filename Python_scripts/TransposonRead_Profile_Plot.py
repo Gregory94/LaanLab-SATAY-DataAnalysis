@@ -192,6 +192,8 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None, savefig=False):
         plt.close()
     else:
         plt.show()
+         
+    
 
 
 
@@ -306,44 +308,6 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
             
         allinsertionsites_list = np.linspace(0,chr_length_dict.get(chrom),int(chr_length_dict.get(chrom)/bar_width)+1)
 
-#%%
-# =============================================================================
-#USE alltransposoncounts_binnedlist FOR NORMALIZING allreadscounts_binnedlist WITH THE AMOUNT OF TRANSPOSONS IN EACH BIN.
-#     allreadscounts_binnedlist_np = np.array(allreadscounts_binnedlist, dtype=np.float)
-#     alltransposoncounts_binnedlist_np = np.array(alltransposoncounts_binnedlist, dtype=np.float)
-#     allreadscounts_binnedlist_np_norm = list(allreadscounts_binnedlist_np/alltransposoncounts_binnedlist_np)
-#     allreadscounts_binnedlist_np_norm = np.where(allreadscounts_binnedlist_np_norm==np.inf,0,allreadscounts_binnedlist_np_norm)
-# =============================================================================
-#%%
-
-#    print('Plotting chromosome ', chrom, '...')
-#    print('bar width for plotting is ',bar_width)
-#
-#    plt.figure(figsize=(19,9))
-#    grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
-#
-#    textsize = 20
-#
-#    binsize = bar_width
-#    ax = plt.subplot(grid[0,0])
-#    for gene in genes_currentchrom_pos_list:
-#        gene_start_pos = int(gene_pos_dict.get(gene)[1])
-#        gene_end_pos = int(gene_pos_dict.get(gene)[2])
-#        if gene in genes_essential_list:
-#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='g',alpha=0.3)
-#            ax.text(gene_start_pos,max(allreadscounts_binnedlist),gene_alias_list.get(gene)[0], rotation=45)
-#        else:
-#            ax.axvspan(gene_start_pos,gene_end_pos,facecolor='r',alpha=0.3)
-#    ax.bar(allinsertionsites_list,allreadscounts_binnedlist,width=binsize,color=[0.0,0.0,0.0,0.8])
-#    ax.set_yscale('log')
-#    ax.set_axisbelow(True)
-#    ax.grid(True)
-#    ax.set_xlim(0,chr_length_dict.get(chrom))
-#    ax.set_xlabel('Basepair position on chromosome '+chrom, fontsize=textsize)
-#    ax.set_ylabel('Read count (log_10)', fontsize=textsize)
-##    ax.set_title('Read profile for chromosome '+chrom)
-#    plt.tight_layout()
-
 
 #%% PLOTTING
     print('Plotting chromosome ', chrom, '...')
@@ -420,10 +384,12 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
 
 #%%
 if __name__ == '__main__':
-    chrom = ['I','II','III']#,'IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
-    # chrom = ["I"]
-    wig_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT.wig'
-    bed_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT.bed'
+    #chrom = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
+    chrom = ['I','II','III','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
+
+    chrom = ["IV"]
+    wig_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\dnrp1-1.wig'
+    bed_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\dnrp1-1.bed'
     for c in chrom:
         read_profile(chrom=c,wig_file=wig_file,savefig=True)
-        transposon_profile(chrom=c, bed_file=bed_file, savefig=False)
+        transposon_profile(chrom=c, bed_file=bed_file, savefig=True)
