@@ -191,9 +191,19 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         #     fc_list[count] = np.log2(0.01 / np.mean(variable_a_array[count]))
         # elif np.mean(variable_b_array[count]) != 0 and np.mean(variable_a_array[count]) == 0:
         #     fc_list[count] = np.log2(np.mean(variable_b_array[count]) / 0.01)
-        elif np.mean(variable_b_array[count]) == 0 or np.mean(variable_a_array[count]) == 0:
+        elif np.mean(variable_b_array[count]) == 0:
+            if variable == 'tn_per_gene':
+                fc_list[count] = np.log2(5 / np.mean(variable_a_array[count]))
+            elif variable == 'read_per_gene':
+                fc_list[count] = np.log2(25 / np.mean(variable_a_array[count]))
+        # elif np.mean(variable_b_array[count]) == 0 or np.mean(variable_a_array[count]) == 0:
             # fc_list[count] = np.nan
-            fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
+            # fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
+        elif np.mean(variable_a_array[count]) == 0:
+            if variable == 'tn_per_gene':
+                fc_list[count] = np.log2(np.mean(variable_b_array[count]) / 5)
+            elif variable == 'read_per_gene':
+                fc_list[count] = np.log2(np.mean(variable_b_array[count]) / 25)
         else:
             fc_list[count] = np.log2(np.mean(variable_b_array[count]) / np.mean(variable_a_array[count]))
             # fc_list[count] = np.mean(variable_b_array[count]) - np.mean(variable_a_array[count])

@@ -14,7 +14,7 @@ file_dirname = os.path.dirname(os.path.abspath('__file__'))
 sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from essential_genes_names import list_known_essentials
-from gene_names import gene_aliases
+# from gene_names import gene_aliases
 from chromosome_names_in_files import chromosome_name_bedfile, chromosome_name_wigfile
 
 #%%
@@ -33,7 +33,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None, savefig=False):
     gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
     essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
                             os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
-    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
+    # gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 #%% GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
     
@@ -55,7 +55,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None, savefig=False):
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items() if chrom in v]
     genes_essential_list = list_known_essentials(essential_genes_files)
-    gene_alias_list = gene_aliases(gene_information_file)[0]
+    # gene_alias_list = gene_aliases(gene_information_file)[0]
     
 #%% READ BED FILE
     with open(bed_file) as f:
@@ -97,10 +97,10 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None, savefig=False):
 
 #%% GET ALL TRANSPOSON COUNTS
 #    allinsertionsites_list = list(range(0,chr_length_dict.get(chrom)))
-    alltransposoncounts_list = np.zeros(chr_length_dict.get(chrom))
+    alltransposoncounts_list = np.zeros(chr_length_dict.get(chrom) + 1)
     for line in lines[chrom_start_index_dict.get(chrom):chrom_end_index_dict.get(chrom)+1]:
         line = line.strip('\n').split()
-        alltransposoncounts_list[int(line[1])] += 1
+        alltransposoncounts_list[int(line[1]) - 1] += 1
     
     
     
@@ -213,7 +213,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
     gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
     essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
                             os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
-    gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
+    # gene_information_file = os.path.join(file_dirname,'Data_Files','Yeast_Protein_Names.txt')
 #%%
     #GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
@@ -230,12 +230,12 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
     chrom = chrom.upper()
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
-        bar_width = int(chr_length_dict.get(chrom)/400)
+        bar_width = int(chr_length_dict.get(chrom)/800)
 #%% GET ALL GENES IN CURRENT CHROMOSOME
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items() if chrom in v]
     genes_essential_list = list_known_essentials(essential_genes_files)
-    gene_alias_list = gene_aliases(gene_information_file)[0]
+    # gene_alias_list = gene_aliases(gene_information_file)[0]
 
 #%%
     with open(wig_file) as f:
@@ -277,11 +277,11 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
 
 
 #    allinsertionsites_list = list(range(0,chr_length_dict.get(chrom))) #CREATE LIST OF ALL POSIBLE INSERTION SITES IN THE CURRENT CHROMOSOME
-    allreadscounts_list = np.zeros(chr_length_dict.get(chrom)) #FOR EACH INSERTION SITE LIST THE NUMBER OF read INSERTION. BY DEFAULT THIS 0 AND IS LATER UPDATED IF AN INSERTION SITE IS PRESENT IN THE WIG FILE
+    allreadscounts_list = np.zeros(chr_length_dict.get(chrom)+1) #FOR EACH INSERTION SITE LIST THE NUMBER OF read INSERTION. BY DEFAULT THIS 0 AND IS LATER UPDATED IF AN INSERTION SITE IS PRESENT IN THE WIG FILE
     #GET ALL read COUNTS FOR THE CURRENT CHROMOSOME
     for line in lines[wigfile_start_index:wigfile_end_index]:
         line = line.strip(' \n').split()
-        allreadscounts_list[int(line[0])] = int(line[1])
+        allreadscounts_list[int(line[0]) - 1] = int(line[1])
     
 #%%    
     
@@ -316,9 +316,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
     textsize = 18
     textcolor = "#000000"
 
-
-    fig = plt.figure(figsize=(19,9))
-
+    plt.figure(figsize=(19,9))
     grid = plt.GridSpec(20, 1, wspace=0.0, hspace=0.0)
     
     binsize = bar_width
