@@ -596,7 +596,7 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 if __name__ == '__main__':
     dna_df2 = dna_features(region = 2,#['xiii', 0, 14790],
                            wig_file=r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig',
-                           pergene_insertions_file =r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.bed'
+                           pergene_insertions_file =r"N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt"
 ,variable="reads", #for plotting
                  plotting=False,
                  savefigure=False,
