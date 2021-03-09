@@ -74,18 +74,24 @@ def strip_redundant_ins(filepath=None):
     elif exten == ".wig":
         print("Wig file loaded %s" % filepath)
 
-        chrom_start_line_dict, chrom_end_line_dict = chromosome_name_wigfile(filepath)[1:3]
+        chrom_names_dict, chrom_start_line_dict, chrom_end_line_dict = chromosome_name_wigfile(filepath)
 
         with open(filepath, 'r') as f:
             lines = f.readlines()
 
         with open(filepath_splitext[0]+"_clean.wig", "w") as w:
-            w.write(lines[0])
+            w.write(lines[0].replace(',',''))
 
             for chrom in num_roman:
                 print("evaluating chromosome %s" % chrom)
 
-                w.write(lines[chrom_start_line_dict.get(chrom) - 1])
+                #replace chromosome names from reference genome with roman numerals
+                chrom_headerline = lines[chrom_start_line_dict.get(chrom) - 1]
+                chrom_nameline = chrom_headerline.split("=")[1].strip("\n").replace("chr","")
+                for romanname, chromname in chrom_names_dict.items():
+                    if chromname == chrom_nameline:
+                        chrom_nameroman = romanname
+                w.write("variablestep chrom=chr" + str(chrom_nameroman) + "\n") #write header for each chromosome
                 for line in lines[chrom_start_line_dict.get(chrom): chrom_end_line_dict.get(chrom)]: #no '+1' in for loop, this is only for bed file
                     line_list = " ".join(line.strip("\n").split()).split(" ")
                     if int(line_list[0]) > chr_length_dict.get(chrom) or int(line_list[0]) < 0:
@@ -93,7 +99,9 @@ def strip_redundant_ins(filepath=None):
                     else:
                         w.write(line)
 
-            for line in lines[chrom_end_line_dict.get("XVI"):]:
+
+            w.write("variablestep chrom=chrM\n")
+            for line in lines[chrom_end_line_dict.get("XVI")+1:]:
                 w.write(line)
 
 
