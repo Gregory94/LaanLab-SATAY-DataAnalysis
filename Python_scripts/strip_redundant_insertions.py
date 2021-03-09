@@ -46,7 +46,7 @@ def strip_redundant_ins(filepath=None):
     if exten == ".bed":
         print("Bed file loaded %s" % filepath)
 
-        chrom_start_line_dict, chrom_end_line_dict = chromosome_name_bedfile(filepath)[1:3]
+        chrom_names_dict, chrom_start_line_dict, chrom_end_line_dict = chromosome_name_bedfile(filepath)
 
         with open(filepath, "r") as f:
             lines = f.readlines()
@@ -62,10 +62,15 @@ def strip_redundant_ins(filepath=None):
                     if int(line_list[1]) > chr_length_dict.get(chrom) or int(line_list[1]) < 0:
                         print("Line removed: %s" % line)
                     else:
-                        w.write(line)
+                        for romanname, chromname in chrom_names_dict.items():
+                            if chromname == line_list[0].replace("chr",""):
+                                chrom_nameroman = romanname
+                        w.write("chr" + str(chrom_nameroman) + " " + str(line_list[1]) + " " + str(line_list[2]) + " " + str(line_list[3]) + " " + str(line_list[4]) + "\n")
 
+            
             for line in lines[chrom_end_line_dict.get("XVI")+1:]:
-                w.write(line)
+                line_list = " ".join(line.strip("\n").split()).split(" ")
+                w.write("chrM" + " " + str(line_list[1]) + " " + str(line_list[2]) + " " + str(line_list[3]) + " " + str(line_list[4]) + "\n")
 
 
 
@@ -113,6 +118,6 @@ def strip_redundant_ins(filepath=None):
 
 #%%
 if __name__ == '__main__':
-    strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig")
-    # strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dnrp1.bed")
+    # strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig")
+    strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.bed")
 
