@@ -452,7 +452,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
         nonessential_color = "#d9252e"
         codingdna_color = '#29a7e6'
         textcolor = "#000000"
-        textsize = 20
+        textsize = 14
 
 
         feature_middle_pos_list = []
