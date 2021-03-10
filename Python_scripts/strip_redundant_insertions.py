@@ -17,7 +17,7 @@ from chromosome_names_in_files import chromosome_name_bedfile, chromosome_name_w
 
 
 
-def strip_redundant_ins(filepath=None):
+def strip_redundant_ins(filepath=None, custom_header=None):
     '''
     This code reads a .bed or .wig file and removed any insertions that were mapped outside a chromosome.
     For this, it creates a new file with the same name as the inputfile with the extension _clean.bed or _clean.wig, respectively.
@@ -53,7 +53,12 @@ def strip_redundant_ins(filepath=None):
 
 
         with open(filepath_splitext[0]+"_clean.bed", "w") as w:
-            w.write(lines[0])
+            #write header
+            if custom_header == None:
+                w.write(lines[0])
+            else:
+                w.write("track name=" + str(custom_header) + " useScore=1\n")
+
             for chrom in num_roman:
                 print("evaluating chromosome %s" % chrom)
 
@@ -85,7 +90,11 @@ def strip_redundant_ins(filepath=None):
             lines = f.readlines()
 
         with open(filepath_splitext[0]+"_clean.wig", "w") as w:
-            w.write(lines[0].replace(',',''))
+            #write header
+            if custom_header == None:
+                w.write(lines[0].replace(',',''))
+            else:
+                w.write("track type=wiggle_0 maxheightPixels=60 name=" + str(custom_header) + "\n")
 
             for chrom in num_roman:
                 print("evaluating chromosome %s" % chrom)
@@ -118,6 +127,7 @@ def strip_redundant_ins(filepath=None):
 
 #%%
 if __name__ == '__main__':
-    # strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig")
-    strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.bed")
+    custom_header = "leila_wt_techrep_ab"
+    # strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig", custom_header=custom_header)
+    strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.bed", custom_header=custom_header)
 
