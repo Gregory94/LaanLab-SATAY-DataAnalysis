@@ -38,7 +38,7 @@
 - [Outlook](#outlook)
 - [How to use the Linux desktop](#how-to-use-the-linux-desktop)
 - [Appendices](#appendices)
-  - [PHRED tables (base33)](#phred-tables-base33)
+  - [PHRED table (base33)](#phred-table-base33)
   - [PHRED table (base64)](#phred-table-base64)
 
 This documentation gives a complete overview for the processing of the data from SAturated Transposon Analysis in Yeast (SATAY).
@@ -59,7 +59,7 @@ More information about satay analysis and experimental protocols can be found at
 ## File types
 
 During the processing, different file types are being used and created.
-This section gives an overview of all files that are being used during processing, how to implement and when to use them.
+This section gives an overview of all those files, how to implement them and when to use which file.
 
 ### fastq
 
@@ -67,17 +67,17 @@ This is the standard output format for sequencing data.
 It contains all (raw) sequencing reads in random order including a quality string per basepair.
 Each read has four lines:
 
-1. Header: This contains some basic information from the sequencing machine and a unique identifier number.
-2. Sequence: This is the actual nucleotide sequence.
-3. Dummy: This is typically a '+' and is there to separate the sequence line from the quality line.
-4. Quality score: This indicates the quality of each basepair in the sequence line (each symbol in this line belongs the nucleotide at the same position in the sequence line). The sequence and this quality line should always have the same length. The quality score is given in terms of phred scores (see below).
+1. Header: Contains some basic information from the sequencing machine and a unique identifier number.
+2. Sequence: The actual nucleotide sequence.
+3. Dummy: Typically a '+' and is there to separate the sequence line from the quality line.
+4. Quality score: Indicates the quality of each basepair in the sequence line (each symbol in this line belongs to the nucleotide at the same position in the sequence line). The sequence and this quality line should always have the same length.
 
-The quality line is typically given as a phred score.
+The quality line is given as a phred score.
 There are two versions, base33 and base64, but the base64 is outdated and hardly used anymore.
-In both versions the quality score is determined by Q = -10*log10(P) where P is the error probability (0 < P < 1).
+In both versions the quality score is determined by Q = -10*log10(P) where P is the error probability determined during sequencing (0 < P < 1).
 A Q-score of 0 (i.e. an error probability of P=1) is defined by ascii symbol 33 ('!') for base33 and by ascii symbol 64 ('@') for base64.
 A Q-score of 1 (p=0.79) is then given by ascii 34 (' " ') (for base33) etcetera.
-For a full table of ascii symbols and probability scores, see the appedices of this document [PHRED tables (base33)](#phred-tables-base33) and [PHRED tables (base64)](#phred-tables-base64).
+For a full table of ascii symbols and probability scores, see the appendices of this document [PHRED table (base33)](#phred-tables-base33) and [PHRED table (base64)](#phred-tables-base64).
 
 The nucleotide sequence typically only contains the four nucleotide letters (A, T, C and G), but when a nucleotide was not accurately determined (i.e. having a error probability higher than a certain threshold), the nucleotide is sometimes converted to the letter N, indicating that this nucleotide was not successfully sequenced.
 
@@ -298,7 +298,7 @@ command line
 
 ## Appendices
 
-### PHRED tables (base33)
+### PHRED table (base33)
 
 | ASCII symbol | ASCII value | Q  | P\_err   |
 | ------------ | ----------- | -- | -------- |
