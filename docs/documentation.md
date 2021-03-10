@@ -77,7 +77,7 @@ There are two versions, base33 and base64, but the base64 is outdated and hardly
 In both versions the quality score is determined by Q = -10*log10(P) where P is the error probability determined during sequencing (0 < P < 1).
 A Q-score of 0 (i.e. an error probability of P=1) is defined by ascii symbol 33 ('!') for base33 and by ascii symbol 64 ('@') for base64.
 A Q-score of 1 (p=0.79) is then given by ascii 34 (' " ') (for base33) etcetera.
-For a full table of ascii symbols and probability scores, see the appendices of this document [PHRED table (base33)](#phred-tables-base33) and [PHRED table (base64)](#phred-tables-base64).
+For a full table of ascii symbols and probability scores, see the appendices of this document [PHRED table (base33)](#phred-table-base33) and [PHRED table (base64)](#phred-table-base64).
 
 The nucleotide sequence typically only contains the four nucleotide letters (A, T, C and G), but when a nucleotide was not accurately determined (i.e. having a error probability higher than a certain threshold), the nucleotide is sometimes converted to the letter N, indicating that this nucleotide was not successfully sequenced.
 
