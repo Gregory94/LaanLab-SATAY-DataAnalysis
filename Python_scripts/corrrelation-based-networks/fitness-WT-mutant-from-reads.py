@@ -16,10 +16,10 @@ import matplotlib.pyplot as plt
 
 
 # %% Importing information per gene 
-gene_info=pd.read_excel(r'chromosomal-info-per-gene.xlsx')
+# gene_info=pd.read_excel(r'chromosomal-info-per-gene.xlsx')
 
 # %% Importing all annoatetd interactions from SGD
-data_all_interactors=pd.read_excel(r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\Calculations\data_sgd\interaction-filtered-data.xlsx',header=0)
+# data_all_interactors=pd.read_excel(r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\Calculations\data_sgd\interaction-filtered-data.xlsx',header=0)
 
 # %% Reading the  reads and insertions from WT and the mutant 
 import os
@@ -107,7 +107,7 @@ axes[1].set_title('mutant')
 
 
 # %% evaluating the fitness score in the dpl1 mutant
-interactions_dpl1=fitness2score(gene_ref=['DPL1'],gene_to_know=gene_info['gene-standard-name'],feature='fitness-HO',data_wt=data_WT_normalized,data_mutant_ref=data_mutant_normalized)
+# interactions_dpl1=fitness2score(gene_ref=['DPL1'],gene_to_know=gene_info['gene-standard-name'],feature='fitness-HO',data_wt=data_WT_normalized,data_mutant_ref=data_mutant_normalized)
 
 
 # %% Converting the dict into a dataframe 
