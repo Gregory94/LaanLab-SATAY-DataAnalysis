@@ -162,7 +162,35 @@ When a sam file is needed, it can always be recreated from the bam file, for exa
 
 ### bed
 
-Explain using _clean.bed
+A bed file is one of the outputs from the transposonmapping pipeline.
+It a standard format for storing read insertion locations and the corresponding number of reads.
+The file consists of a single header, typically something similar to `track name=[file_name] usescore=1`.
+Then every row corresponds to one insertion and has (in case of the satay analysis) the following space delimited columns:
+
+1. chromosome (e.g. `chrI` or `chrref|NC_001133|`)
+2. start position of insertion
+3. end position of insertion (in case of satay-analysis, this is always start position + 1)
+4. dummy column (this information is not present for satay analysis, but must be there to satisfy the bed format)
+5. number of reads at that insertion location
+
+In case of processing with `transposonmapping.py` (final step in processing pipeline), the number of reasd are given according to `(reads*20)+100`, meaning that 2 reads are stored as 140.
+
+The bed file can be used for many downstream analysis tools, for example [genome_browser](http://genome-euro.ucsc.edu/index.html).
+
+Sometimes it might occur that insertions are stored outside the chromosome (i.e. the insertion position is larger than the length of that chromosome).
+Also, reference genomes sometimes do not have the different chromosomes stored as roman numerals like `chrI`, `chrII`, etc. but rather use different names.
+These things can confuse some analysis tools, for example the [genome_browser](http://genome-euro.ucsc.edu/index.html).
+To solve this, the python function [strip_redundant_insertions.py](#strip_redundant_insertionspy) is created.
+This creates a _clean.bed file where the insertions outside the chromosome are removed and all the chromosome names are stored with their roman numerals.
+See [strip_redundant_insertions.py](#strip_redundant_insertionspy) for more information.
+
+Example bed file:
+
+> `track name=leila_wt_techrep_ab useScore=1`  
+> `chrI 86 87 . 140`  
+> `chrI 89 90 . 140`  
+> `chrI 100 101 . 3820`  
+> `chrI 111 112 . 9480`
 
 ### wig
 
