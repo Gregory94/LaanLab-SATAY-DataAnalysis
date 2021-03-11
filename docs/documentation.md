@@ -4,8 +4,8 @@
 - [File types](#file-types)
   - [fastq](#fastq)
   - [sam & bam](#sam--bam)
-  - [wig](#wig)
   - [bed](#bed)
+  - [wig](#wig)
   - [pergene.txt & peressential.txt](#pergenetxt--peressentialtxt)
   - [pergene_insertions.txt & peressential_insertions.txt](#pergene_insertionstxt--peressential_insertionstxt)
 - [Software - Processing](#software---processing)
@@ -32,6 +32,7 @@
     - [mapped_reads.py](#mapped_readspy)
     - [read_sgdfeatures.py](#read_sgdfeaturespy)
     - [statistics_perchromosome.py](#statistics_perchromosomepy)
+    - [samflag.py](#samflagpy)
   - [Other tools](#other-tools)
     - [IGV](#igv)
     - [genome browser](#genome-browser)
@@ -85,7 +86,7 @@ Fastq files tend to be large in size (depending on how many reads are sequenced,
 Therefore these files are typically compressed in gzip format (.fastq.gz).
 The pipeline can handle gzipped files by itself, so there is no need to convert it manually.
 
-Example:
+Example fastq file:
 
 > `@NB501605:544:HLHLMBGXF:1:11101:9938:1050 1:N:0:TGCAGCTA`  
 > `TGTCAACGGTTTAGTGTTTTCTTACCCAATTGTAGAGACTATCCACAAGGACAATATTTGTGACTTATGTTATGCG`  
@@ -103,26 +104,73 @@ Example:
 ### sam & bam
 
 When the reads are aligned to a reference genome, the resulting file is a Sequence Alignment Mapping (sam) file.
-Every read is one line in the file and consists of at least 11 different fields in the same order:
-1. QNAME
-2. FLAG
-3. RNAME
+Every read is one line in the file and consists of at least 11 tab delimited fields in the same order:
+
+1. Name of the read. This is unique for each read, but occur multiple times in the file when a read is split up over multiple alignments at different locations.
+2. Flag indicating properties of the read about how it was mapped. (See below for more information).
+3. Chromosome name to which read was mapped.
+4. Leftmost position in the chromosome to which the read was mapped.
+5. Mapping quality in terms of Q-score as explained in the section [fastq](#fastq).
+6. CIGAR string describing which nucleotides were mapped, where insertions and deletions are and where mismatches occurs. For example, `43M1I10M3D18M` means that the first 43 nucleotides match with the reference genome, the next 1 nucleotide exists in the read but not in the reference genome (insertion), then 10 matches, then 3 nucleotides that do not exist in the read but do exist in the reference genome (deletions) and finally 18 matches. For more information see [this website](https://www.drive5.com/usearch/manual/cigar.html).
+7. Reference name of the mate read (when using paired end datafiles). If no mate was mapped (e.g. in case of single end data or if it was not possible to map the mate read) this is typically set to `*`.
+8. Position of the mate read. If no mate was mapped this is typically set to `0`.
+9. Template length. Length of a group (i.e. mate reads or reads that are split up over multiple alignments) from the left most base position to the right most base position.
+10. Nucleotide sequence.
+11. Phred score of the sequence (see [fastq](#fastq) section).
 
 Depending on the software, the sam file typically starts with a few header lines containing information regarding the alignment.
 For example for BWA MEM (which is used in the pipeline), the sam file start with `@SQ` lines that shows information about the names for the different chromosome and the length of the chromosomes and `@PG` shows the options regarding the alignment software.
 Note that these lines might be different when using different alignment software.
+Also, there is a whole list of optional fields that can be added.
+For more information, see for example [wikipedia](https://en.wikipedia.org/wiki/SAM_(file_format)).
 
-Example:
+The flag in the sam files is way of representing a list of properties as a single integer.
+There is a defined list of properties in a fixed order:
 
->`NB501605:544:HLHLMBGXF:1:11101:25386:1198     2064    ref|NC_001136|  362539  0       42H34M  *       0       0       GATCACTTCTTACGCTGGGTATATGAGTCGTAAT      EEEAEEEEEEAEEEAEEAEEEEEEEEEEEAAAAA      NM:i:0  MD:Z:34 AS:i:34 XS:i:0  SA:Z:ref|NC_001144|,461555,+,30S46M,0,0;`  
->`NB501605:544:HLHLMBGXF:1:11101:20462:1198       16      ref|NC_001137|  576415  0       75M     *       0       0       CTGTACATGCTGATGGTAGCGGTTCACAAAGAGCTGGATAGTGATGATGTTCCAGACGGTAGATTTGATATATTA     EEEAEEEEEEEEEEEEEAEEAE/EEEEEEEEEEEAEEEEEE/EEEEEAEAEEEEEEEEEEEEEEEEEEEEAAAAA     NM:i:1  MD:Z:41C33      AS:i:41 XS:i:41`  
+1. read paired
+2. read mapped in proper pair
+3. read unmapped
+4. mate unmapped
+5. read reverse strand
+6. mate reverse strand
+7. first in pair
+8. second in pair
+9. not primary alignment
+10. read fails platform/vendor quality checks
+11. read is PCR or optical duplicate
+12. supplementary alignment
+
+To create the flag integer, a 12-bit binary number is created with zeros for the properties that does not hold a read and ones for those that are true for that read.
+Note the binary number should be read from right to left.
+This 12-bit binary number is than converted to an integer.
+For example, FLAG=81 corresponds to 12-bit binary 000001010001 which indicates the properties: 'read paired', 'read reverse strand' and 'first in pair'.
+Deconding of sam flags can be done using [this website](http://broadinstitute.github.io/picard/explain-flags.html) or using [samflag.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/python_modules/samflag.py "LaanLab-SATAY_DataAnalysis.samflag.py").
+
+Example sam file (note that the last read was not mapped):
+
+>`NB501605:544:HLHLMBGXF:1:11101:25386:1198     2064    ref|NC_001136|  362539  0       42H34M  *       0       0       GATCACTTCTTACGCTGGGTATATGAGTCGTAAT      EEEAEEEEEEAEEEAEEAEEEEEEEEEEEAAAAA      NM:i:0  MD:Z:34 AS:i:34 XS:i:0  SA:Z:ref|NC_001144|,461555,+,30S46M,0,0;`
+>
+>`NB501605:544:HLHLMBGXF:1:11101:20462:1198       16      ref|NC_001137|  576415  0       75M     *       0       0       CTGTACATGCTGATGGTAGCGGTTCACAAAGAGCTGGATAGTGATGATGTTCCAGACGGTAGATTTGATATATTA     EEEAEEEEEEEEEEEEEAEEAE/EEEEEEEEEEEAEEEEEE/EEEEEAEAEEEEEEEEEEEEEEEEEEEEAAAAA     NM:i:1  MD:Z:41C33      AS:i:41 XS:i:41`
+>
 >`NB501605:544:HLHLMBGXF:1:11101:15826:1199       4       *       0       0       *       *       0       0       ACAATATTTGTGACTTATGTTATGCG      EEEEEEEEEEE6EEEEEEEEEEEEEE      AS:i:0  XS:i:0`
 
-### wig
+Sam files tend to be large in size (tens of Gb is normal).
+Therefore the sam files are typically stored as compressed binary files called bam files.
+Almost all downstream analysis tools that need the alignment information accept bam files as input.
+Therefore the sam files are mostly deleted after the bam file is created.
+When a sam file is needed, it can always be recreated from the bam file, for example using `samtools` using the command `samtools view -h -o out.sam in.bam`.
 
 ### bed
 
+Explain using _clean.bed
+
+### wig
+
+Explain using _clean.wig
+
 ### pergene.txt & peressential.txt
+
+different gene names and aliases
 
 ### pergene_insertions.txt & peressential_insertions.txt
 
@@ -295,6 +343,8 @@ Difference in VariableStep in variablestep
 #### read_sgdfeatures.py
 
 #### statistics_perchromosome.py
+
+#### samflag.py
 
 ### Other tools
 
