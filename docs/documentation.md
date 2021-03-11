@@ -104,14 +104,14 @@ Example fastq file:
 ### sam & bam
 
 When the reads are aligned to a reference genome, the resulting file is a Sequence Alignment Mapping (sam) file.
-Every read is one line in the file and consists of at least 11 tab delimited fields in the same order:
+Every read is one line in the file and consists of at least 11 tab delimited fields that are always in the same order:
 
-1. Name of the read. This is unique for each read, but occur multiple times in the file when a read is split up over multiple alignments at different locations.
-2. Flag indicating properties of the read about how it was mapped. (See below for more information).
-3. Chromosome name to which read was mapped.
+1. Name of the read. This is unique for each read, but can occur multiple times in the file when a read is split up over multiple alignments at different locations.
+2. Flag. Indicating properties of the read about how it was mapped (see below for more information).
+3. Chromosome name to which the read was mapped.
 4. Leftmost position in the chromosome to which the read was mapped.
-5. Mapping quality in terms of Q-score as explained in the section [fastq](#fastq).
-6. CIGAR string describing which nucleotides were mapped, where insertions and deletions are and where mismatches occurs. For example, `43M1I10M3D18M` means that the first 43 nucleotides match with the reference genome, the next 1 nucleotide exists in the read but not in the reference genome (insertion), then 10 matches, then 3 nucleotides that do not exist in the read but do exist in the reference genome (deletions) and finally 18 matches. For more information see [this website](https://www.drive5.com/usearch/manual/cigar.html).
+5. Mapping quality in terms of Q-score as explained in the [fastq](#fastq) section.
+6. CIGAR string. Describing which nucleotides were mapped, where insertions and deletions are and where mismatches occurs. For example, `43M1I10M3D18M` means that the first 43 nucleotides match with the reference genome, the next 1 nucleotide exists in the read but not in the reference genome (insertion), then 10 matches, then 3 nucleotides that do not exist in the read but do exist in the reference genome (deletions) and finally 18 matches. For more information see [this website](https://www.drive5.com/usearch/manual/cigar.html).
 7. Reference name of the mate read (when using paired end datafiles). If no mate was mapped (e.g. in case of single end data or if it was not possible to map the mate read) this is typically set to `*`.
 8. Position of the mate read. If no mate was mapped this is typically set to `0`.
 9. Template length. Length of a group (i.e. mate reads or reads that are split up over multiple alignments) from the left most base position to the right most base position.
@@ -119,12 +119,12 @@ Every read is one line in the file and consists of at least 11 tab delimited fie
 11. Phred score of the sequence (see [fastq](#fastq) section).
 
 Depending on the software, the sam file typically starts with a few header lines containing information regarding the alignment.
-For example for BWA MEM (which is used in the pipeline), the sam file start with `@SQ` lines that shows information about the names for the different chromosome and the length of the chromosomes and `@PG` shows the options regarding the alignment software.
-Note that these lines might be different when using different alignment software.
-Also, there is a whole list of optional fields that can be added.
-For more information, see for example [wikipedia](https://en.wikipedia.org/wiki/SAM_(file_format)).
+For example for BWA MEM (which is used in the pipeline), the sam file start with `@SQ` lines that shows information about the names and lengths for the different chromosome and `@PG` shows the user options that were set regarding the alignment software.
+Note that these lines might be different when using a different alignment software.
+Also, there is a whole list of optional fields that can be added to each read after the first 11 required fields.
+For more information, see [wikipedia](https://en.wikipedia.org/wiki/SAM_(file_format)).
 
-The flag in the sam files is way of representing a list of properties as a single integer.
+The flag in the sam files is a way of representing a list of properties for a read as a single integer.
 There is a defined list of properties in a fixed order:
 
 1. read paired
@@ -140,11 +140,11 @@ There is a defined list of properties in a fixed order:
 11. read is PCR or optical duplicate
 12. supplementary alignment
 
-To create the flag integer, a 12-bit binary number is created with zeros for the properties that does not hold a read and ones for those that are true for that read.
-Note the binary number should be read from right to left.
-This 12-bit binary number is than converted to an integer.
-For example, FLAG=81 corresponds to 12-bit binary 000001010001 which indicates the properties: 'read paired', 'read reverse strand' and 'first in pair'.
-Deconding of sam flags can be done using [this website](http://broadinstitute.github.io/picard/explain-flags.html) or using [samflag.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/python_modules/samflag.py "LaanLab-SATAY_DataAnalysis.samflag.py").
+To determine the flag integer, a 12-bit binary number is created with zeros for the properties that are not true for a read and ones for those properties that are true for that read.
+This 12-bit binary number is then converted to a decimal integer.
+Note that the binary number should be read from right to left.
+For example, FLAG=81 corresponds to the 12-bit binary 000001010001 which indicates the properties: 'read paired', 'read reverse strand' and 'first in pair'.
+Decoding of sam flags can be done using [this website](http://broadinstitute.github.io/picard/explain-flags.html) or using [samflag.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/python_modules/samflag.py "LaanLab-SATAY_DataAnalysis.samflag.py").
 
 Example sam file (note that the last read was not mapped):
 
@@ -162,10 +162,10 @@ When a sam file is needed, it can always be recreated from the bam file, for exa
 
 ### bed
 
-A bed file is one of the outputs from the transposonmapping pipeline.
-It a standard format for storing read insertion locations and the corresponding number of reads.
-The file consists of a single header, typically something similar to `track name=[file_name] usescore=1`.
-Then every row corresponds to one insertion and has (in case of the satay analysis) the following space delimited columns:
+A bed file is one of the outputs from the transposon mapping pipeline.
+It is a standard format for storing read insertion locations and the corresponding read counts.
+The file consists of a single header, typically something similar to `track name=[file_name] userscore=1`.
+Every row corresponds to one insertion and has (in case of the satay analysis) the following space delimited columns:
 
 1. chromosome (e.g. `chrI` or `chrref|NC_001133|`)
 2. start position of insertion
@@ -173,12 +173,12 @@ Then every row corresponds to one insertion and has (in case of the satay analys
 4. dummy column (this information is not present for satay analysis, but must be there to satisfy the bed format)
 5. number of reads at that insertion location
 
-In case of processing with `transposonmapping.py` (final step in processing pipeline), the number of reasd are given according to `(reads*20)+100`, meaning that 2 reads are stored as 140.
+In case of processing with `transposonmapping.py` (final step in processing pipeline) or [the matlab code from the kornmann-lab](https://sites.google.com/site/satayusers/complete-protocol/bioinformatics-analysis/matlab-script), the number of reads are given according to `(reads*20)+100`, for example 2 reads are stored as 140.
 
 The bed file can be used for many downstream analysis tools, for example [genome_browser](http://genome-euro.ucsc.edu/index.html).
 
-Sometimes it might occur that insertions are stored outside the chromosome (i.e. the insertion position is larger than the length of that chromosome).
-Also, reference genomes sometimes do not have the different chromosomes stored as roman numerals like `chrI`, `chrII`, etc. but rather use different names.
+Sometimes it might occur that insertions are stored outside the chromosome (i.e. the insertion position is bigger than the length of that chromosome).
+Also, reference genomes sometimes do not have the different chromosomes stored as roman numerals (for example `chrI`, `chrII`, etc.) but rather use different names.
 These things can confuse some analysis tools, for example the [genome_browser](http://genome-euro.ucsc.edu/index.html).
 To solve this, the python function [strip_redundant_insertions.py](#strip_redundant_insertionspy) is created.
 This creates a _clean.bed file where the insertions outside the chromosome are removed and all the chromosome names are stored with their roman numerals.
@@ -194,7 +194,33 @@ Example bed file:
 
 ### wig
 
-Explain using _clean.wig
+A wiggle (wig) file is another output from the transposon mapping pipeline.
+It stores similar information as the bed file, but in a different format.
+This file has a header typically in the form of `track type=wiggle_0 maxheightPixels=60 name=[file_name]`.
+Each chromosome starts with the line `variablestep chrom=chr[chromosome]` where `[chromosome]` is replaced by a chromosome name, e.g. `I` or `ref|NC_001133|`.
+After a variablestep line, every row corresponds with an insertion in two space delimited columns:
+
+1. insertion position
+2. number of reads
+
+In the wig file, the read count represent the actual count.
+
+There is one difference between the bed and the wig file.
+In the bed file the insertions at the same position but have a different orientation are stored as individual insertions.
+In the wig file these insertions are represented as a single insertion and the corresponding read counts are added up.
+
+Similar to the bed file, also in the wig insertions might occur that have an insertion position that is bigger then the length of the chromosome.
+This can be solved with the [same python script](#strip_redundant_insertionspy) as the bed file.
+The insertions that have a position outside the chromosome are removed and the chromosome names are represented as a roman numeral.
+
+Example wig file:
+
+> `track type=wiggle_0 maxheightPixels=60 name=WT_merged-techrep-a_techrep-b_trimmed.sorted.bam`  
+> `variablestep chrom=chrI`  
+> `86 2`  
+> `89 2`  
+> `100 186`  
+> `111 469`
 
 ### pergene.txt & peressential.txt
 
