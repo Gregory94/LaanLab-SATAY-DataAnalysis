@@ -5,6 +5,10 @@ Created on Wed Mar 10 14:38:47 2021
 @author: gregoryvanbeek
 """
 import os
+from gene_names import gene_aliases
+
+gene_alias_dict = gene_aliases(r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\Data_Files\Yeast_Protein_Names.txt")[0]
+
 
 filepath_a = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_pergene.txt"
 filepath_greg = r"X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene.txt"
@@ -88,3 +92,35 @@ for gene in genes_in_b_not_in_a: # for the case of their analyses they sometimes
     
     
     k=k+1
+
+
+#check for aliases
+for index, gene in enumerate(genes_in_a_not_in_b):
+    alias_list = []
+    for keys, nums in gene_alias_dict.items():
+        if keys == gene or gene in nums:
+            alias_list = gene_alias_dict.get(keys)
+            alias_list.append(keys)
+            break
+
+    if not alias_list == []:
+        for alias in alias_list:
+            if alias in genes_in_b_not_in_a:
+                genes_in_b_not_in_a.remove(alias)
+                break
+
+# for index, gene in enumerate(genes_in_b_not_in_a):
+#     alias_list = []
+#     for keys, nums in gene_alias_dict.items():
+#         if keys == gene or gene in nums:
+#             alias_list = gene_alias_dict.get(keys)
+#             alias_list.append(keys)
+#             break
+
+#     if not alias_list == []:
+#         for alias in alias_list:
+#             if alias in genes_in_a_not_in_b:
+#                 genes_in_a_not_in_b.remove(alias)
+#                 break
+
+del (keys, nums, gene, alias_list, index, alias)
