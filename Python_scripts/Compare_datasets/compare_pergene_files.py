@@ -66,5 +66,18 @@ for index, gene in enumerate(genes_in_a_not_in_b):
                 genes_in_b_not_in_a.remove(alias)
                 break
 
+# for index, gene in enumerate(genes_in_b_not_in_a):
+#     alias_list = []
+#     for keys, nums in gene_alias_dict.items():
+#         if keys == gene or gene in nums:
+#             alias_list = gene_alias_dict.get(keys)
+#             alias_list.append(keys)
+#             break
 
-# del (keys, nums, gene, alias_list, index, alias)
+#     if not alias_list == []:
+#         for alias in alias_list:
+#             if alias in genes_in_a_not_in_b:
+#                 genes_in_a_not_in_b.remove(alias)
+#                 break
+
+del (keys, nums, gene, alias_list, index, alias)
