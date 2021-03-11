@@ -383,7 +383,7 @@ ATG26; UGT51                                                               YLR18
 ATG27; ETF1                                                                YJL178C             P46989     ATG27_YEAST S000003714   271     10
 ATG29                                                                      YPL166W             Q12092     ATG29_YEAST S000006087   213     16
 ATG2; APG2; AUT8; SPO72                                                    YNL242W             P53855     ATG2_YEAST  S000005186  1592     14
-ATG31; CIS1                                                                YDR022C             Q12421     ATG31_YEAST S000002429   196      4
+ATG31; CIS1; YLR346C                                                       YDR022C             Q12421     ATG31_YEAST S000002429   196      4
 ATG32; ECM17                                                               YIL146C             P40458     ATG32_YEAST S000001408   529 (3)  9
 ATG33                                                                      YLR356W             Q06485     ATG33_YEAST S000004348   197     12
 ATG34; ATG19-B                                                             YOL083W             Q12292     ATG34_YEAST S000005443   412 (3) 15
@@ -5698,7 +5698,7 @@ YER097W                                                                    YER09
 YER107W-A                                                                  YER107W-A           A0A023PXJ7 YE107_YEAST S000028755   106      5
 YER119C-A                                                                  YER119C-A           P87191     YE119_YEAST S000002961   123      5
 YER121W                                                                    YER121W             P40076     YEV1_YEAST  S000000923   114      5
-YER130C                                                                    YER130C             P39959     YEW0_YEAST  S000000932   443      5
+YER130C; COM2                                                              YER130C             P39959     YEW0_YEAST  S000000932   443      5
 YER133W-A                                                                  YER133W-A           A0A023PZC3 YE133_YEAST S000028756   113      5
 YER134C                                                                    YER134C             P40081     MGDP1_YEAST S000000936   178      5
 YER135C                                                                    YER135C             P40082     YEW5_YEAST  S000000937   130      5
@@ -5931,7 +5931,7 @@ YHR086W-A                                                                  YHR08
 YHR095W                                                                    YHR095W             P38808     YHP5_YEAST  S000001137   164      8
 YHR097C                                                                    YHR097C             P38809     YHP7_YEAST  S000001139   366      8
 YHR112C                                                                    YHR112C             P38716     YHR2_YEAST  S000001154   378      8
-YHR122W                                                                    YHR122W             P38829     YHS2_YEAST  S000001164   231      8
+YHR122W; CIA2                                                              YHR122W             P38829     YHS2_YEAST  S000001164   231      8
 YHR125W                                                                    YHR125W             P38831     YHS5_YEAST  S000001167   101      8
 YHR127W                                                                    YHR127W             P38833     YHS7_YEAST  S000001169   243      8
 YHR130C                                                                    YHR130C             P38834     YHT0_YEAST  S000001172   111      8
@@ -6148,7 +6148,7 @@ YKL083W                                                                    YKL08
 YKL091C                                                                    YKL091C             P33324     YKJ1_YEAST  S000001574   310 (3) 11
 YKL096C-B                                                                  YKL096C-B           Q8TGT2     YK096_YEAST S000028667    49     11
 YKL097C; YKL445                                                            YKL097C             P34245     YKJ7_YEAST  S000001580   136     11
-YKL100C; YKL450                                                            YKL100C             P34248     YKK0_YEAST  S000001583   587     11
+YKL100C; YKL450; YPF1                                                      YKL100C             P34248     YKK0_YEAST  S000001583   587     11
 YKL100W-A                                                                  YKL100W-A           P0C5P2     YK100_YEAST S000028840    29     11
 YKL102C; YKL454                                                            YKL102C             P34249     YKK2_YEAST  S000001585   101     11
 YKL106C-A                                                                  YKL106C-A           Q3E7A0     YK106_YEAST S000007616    39     11
@@ -6170,7 +6170,7 @@ YKL165C-A                                                                  YKL16
 YKL169C; YKL633                                                            YKL169C             P36050     YKQ9_YEAST  S000001652   127     11
 YKL177W                                                                    YKL177W             P34238     YKR7_YEAST  S000001660   112     11
 YKL183C-A                                                                  YKL183C-A           Q3E765     YK183_YEAST S000028558    70     11
-YKL187C                                                                    YKL187C             P34231     YKS7_YEAST  S000001670   750     11
+YKL187C; FAT3                                                                    YKL187C             P34231     YKS7_YEAST  S000001670   750     11
 YKL202W                                                                    YKL202W             P36042     YKU2_YEAST  S000001685   193     11
 YKL222C                                                                    YKL222C             P35995     YKW2_YEAST  S000001705   705     11
 YKL223W                                                                    YKL223W             P36031     YKW3_YEAST  S000001706   110     11
@@ -6315,7 +6315,7 @@ YLR402W; L8084.5                                                           YLR40
 YLR406C-A                                                                  YLR406C-A           Q8TGT1     YL406_YEAST S000028683    49     12
 YLR407W                                                                    YLR407W             Q06070     YL407_YEAST S000004399   228     12
 YLR412C-A                                                                  YLR412C-A           Q3E742     YL412_YEAST S000028572    68     12
-YLR413W                                                                    YLR413W             Q06689     YL413_YEAST S000004405   675     12
+YLR413W; INA1                                                              YLR413W             Q06689     YL413_YEAST S000004405   675     12
 YLR415C                                                                    YLR415C             O13578     YL415_YEAST S000004407   112     12
 YLR416C; L9931.9                                                           YLR416C             Q06695     YL416_YEAST S000004408   132     12
 YLR419W                                                                    YLR419W             Q06698     YL419_YEAST S000004411  1435     12
@@ -6324,7 +6324,7 @@ YLR434C                                                                    YLR43
 YLR437C-A                                                                  YLR437C-A           Q8TGR0     YL37A_YEAST S000028684    75     12
 YLR444C                                                                    YLR444C             O13560     YL444_YEAST S000004436   100     12
 YLR446W                                                                    YLR446W             Q06204     YL446_YEAST S000004438   433     12
-YLR455W                                                                    YLR455W             Q06188     YL455_YEAST S000004447   304     12
+YLR455W; PDP3                                                              YLR455W             Q06188     YL455_YEAST S000004447   304     12
 YLR456W                                                                    YLR456W             Q06199     YL456_YEAST S000004448   204     12
 YLR458W                                                                    YLR458W             A0A023PZK9 YL458_YEAST S000004450   126     12
 YLR460C; L9122.7                                                           YLR460C             P54007     YL460_YEAST S000004452   376     12
@@ -6394,7 +6394,7 @@ YMR114C; YM9718.13C                                                        YMR11
 YMR119W-A                                                                  YMR119W-A           A0A023PZL2 YM119_YEAST S000004726   124     13
 YMR122C; YM8564.04C                                                        YMR122C             Q03879     YM09_YEAST  S000004729   124     13
 YMR122W-A                                                                  YMR122W-A           Q3E842     YM122_YEAST S000007524    84     13
-YMR124W; YM8564.06                                                         YMR124W             P39523     YM11_YEAST  S000004731   943     13
+YMR124W; YM8564.06; EPO1                                                   YMR124W             P39523     YM11_YEAST  S000004731   943     13
 YMR130W; YM9553.06                                                         YMR130W             Q04223     YM14_YEAST  S000004737   302     13
 YMR135W-A                                                                  YMR135W-A           Q6B0X1     YM135_YEAST S000004743   177     13
 YMR141C; YM9375.10C                                                        YMR141C             P40211     YM21_YEAST  S000004749   102     13
@@ -6625,7 +6625,7 @@ YOR192C-C                                                                  YOR19
 YOR199W; O4821                                                             YOR199W             Q08604     YO199_YEAST S000005725   109     15
 YOR200W; O4824                                                             YOR200W             Q08620     YO200_YEAST S000005726   132     15
 YOR203W; O4833                                                             YOR203W             Q08621     YO201_YEAST S000005729   117     15
-YOR214C; YO50-4                                                            YOR214C             Q12282     YO214_YEAST S000005740   236     15
+YOR214C; YO50-4; SPR2                                                      YOR214C             Q12282     YO214_YEAST S000005740   236     15
 YOR218C; O5008; O5042; YOR50-8                                             YOR218C             Q12249     YO218_YEAST S000005744   139     15
 YOR225W; O5015; O5073; YOR50-15                                            YOR225W             Q12225     YO225_YEAST S000005751   109     15
 YOR231C-A                                                                  YOR231C-A           Q8TGL2     YO231_YEAST S000028716    66     15
@@ -6642,7 +6642,7 @@ YOR293C-A                                                                  YOR29
 YOR296W                                                                    YOR296W             Q08748     YO296_YEAST S000005822  1289     15
 YOR300W; O5639                                                             YOR300W             Q08756     YO300_YEAST S000005826   102     15
 YOR302W                                                                    YOR302W             P08521     AAP_YEAST   S000005828    25     15
-YOR304C-A                                                                  YOR304C-A           O14468     YO304_YEAST S000005830    76     15
+YOR304C-A; BIL1                                                            YOR304C-A           O14468     YO304_YEAST S000005830    76     15
 YOR309C; 06105                                                             YOR309C             Q12444     YO309_YEAST S000005836   126     15
 YOR314W-A                                                                  YOR314W-A           P0C5R0     YO14A_YEAST S000007629    36     15
 YOR314W; 06123                                                             YOR314W             Q12506     YO314_YEAST S000005841   109     15
@@ -6657,7 +6657,7 @@ YOR338W; O6265                                                             YOR33
 YOR342C; O6283                                                             YOR342C             Q12182     YO342_YEAST S000005869   319     15
 YOR343C; O6287                                                             YOR343C             Q12484     YO343_YEAST S000005870   108     15
 YOR345C; O6336                                                             YOR345C             Q08811     YO345_YEAST S000005872   116     15
-YOR352W                                                                    YOR352W             Q08816     YO352_YEAST S000005879   343     15
+YOR352W; TFB6                                                              YOR352W             Q08816     YO352_YEAST S000005879   343     15
 YOR364W; O6658                                                             YOR364W             Q08842     YO364_YEAST S000005891   122     15
 YOR365C                                                                    YOR365C             Q08844     YO365_YEAST S000005892   703     15
 YOR366W; O6664                                                             YOR366W             Q08872     YO366_YEAST S000005893   117     15
@@ -6716,7 +6716,7 @@ YPL251W; P1010                                                             YPL25
 YPL257W                                                                    YPL257W             Q08974     YP257_YEAST S000006178   193     16
 YPL261C; P0386                                                             YPL261C             Q08976     YP261_YEAST S000006182   102     16
 YPL264C                                                                    YPL264C             Q08980     YP264_YEAST S000006185   353     16
-YPL272C                                                                    YPL272C             Q08984     YP272_YEAST S000006193   517     16
+YPL272C; PBI1                                                              YPL272C             Q08984     YP272_YEAST S000006193   517     16
 YPL276W; P0323                                                             YPL276W             P0CF36     YP276_YEAST S000006197   145     16
 YPL277C                                                                    YPL277C             Q08989     YP277_YEAST S000006198   487     16
 YPL278C                                                                    YPL278C             Q08990     YP278_YEAST S000006199   100     16
