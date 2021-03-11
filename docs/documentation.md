@@ -203,10 +203,10 @@ After a variablestep line, every row corresponds with an insertion in two space 
 1. insertion position
 2. number of reads
 
-In the wig file, the read count represent the actual count.
+In the wig file, the read count represent the actual count (unlike the bed file).
 
 There is one difference between the bed and the wig file.
-In the bed file the insertions at the same position but have a different orientation are stored as individual insertions.
+In the bed file the insertions at the same position but with a different orientation are stored as individual insertions.
 In the wig file these insertions are represented as a single insertion and the corresponding read counts are added up.
 
 Similar to the bed file, also in the wig insertions might occur that have an insertion position that is bigger then the length of the chromosome.
@@ -224,9 +224,59 @@ Example wig file:
 
 ### pergene.txt & peressential.txt
 
-different gene names and aliases
+A pergene.txt and peressential.txt file are yet another outputs from the transposon mapping pipeline.
+Where bed and wig files store all insertions throughout the genome, these files only store the insertions in each gene or each essential gene, respectively.
+Essential genes are the annotated essential genes as stated by SGD for wild type cells.
+The genes are taken from the [Yeast_Protein_Names.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Yeast_Protein_Names.txt) file, which is downloaded from [uniprot](https://www.uniprot.org/docs/yeast).
+The positions of each gene are determined by a [gff3 file](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Saccharomyces_cerevisiae.R64-1-1.99.gff3) downloaded from SGD.
+Essential genes are defined in [Cerevisiae_AllEssentialGenes.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Cerevisiae_AllEssentialGenes_List.txt).
+
+The pergene.txt and the peressential.txt have the same format.
+This consists of a header and then each row contains three tab delimited columns:
+
+1. gene name
+2. total number of insertions within the gene
+3. sum of all reads of those insertions
+
+The reads are the actual read counts.
+
+Note that when comparing files that include gene names there might be differences in the gene naming.
+Genes have multiple names, e.g. systematic names like 'YBR200W' or standard names like 'BEM1' which can have aliases such as 'SRO1'.
+The above three names all refer to the same gene.
+The [Yeast_Protein_Names.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Yeast_Protein_Names.txt) file can be used to search for aliases when comparing gene names in different files, or the [genomicfeatures_dataframe.py](#genomicfeatures_dataframepy) python script can be used which creates a pandas dataframe that includes the different gene names.
+
+Example of pergene.txt file:
+
+> `Gene name Number of transposons per gene Number of reads per gene`  
+> `YAL069W 34 1819`  
+> `YAL068W-A 10 599`  
+> `PAU8 26 1133`  
+> `YAL067W-A 12 319`
 
 ### pergene_insertions.txt & peressential_insertions.txt
+
+The final two files that are created by the tranposon mapping pipeline are the pergene_insertions.txt and the peressential_insertions.txt.
+The files have a similar format as the pergene.txt file, but is more extensive about the information per gene.
+The information is taken from [Yeast_Protein_Names.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Yeast_Protein_Names.txt), the [gff3 file](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Saccharomyces_cerevisiae.R64-1-1.99.gff3) and [Cerevisiae_AllEssentialGenes.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Cerevisiae_AllEssentialGenes_List.txt), similar as the pergene.txt files.
+
+Both the pergene_insertions.txt and the peressential_insertions.txt files has a header and then each row contains six tab delimited columns:
+
+1. gene name
+2. chromosome where the gene is located
+3. start position of the gene
+4. end position of the gene
+5. list of all insertions
+6. list of all read counts in the same order as the insertion list
+
+This file can be useful when not only the number of insertions are important, but also the distibution of the insertions within the genes.
+
+Example of pergene_insertions.txt file:
+
+> `Essential gene name chromosome Start location End location Insertion locations Reads per insertion location`  
+> `EFB1 I 142174 143160 [142325, 142886] [1, 1]`  
+> `MAK16 I 100225 101145 100229, 100407, 100422, 100791, 101022, 101129] [4, 1, 5, 1, 1, 1]`  
+> `PRE7 II 141247 141972 [141262, 141736, 141742, 141895] [1, 1, 1, 1]`  
+> `RPL32 II 45978 46370 [46011, 46142, 46240] [1, 3, 1]`
 
 ## Software - Processing
 
