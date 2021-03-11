@@ -597,17 +597,18 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 if __name__ == '__main__':
     chrom=['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']
+    dna_df2=[]
     for chrom in chrom:
-        dna_df2 = dna_features(region = chrom,#['xiii', 0, 14790],
-                               wig_file=r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_dnrp1\leila_dataset_dnrp1_processing\dnrp1_merged_dnrp1-1_dnrp1-2_processing\align_out\dnrp1_merged_dnrp1-1_dnrp1-2_trimmed.sorted.bam_clean.wig',
-                               pergene_insertions_file =r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_dnrp1\leila_dataset_dnrp1_processing\dnrp1_merged_dnrp1-1_dnrp1-2_processing\align_out\dnrp1_merged_dnrp1-1_dnrp1-2_trimmed.sorted.bam_pergene_insertions.txt'
+        dna_df2.append(dna_features(region = chrom,#['xiii', 0, 14790],
+                               wig_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig',
+                               pergene_insertions_file =r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt'
     ,variable="reads", #for plotting
-                     plotting=True,
-                     savefigure=True,
-                     verbose=True)
+                     plotting=False,
+                     savefigure=False,
+                     verbose=True))
         
-        dna_df2.to_excel(r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\Processed-data\WT-dnrp1-sequencing-analysis-plots\detailed-analysis\data_df2_'+chrom+'.xlsx')
-
+        #dna_df2.to_excel(r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\Processed-data\WT-dnrp1-sequencing-analysis-plots\detailed-analysis\data_df2_'+chrom+'.xlsx')
+    data_genome=pd.concat(dna_df2, axis=0)
 #
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
 #        dna_df2 = dna_features(region = chrom,

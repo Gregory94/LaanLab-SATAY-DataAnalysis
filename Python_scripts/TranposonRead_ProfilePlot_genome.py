@@ -286,8 +286,8 @@ def read_profile(wig_file=None, bar_width=None):
         right=False,       # ticks along the top edge are off
         labelleft=False)   # labels along the bottom edge are off
 
-    plt.show()
-
+    #plt.show()
+    plt.savefig('reads-all-genome-mutant-merged.png', orientation='landscape', dpi=300)
 
 
     return(allreadscounts_list)
@@ -301,6 +301,6 @@ if __name__ == '__main__':
 
 #    read_profile(wig_file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample1\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim20210127\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig")
     wig_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig'
-
+    wig_file_mutant=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\dnrp1_merged_dnrp1-1_dnrp1-2_trimmed.sorted.bam_clean.wig'
     read_profile(wig_file=wig_file)
     #read_profile(wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig")
