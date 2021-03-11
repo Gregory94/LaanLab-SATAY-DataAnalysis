@@ -214,10 +214,11 @@ def read_profile(wig_file=None, bar_width=None):
 
     allreadscounts_list = np.zeros(l_genome)
     for line in lines[chrom_start_index_dict.get("I")-1:chrom_end_index_dict.get("XVI")]:
-        if line.startswith('VariableStep'):
+        if line.startswith('VariableStep') or line.startswith('variablestep'):
             current_chr = line.split(' ')[1].replace('chrom=chr','')
             current_chr_roman = [k for k, v in chrom_names_dict.items() if v == current_chr.strip('\n')][0]
-        elif not line.startswith('VariableStep'):
+        # elif not line.startswith('VariableStep'):
+        else:
             line = line.strip(' \n').split()
             allreadscounts_list[int(line[0])+summed_chr_length_dict.get(current_chr_roman)] = int(line[1]) #DEFINE CURRENT_CHR_LENGTH DEFINED IN ELIF STATEMENT
         # elif line.startswith('VariableStep'):
