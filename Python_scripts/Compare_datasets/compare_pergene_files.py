@@ -6,11 +6,11 @@ Created on Wed Mar 10 14:38:47 2021
 """
 import os
 
-filepath_a = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene.txt"
-filepath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\WT_pergene.txt"
+filepath_a = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_pergene.txt"
+filepath_greg = r"X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene.txt"
 
 assert os.path.isfile(filepath_a), "Filepath_a not found."
-assert os.path.isfile(filepath_b), "Filepath_b not found."
+assert os.path.isfile(filepath_greg), "Filepath_b not found."
 
 genes_a = []
 with open(filepath_a, 'r') as a:
@@ -23,7 +23,7 @@ for line in lines:
 
 
 genes_b = []
-with open(filepath_b, 'r') as b:
+with open(filepath_greg, 'r') as b:
     lines = b.readlines()[1:]
 for line in lines:    
     if '\t' in line:
@@ -45,3 +45,13 @@ for gene in genes_b:
         genes_in_b_not_in_a.append(gene)
 
 del (gene)
+#%%
+from Python_scripts.python_modules.read_sgdfeatures import sgd_features
+from Python_scripts.python_modules.gene_names import  gene_aliases
+
+file_dirname = os.path.dirname(os.path.abspath('__file__'))
+sgd_features_file = os.path.join(file_dirname,'Python_scripts','Data_Files','SGD_features.tab')
+
+gene_information_file = os.path.join(file_dirname,'Python_scripts','Data_Files','Yeast_Protein_Names.txt')
+
+gene_alias_dict = gene_aliases(gene_information_file)[0]

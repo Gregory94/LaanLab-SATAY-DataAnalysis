@@ -26,7 +26,7 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
     '''
 
 
-#%%
+
     gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
     essential_genes_files = [os.path.join(file_dirname,'..','Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
                             os.path.join(file_dirname,'..','Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
@@ -164,7 +164,7 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
 
 
 
-#%%
+
 def read_profile(wig_file=None, bar_width=None):
 
     gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
@@ -299,7 +299,7 @@ if __name__ == '__main__':
 #    transposon_profile(bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
 
 #    read_profile(wig_file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample1\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim20210127\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig")
-    bed_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT.bed'
+    wig_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig'
 
-    read_profile(wig_file=bed_file)
+    read_profile(wig_file=wig_file)
     #read_profile(wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig")
