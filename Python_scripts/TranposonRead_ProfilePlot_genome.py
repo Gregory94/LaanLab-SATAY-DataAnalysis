@@ -214,10 +214,11 @@ def read_profile(wig_file=None, bar_width=None):
 
     allreadscounts_list = np.zeros(l_genome)
     for line in lines[chrom_start_index_dict.get("I")-1:chrom_end_index_dict.get("XVI")]:
-        if line.startswith('VariableStep'):
+        if line.startswith('VariableStep') or line.startswith('variablestep'):
             current_chr = line.split(' ')[1].replace('chrom=chr','')
             current_chr_roman = [k for k, v in chrom_names_dict.items() if v == current_chr.strip('\n')][0]
-        elif not line.startswith('VariableStep'):
+        # elif not line.startswith('VariableStep'):
+        else:
             line = line.strip(' \n').split()
             allreadscounts_list[int(line[0])+summed_chr_length_dict.get(current_chr_roman)] = int(line[1]) #DEFINE CURRENT_CHR_LENGTH DEFINED IN ELIF STATEMENT
         # elif line.startswith('VariableStep'):
@@ -299,5 +300,5 @@ if __name__ == '__main__':
 #    transposon_profile(bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
 
 #    read_profile(wig_file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample1\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim20210127\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig")
-    read_profile(wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig")
+    read_profile(wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig")
     # read_profile(wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig")
