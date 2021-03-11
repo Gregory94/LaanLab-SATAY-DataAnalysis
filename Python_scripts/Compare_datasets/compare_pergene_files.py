@@ -45,13 +45,46 @@ for gene in genes_b:
         genes_in_b_not_in_a.append(gene)
 
 del (gene)
-#%%
-from Python_scripts.python_modules.read_sgdfeatures import sgd_features
-from Python_scripts.python_modules.gene_names import  gene_aliases
+#%% Finding aliases genes between those datasets
+from read_sgdfeatures import sgd_features
+from gene_names import  gene_aliases
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-sgd_features_file = os.path.join(file_dirname,'Python_scripts','Data_Files','SGD_features.tab')
+sgd_features_file = os.path.join(file_dirname,'..','..','Data_Files','SGD_features.tab')
 
-gene_information_file = os.path.join(file_dirname,'Python_scripts','Data_Files','Yeast_Protein_Names.txt')
+gene_information_file = os.path.join(file_dirname,'..','..','Data_Files','Yeast_Protein_Names.txt')
 
-gene_alias_dict = gene_aliases(gene_information_file)[0]
+gene_alias_dict = gene_aliases(gene_information_file)[0] # it is only used systematic gene names
+feature_orf_dict = sgd_features(sgd_features_file)[1]
+
+same_genes_for_a=[]
+unique_genes_in_b_not_in_a=[]
+unique_genes_in_a_not_in_b=[]
+k=0
+for gene in genes_in_a_not_in_b: # for the case of their analyses they sometimes use systematic gene names 
+    
+    if gene.startswith('Y') and len(gene)>4: # looking for systematic gene annotation
+        if gene_alias_dict[gene][0] == genes_in_b_not_in_a[k]:
+            same_genes_for_a.append(genes_in_b_not_in_a[k])
+        else :
+            unique_genes_in_b_not_in_a.append(genes_in_b_not_in_a[k])
+            unique_genes_in_a_not_in_b.append(genes_in_a_not_in_b[k])
+    
+    
+    
+    k=k+1
+    
+k=0
+same_genes_for_b=[]
+for gene in genes_in_b_not_in_a: # for the case of their analyses they sometimes use systematic gene names 
+    
+    if gene.startswith('Y') and len(gene)>4: # looking for systematic gene annotation
+        if feature_orf_dict[gene][2] == genes_in_a_not_in_b[k] :
+            same_genes_for_b.append(genes_in_a_not_in_b[k])
+        else :
+            unique_genes_in_b_not_in_a.append(genes_in_b_not_in_a[k])
+            unique_genes_in_a_not_in_b.append(genes_in_a_not_in_b[k])
+    
+    
+    
+    k=k+1
