@@ -102,6 +102,22 @@ Example:
 
 ### sam & bam
 
+When the reads are aligned to a reference genome, the resulting file is a Sequence Alignment Mapping (sam) file.
+Every read is one line in the file and consists of at least 11 different fields in the same order:
+1. QNAME
+2. FLAG
+3. RNAME
+
+Depending on the software, the sam file typically starts with a few header lines containing information regarding the alignment.
+For example for BWA MEM (which is used in the pipeline), the sam file start with `@SQ` lines that shows information about the names for the different chromosome and the length of the chromosomes and `@PG` shows the options regarding the alignment software.
+Note that these lines might be different when using different alignment software.
+
+Example:
+
+>`NB501605:544:HLHLMBGXF:1:11101:25386:1198     2064    ref|NC_001136|  362539  0       42H34M  *       0       0       GATCACTTCTTACGCTGGGTATATGAGTCGTAAT      EEEAEEEEEEAEEEAEEAEEEEEEEEEEEAAAAA      NM:i:0  MD:Z:34 AS:i:34 XS:i:0  SA:Z:ref|NC_001144|,461555,+,30S46M,0,0;`  
+>`NB501605:544:HLHLMBGXF:1:11101:20462:1198       16      ref|NC_001137|  576415  0       75M     *       0       0       CTGTACATGCTGATGGTAGCGGTTCACAAAGAGCTGGATAGTGATGATGTTCCAGACGGTAGATTTGATATATTA     EEEAEEEEEEEEEEEEEAEEAE/EEEEEEEEEEEAEEEEEE/EEEEEAEAEEEEEEEEEEEEEEEEEEEEAAAAA     NM:i:1  MD:Z:41C33      AS:i:41 XS:i:41`  
+>`NB501605:544:HLHLMBGXF:1:11101:15826:1199       4       *       0       0       *       *       0       0       ACAATATTTGTGACTTATGTTATGCG      EEEEEEEEEEE6EEEEEEEEEEEEEE      AS:i:0  XS:i:0`
+
 ### wig
 
 ### bed
