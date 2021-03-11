@@ -155,6 +155,8 @@ Some extra note to be aware of.
 - **Output files**
 
 - **Notes**
+  
+Difference in VariableStep in variablestep
 
 #### genomicfeatures_dataframe.py
 
@@ -292,9 +294,11 @@ general layout
 
 Log in codes
 
-sftp for drives
+sftp for drives and disabling after 10 minutes
 
 command line
+
+updating
 
 ## Appendices
 
