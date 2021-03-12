@@ -178,7 +178,7 @@ In case of processing with `transposonmapping.py` (final step in processing pipe
 The bed file can be used for many downstream analysis tools, for example [genome_browser](http://genome-euro.ucsc.edu/index.html).
 
 Sometimes it might occur that insertions are stored outside the chromosome (i.e. the insertion position is bigger than the length of that chromosome).
-Also, reference genomes sometimes do not have the different chromosomes stored as roman numerals (for example `chrI`, `chrII`, etc.) but rather use different names.
+Also, reference genomes sometimes do not have the different chromosomes stored as roman numerals (for example `chrI`, `chrII`, etc.) but rather use different names (this originates from the chromosome names used in the reference genome).
 These things can confuse some analysis tools, for example the [genome_browser](http://genome-euro.ucsc.edu/index.html).
 To solve this, the python function [strip_redundant_insertions.py](#strip_redundant_insertionspy) is created.
 This creates a _clean.bed file where the insertions outside the chromosome are removed and all the chromosome names are stored with their roman numerals.
@@ -225,7 +225,7 @@ Example wig file:
 ### pergene.txt & peressential.txt
 
 A pergene.txt and peressential.txt file are yet another outputs from the transposon mapping pipeline.
-Where bed and wig files store all insertions throughout the genome, these files only store the insertions in each gene or each essential gene, respectively.
+Where bed and wig files store *all* insertions throughout the genome, these files only store the insertions in each gene or each essential gene, respectively.
 Essential genes are the annotated essential genes as stated by SGD for wild type cells.
 The genes are taken from the [Yeast_Protein_Names.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Yeast_Protein_Names.txt) file, which is downloaded from [uniprot](https://www.uniprot.org/docs/yeast).
 The positions of each gene are determined by a [gff3 file](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Saccharomyces_cerevisiae.R64-1-1.99.gff3) downloaded from SGD.
@@ -243,7 +243,7 @@ The reads are the actual read counts.
 Note that when comparing files that include gene names there might be differences in the gene naming.
 Genes have multiple names, e.g. systematic names like 'YBR200W' or standard names like 'BEM1' which can have aliases such as 'SRO1'.
 The above three names all refer to the same gene.
-The [Yeast_Protein_Names.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Yeast_Protein_Names.txt) file can be used to search for aliases when comparing gene names in different files, or the [genomicfeatures_dataframe.py](#genomicfeatures_dataframepy) python script can be used which creates a pandas dataframe that includes the different gene names.
+The [Yeast_Protein_Names.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Yeast_Protein_Names.txt) file can be used to search for aliases when comparing gene names in different files, or the [genomicfeatures_dataframe.py](#genomicfeatures_dataframepy) python script can be used which creates a pandas dataframe that includes the different gene names (this python script itself makes also use of the Yeast_Protein_Names.txt file).
 
 Example of pergene.txt file:
 
@@ -255,20 +255,20 @@ Example of pergene.txt file:
 
 ### pergene_insertions.txt & peressential_insertions.txt
 
-The final two files that are created by the tranposon mapping pipeline are the pergene_insertions.txt and the peressential_insertions.txt.
-The files have a similar format as the pergene.txt file, but is more extensive about the information per gene.
+The final two files that are created by the transposon mapping pipeline are the pergene_insertions.txt and the peressential_insertions.txt.
+The files have a similar format as the pergene.txt file, but are more extensive in terms of the information per gene.
 The information is taken from [Yeast_Protein_Names.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Yeast_Protein_Names.txt), the [gff3 file](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Saccharomyces_cerevisiae.R64-1-1.99.gff3) and [Cerevisiae_AllEssentialGenes.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/Cerevisiae_AllEssentialGenes_List.txt), similar as the pergene.txt files.
 
-Both the pergene_insertions.txt and the peressential_insertions.txt files has a header and then each row contains six tab delimited columns:
+Both the pergene_insertions.txt and the peressential_insertions.txt files have a header and then each row contains six tab delimited columns:
 
 1. gene name
 2. chromosome where the gene is located
 3. start position of the gene
 4. end position of the gene
-5. list of all insertions
+5. list of all insertions within the gene
 6. list of all read counts in the same order as the insertion list
 
-This file can be useful when not only the number of insertions are important, but also the distibution of the insertions within the genes.
+This file can be useful when not only the number of insertions is important, but also the distribution of the insertions within the genes.
 
 Example of pergene_insertions.txt file:
 
