@@ -10,6 +10,11 @@
   - [pergene_insertions.txt & peressential_insertions.txt](#pergene_insertionstxt--peressential_insertionstxt)
 - [Software - Processing](#software---processing)
   - [satay.sh](#sataysh)
+    - [Dependencies](#dependencies)
+    - [Input, Output](#input-output)
+    - [How to use](#how-to-use)
+    - [How does it work](#how-does-it-work)
+    - [Notes](#notes)
 - [Software - analysis](#software---analysis)
   - [python scripts](#python-scripts)
     - [strip_redundant_insertions.py](#strip_redundant_insertionspy)
@@ -296,7 +301,7 @@ Everything that is shown in green can be automatically performed in a single wor
 
 The main program for the data processing is called [satay.sh](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/satay.sh) and is a bash script which automatically calls all required software tools.
 
-- **Dependencies**
+#### Dependencies
 
 Below is a list of dependencies.
 Note the folder structure for the python scripts and modules and the data files.
@@ -321,7 +326,7 @@ Note the folder structure for the python scripts and modules and the data files.
 11. data_files/[Cerevisiae_AllEssentialGenes_List.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/data_files/Cerevisiae_AllEssentialGenes_List.txt)
 12. data_files/[Yeast_Protein_Names.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/data_files/Yeast_Protein_Names.txt)
 
-- **Input & Output**
+#### Input, Output
 
 The bash script satay.sh accepts raw fastq files, either compressed (gzip) or uncompressed, with one of the following extensions: .fastq, .fq, fastq.gz, fq.gz.
 The fastq files can be either paired-end or single-end.
@@ -350,7 +355,7 @@ The output may include the following folders and files:
    1. .html; contains an a number of figures showing the quality of the data. This can be created for both raw data and/or trimmed data.
    2. zipped folder; contains the data for creating the figures in the .html file.
 
-- **How to use**
+#### How to use
 
 The workflow satay.sh only runs in Linux and is designed to be used as a commandline tool (see [How to use the Linux desktop](#how-to-use-the-linux-desktop)).
 
@@ -361,9 +366,45 @@ Access the help text using `bash satay.sh --help` or `bash satay.sh -h` and chec
 The help text explains the different commandline arguments that can be set.
 These are the same options that are set when using the GUI, so here only the GUI is explained.
 
-What to input, how to run and arguments and settings, what to expect from output, how to change things, what to do in case of error. set adapters file path
+Start the GUI with `bash satay.sh` without any arguments.
+This opens a window where the data file(s) can be selected.
+Navigate to the folder containing the data file(s) and select one or two files (select only two files when using paired-end data that is not interleaved and select both files by holding the ctrl button and selecting the files).
+Use the drop down window on the bottom right to select the right extension.
 
-- **How does it work**
+<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satay_fileselectionwindow.png" alt="satay.sh_file_selection_window" width=700>
+
+Press OK after which a second window opens that already has default values set.
+This shows all the settings that can be changed.
+The first two lines indicate the file(s) that were selected in the previous window (if only one file was selected, the secondary reads file is set to `none`).
+The third line is a drop-down menu to set whether to process the data single-end (default) or paired-end.
+The fourth line sets which trimming tool to use.
+There are two trimming tools installed, BBDuk and Trimmomatic, which can be selected in this drop-down menu (default is BBDuks).
+If the trimming should be skipped (and therefore the alignment is performed with the raw input data), select `donottrim` in this menu.
+The fifth line sets the trimming arguments.
+When trimming is skipped, what is put in this line is ignored.
+Otherwise, use the arguments allowed by the selected trimming software.  
+**Default trimming settings explained**: By default some of the most common options are set for BBDuk (`ktrim=l k=15 mink=10 hdist=1 qtrim=r trimq=10 minlen=30`).
+The first four options are for trimming unwanted (9)adapter) sequences which in BBDuk is done using k-mers (e.g. all 3-mers for ATTGCAAT is ATT, TTG, TGC, GCA, CAA, AAT).
+The value for k is set by the `k` parameter and should not be higher than the length of the shortest unwanted sequence (e.g. if the shortest sequence that needs to be trimmed has length 10, then k < 10).
+The higher this number is, the smaller the chances are that false positives are found when trimming.
+This method, however, might skip over the last few basepairs of a read when the length of a read is not a multiple of k.
+To solve for this, the `mink` option can be set which allows for shorter k-mers at the end of a read.
+Therefore, `mink` < `k`.
+The `ktrim` option set to which side to trim (`r` or `l`), in this case this is set to trim everything to the left.
+The number set with `hdist` determines the number is mistakes that can be made when matching the unwanted sequences with the reads.
+Next are some options for quality trimming of the reads.
+The `trimq` option sets the minimum Q-score that a basepairs are allowed to have on average.
+When the average quality of either first few or last few basepairs is lower than this threshold, those basepairs will be removed.
+Whether the basepairs on the left or on the right have to be trimmed is determined by the `qtrim` parameter (either `r` or `l` or `rl` to trim everything in that read).
+Finally the `minlen` parameter checks for the minimum length of a read after trimming.
+When this is smaller then this threshold, the read is completely removed.
+Note that the trimming can have a serious influence on the alignment and choosing good options can be important.
+For more information about these and many other settings check [BBDuk manual](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) or the [Trimmomatic manual](http://www.usadellab.org/cms/?page=trimmomatic).
+
+
+<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satay_settingswindow.png" alt="satay.sh_settings_window" width=700>
+
+#### How does it work
 
 When the pipeline is started after the files and options are selected, it starts with checking all the paths for the software tools and data files.
 The paths to the software tools and some other files can be adjusted by opening the bash script and change the paths in the `DEFINE PATHS` section at the beginning of the script.
@@ -417,7 +458,7 @@ The same is done for the pergene_insertions and peressential_insertions text fil
 Finally the wiggle file is created where first the insertions that were mapped to the same location but with a different orientation are taken as a single insertion rather than two unique insertions.
 The corresponding reads are added up and this information is stored as a wig file.
 
-- **Notes**
+#### Notes
 
 Some extra note to be aware of.
 
