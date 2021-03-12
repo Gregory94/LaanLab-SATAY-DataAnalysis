@@ -382,9 +382,21 @@ There are two trimming tools installed, BBDuk and Trimmomatic, which can be sele
 If the trimming should be skipped (and therefore the alignment is performed with the raw input data), select `donottrim` in this menu.
 The fifth line sets the trimming arguments.
 When trimming is skipped, what is put in this line is ignored.
-Otherwise, use the arguments allowed by the selected trimming software.  
-**Default trimming settings explained**: By default some of the most common options are set for BBDuk (`ktrim=l k=15 mink=10 hdist=1 qtrim=r trimq=10 minlen=30`).
-The first four options are for trimming unwanted (9)adapter) sequences which in BBDuk is done using k-mers (e.g. all 3-mers for ATTGCAAT is ATT, TTG, TGC, GCA, CAA, AAT).
+Otherwise, use the arguments allowed by the selected trimming software.
+
+**Trimming settings**: By default some of the most common options are set for BBDuk (`ktrim=l k=15 mink=10 hdist=1 qtrim=r trimq=10 minlen=30`).
+The first four options are for trimming unwanted (adapter) sequences which in BBDuk is done using k-mers (e.g. all 3-mers for ATTGCAAT are ATT, TTG, TGC, GCA, CAA, AAT).
+Any unwanted sequences (e.g. adapter, primer and transposon sequences) can trimmed using the adapters file at the bottom of the window.
+Clicking the `Open adapters file` opens a text file in which the unwanted sequences can be placed in fasta format.
+Fasta format is similar to the fastq format, but without the last two lines (i.e. the dummy line and the quality line).
+The header line of each read should start with a `>` and can contain any text (preferably no special symbols to be sure) and the next line should contain the unwanted sequence, for example:
+
+> `> header line first unwanted sequence`  
+> `GATC`  
+> `> header line second unwanted seqence`  
+> `CATG`
+
+When all unwanted sequences are set, save the text file and close it.
 The value for k is set by the `k` parameter and should not be higher than the length of the shortest unwanted sequence (e.g. if the shortest sequence that needs to be trimmed has length 10, then k < 10).
 The higher this number is, the smaller the chances are that false positives are found when trimming.
 This method, however, might skip over the last few basepairs of a read when the length of a read is not a multiple of k.
@@ -399,8 +411,26 @@ Whether the basepairs on the left or on the right have to be trimmed is determin
 Finally the `minlen` parameter checks for the minimum length of a read after trimming.
 When this is smaller then this threshold, the read is completely removed.
 Note that the trimming can have a serious influence on the alignment and choosing good options can be important.
-For more information about these and many other settings check [BBDuk manual](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) or the [Trimmomatic manual](http://www.usadellab.org/cms/?page=trimmomatic).
+For more information about these and many other settings check the [BBDuk manual](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) or the [Trimmomatic manual](http://www.usadellab.org/cms/?page=trimmomatic).
 
+**Alignment settings**: The next line takes the arguments for the alignment software.
+The default value is `-v 2` which reduces the verbose level and prevents a whole lot of text to be printed during alignment, but doesn't do anything with the way the aligner works.
+Most aligners (including BWA MEM) initially align a read to a random location after which it calculates a certain score which indicates how well the read aligns to that location.
+Then it moves the read to another location and calculates the score again.
+Based on the scores of previous positions, the aligner determines the next location based on some algorithm (e.g. BWA MEM uses the Maximal Exact Matches algorithm) which should, in the end, converge to a mapping location with the highest mapping score.
+The parameters that can be set alters the way the mapping score is influenced by matches, mismatches, insertions, deletions etc.
+Useful parameters to consider are: `-A`, `-B`, `-O`, `-E` and `-L`.
+When using paired end data it is also good to think about the parameter `-U` to change the penalty for unpaired read pairs.
+For explanation about the parameters and their default values, see the [BWA MEM manual](http://bio-bwa.sourceforge.net/bwa.shtml).
+
+Next are check boxes that can be set to turn on or off certain parts of the workflow.
+The first two checkboxes turn on or off quality checking before and after trimming.
+When `Quality check interrupt` is checked, the program pauses after the raw quality checking (before the trimming) and asking if the user want to stop the processing (press `y` to stop and `n` to continue).
+Stopping the program allows the user to check the quality report of the raw data.
+After checking the quality report, the program can be restarted by typing `bash satay.sh` after which the program remembers the settings that were previously set (it will skip the file selection window).
+Changes can be made for the trimming and alignment tools and press `OK` to continue.
+This time the raw quality report will be skipped.
+The next options determine if the sam file needs to be deleted after processing, whether the bam file needs to be sorted and indexed, if the [transposon mapping](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/transposonmapping_satay.py) needs to be performed and if a flagstat report needs to be created (the quality report of the alignment).
 
 <img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satay_settingswindow.png" alt="satay.sh_settings_window" width=700>
 
