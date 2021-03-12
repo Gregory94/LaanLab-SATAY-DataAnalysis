@@ -280,15 +280,46 @@ Example of pergene_insertions.txt file:
 
 ## Software - Processing
 
+This section discusses the main pipeline for processing satay datasets, from the raw fastq files of the sequencing output to the bed, wig and pergene text files which can be directly used for analysis.
+See the image below for a schematic overview of the pipeline with the used software tools between brackets and the file type after each processing step on the left.
+Everything that is shown in green can be automatically performed in a single workflow as will be discussed in [satay section](#sataysh) below.
+
+<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satayprocessingpipeline.png" alt="satay_processing_pipeline" width="500"/>
+
 ### satay.sh
+
+*Note that the workflow only runs in Linux (or Mac, but this is untested) as some of its dependencies are specifically designed for Unix machines.*
+
+The main program for the data processing is called [satay.sh](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/satay.sh) and is a bash script which automatically calls all required software tools.
+
+- **Dependencies**
+
+Below is a list of dependencies.
+Note the folder structure for the python scripts and modules and the data files.
+
+1. Zenity (by default installed in Linux Ubuntu 20.10)
+2. [YAD](http://manpages.ubuntu.com/manpages/groovy/man1/yad.1.html)
+3. [FASTQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+4. [BBMap](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/)
+5. [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)
+6. [BWA](http://bio-bwa.sourceforge.net/bwa.shtml)
+7. [SAMTools](http://www.htslib.org/)
+8. [Sambamba](https://lomereiter.github.io/sambamba/)
+9. Python > v3.7
+    a. numpy
+    b. [pysam](https://pysam.readthedocs.io/en/latest/index.html)
+    c. timeit
+    d. python_scripts/[transposonmapping_satay.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/transposonmapping_satay.py)
+    e. python_scripts/python_modules/[chromosome_and_gene_positions.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/chromosome_and_gene_positions.py)
+    f. python_scripts/python_modules/[gene_names.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/gene_names.py)
+    g. python_scripts/python_modules/[samflag.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/samflag.py)
+10. resources/Saccharomyces_cerevisiae.R64-1-1.99.gff3
+11. resources/Cerevisiae_AllEssentialGenes_List.txt
+12. resources/Yeast_Protein_Names.txt
 
 - **Main tasks**
 
 Briefly explain what this thing does.
-
-- **Dependencies**
-
-All scripts and files where this thing is depending on.
 
 - **How does it work**
 
