@@ -490,7 +490,7 @@ The corresponding reads are added up and this information is stored as a wig fil
 
 #### Notes
 
-Some extra note to be aware of.
+[] Some extra note to be aware of.
 
 ## Software - analysis
 
