@@ -320,37 +320,54 @@ Note the folder structure for the python scripts and modules and the data files.
 - **Input & Output**
 
 The bash script satay.sh accepts raw fastq files, either compressed (gzip) or uncompressed, with one of the following extensions: .fastq, .fq, fastq.gz, fq.gz.
-The fastq files can be either in paired-end or single-end.
+The fastq files can be either paired-end or single-end.
 
 It is assumed that each data file contains one sample, so in case multiple samples are sequenced together, it might be necessary to demultiplex the fastq files.
 This is not integrated in the pipeline and should be performed before pipeline is started.
 
-When the processing was completed successfully, a number of output folders are created at the same location where the input file is stored. (Some files and folders are depending on which options are selected in satay.sh, see below for more information about the options)
-This always includes the following folders and files:
+When the processing was completed successfully, a number of output folders are created at the same location where the input file is stored. Some files and folders are depending on which options are selected in satay.sh (see below for more information about the options).
+The output may include the following folders and files:
 
-1. `align_out`
-   1. .bam
-   2. .sorted.bam (depending on whether the option for sorting&indexing is selected); The reads are sorted which speeds up downstream processing.
-   3. .sorted.bam.bai (depending on whether the option for sorting&indexing is selected); Many downstream processing tools require this index file.
-   4. _flagstatreport.txt; Stores some basic information about the alignment.
-   5. .bed
-   6. .wig
-   7. pergene.txt
-   8. peressential.txt
-   9. pergene_insertions.txt
-   10. peressential_insertions.txt
-2. `trimm_out`
-
-
-
-
-- **How does it work**
-
-what tasks are completed by the pipeline (quality checking, trimming, etc.)
+1. `align_out/`
+   1. .sam (depending on whether the option for deleting sam files was selected)
+   2. .bam
+   3. .sorted.bam (depending on whether the option for sorting&indexing is selected); The reads are sorted which speeds up downstream processing.
+   4. .sorted.bam.bai (depending on whether the option for sorting&indexing is selected); Many downstream processing tools require this index file.
+   5. _flagstatreport.txt; Stores some basic information about the alignment.
+   6. .bed
+   7. .wig
+   8. pergene.txt
+   9. peressential.txt
+   10. pergene_insertions.txt
+   11. peressential_insertions.txt
+2. `trimm_out/` (depending on whether the option for trimming is selected)
+   1. _trimmed.fastq
+3. `fastqc/` (depending on whether the option for quality checking is selected)
+   1. .html; contains an a number of figures showing the quality of the data. This can be created for both raw data and/or trimmed data.
+   2. zipped folder; contains the data for creating the figures in the .html file.
 
 - **How to use**
 
-What to input, how to run and arguments and settings, what to expect from output, how to change things, what to do in case of error.
+What to input, how to run and arguments and settings, what to expect from output, how to change things, what to do in case of error. set adapters file path
+
+- **How does it work**
+
+When the pipeline is started after the files and options are selected, it starts with checking all the paths for the software tools and data files.
+The paths to the software tools and some other files can be adjusted by opening the bash script and change the paths in the `DEFINE PATHS` section at the beginning of the script.
+Also it checks if the options that were given by the user don't conflict (e.g. when two data files were selected, but the option for processing the data as single-end reads in which case the second data file is ignored).
+Next it defines names for all output files and folders.
+
+After this the actual processing starts.
+Here the full processing workflow is explained, but some parts may be skipped depending on which options are set by the user.
+
+The first step is quality checking of the raw data in the fastq files using [FASTQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+This creates a quality report in the `fastqc` folder and will take a few minutes depending on the size of the datafile.
+After this first quality report the script will pause and ask the user to continue (enter `y` or `n`).
+If the program is stopped, the quality report can be checked after which the program can be restarted (again with the command `bash satay.sh`).
+All the previous settings will be remembered and do not have to be entered again.
+But some options (e.g. trimming and alignment) can be altered if this is prefered by the user after checking the quality report.
+Next the trimming is started (either with BBDuk or Trimmomatic).
+If the option for paired-end data is selected, automatically these options are also selected for the trimming (e.g. `interleaved=t` for BBDuk or `PE` for Trimmomatic).
 
 - **Notes**
 
