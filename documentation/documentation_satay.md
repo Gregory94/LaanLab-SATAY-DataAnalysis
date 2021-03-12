@@ -313,25 +313,44 @@ Note the folder structure for the python scripts and modules and the data files.
     e. python_scripts/python_modules/[chromosome_and_gene_positions.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/chromosome_and_gene_positions.py)
     f. python_scripts/python_modules/[gene_names.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/gene_names.py)
     g. python_scripts/python_modules/[samflag.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/samflag.py)
-10. resources/Saccharomyces_cerevisiae.R64-1-1.99.gff3
-11. resources/Cerevisiae_AllEssentialGenes_List.txt
-12. resources/Yeast_Protein_Names.txt
+10. data_files/[Saccharomyces_cerevisiae.R64-1-1.99.gff3](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/data_files/Saccharomyces_cerevisiae.R64-1-1.99.gff3)
+11. data_files/[Cerevisiae_AllEssentialGenes_List.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/data_files/Cerevisiae_AllEssentialGenes_List.txt)
+12. data_files/[Yeast_Protein_Names.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/data_files/Yeast_Protein_Names.txt)
 
-- **Main tasks**
+- **Input & Output**
 
-Briefly explain what this thing does.
+The bash script satay.sh accepts raw fastq files, either compressed (gzip) or uncompressed, with one of the following extensions: .fastq, .fq, fastq.gz, fq.gz.
+The fastq files can be either in paired-end or single-end.
+
+It is assumed that each data file contains one sample, so in case multiple samples are sequenced together, it might be necessary to demultiplex the fastq files.
+This is not integrated in the pipeline and should be performed before pipeline is started.
+
+When the processing was completed successfully, a number of output folders are created at the same location where the input file is stored. (Some files and folders are depending on which options are selected in satay.sh, see below for more information about the options)
+This always includes the following folders and files:
+
+1. `align_out`
+   1. .bam
+   2. .sorted.bam (depending on whether the option for sorting&indexing is selected); The reads are sorted which speeds up downstream processing.
+   3. .sorted.bam.bai (depending on whether the option for sorting&indexing is selected); Many downstream processing tools require this index file.
+   4. _flagstatreport.txt; Stores some basic information about the alignment.
+   5. .bed
+   6. .wig
+   7. pergene.txt
+   8. peressential.txt
+   9. pergene_insertions.txt
+   10. peressential_insertions.txt
+2. `trimm_out`
+
+
+
 
 - **How does it work**
 
-A more detailed explanation how the thing works and optionally different functions within the thing.
+what tasks are completed by the pipeline (quality checking, trimming, etc.)
 
 - **How to use**
 
 What to input, how to run and arguments and settings, what to expect from output, how to change things, what to do in case of error.
-
-- **Output files**
-
-More detailed explanation about output if required.
 
 - **Notes**
 
