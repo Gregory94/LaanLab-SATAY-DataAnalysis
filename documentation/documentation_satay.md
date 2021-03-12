@@ -3,7 +3,7 @@
 - [Introduction](#introduction)
 - [File types](#file-types)
   - [fastq](#fastq)
-  - [sam & bam](#sam--bam)
+  - [sam, bam](#sam-bam)
   - [bed](#bed)
   - [wig](#wig)
   - [pergene.txt & peressential.txt](#pergenetxt--peressentialtxt)
@@ -50,7 +50,7 @@ The workflow and the python codes can be found at [github.com/Gregory94/LaanLab-
 More information about satay analysis and experimental protocols can be found at the [satayusers website from the Kornmann lab](https://sites.google.com/site/satayusers/ "satayusers website") or, for more questions, visit the [satayusers forum](https://groups.google.com/g/satayusers "satayusers forum").
 
 > Date last update: 10-03-2021
-> 
+>
 > Contact: Gregory van Beek (G.M.vanBeek@tudelft.nl)
 >  
 > [Laanlab, Delft University of Technology](https://www.tudelft.nl/en/faculty-of-applied-sciences/about-faculty/departments/bionanoscience/research/research-labs/liedewij-laan-lab/research-projects/evolvability-and-modularity-of-essential-functions-in-budding-yeast "LaanLab TUDelft")
@@ -79,6 +79,7 @@ In both versions the quality score is determined by Q = -10*log10(P) where P is 
 A Q-score of 0 (i.e. an error probability of P=1) is defined by ascii symbol 33 ('!') for base33 and by ascii symbol 64 ('@') for base64.
 A Q-score of 1 (p=0.79) is then given by ascii 34 (' " ') (for base33) etcetera.
 For a full table of ascii symbols and probability scores, see the appendices of this document [PHRED table (base33)](#phred-table-base33) and [PHRED table (base64)](#phred-table-base64).
+Basically all fastq files that are being created on modern sequencing machines use the base33 system.
 
 The nucleotide sequence typically only contains the four nucleotide letters (A, T, C and G), but when a nucleotide was not accurately determined (i.e. having a error probability higher than a certain threshold), the nucleotide is sometimes converted to the letter N, indicating that this nucleotide was not successfully sequenced.
 
@@ -101,7 +102,7 @@ Example fastq file:
 > `+`  
 > `AAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE`
 
-### sam & bam
+### sam, bam
 
 When the reads are aligned to a reference genome, the resulting file is a Sequence Alignment Mapping (sam) file.
 Every read is one line in the file and consists of at least 11 tab delimited fields that are always in the same order:
@@ -158,7 +159,10 @@ Sam files tend to be large in size (tens of Gb is normal).
 Therefore the sam files are typically stored as compressed binary files called bam files.
 Almost all downstream analysis tools that need the alignment information accept bam files as input.
 Therefore the sam files are mostly deleted after the bam file is created.
-When a sam file is needed, it can always be recreated from the bam file, for example using `samtools` using the command `samtools view -h -o out.sam in.bam`.
+When a sam file is needed, it can always be recreated from the bam file, for example using `SAMTools` using the command `samtools view -h -o out.sam in.bam`.
+The bam file can be sorted (creating a .sorted.bam file) where the reads are typically ordered depending on their position in the genome.
+This usually also comes with an index file (a .sorted.bam.bai file) which stores some information where for example the different chromosomes start within the bam file and where specific often occuring sequences are.
+Many downstream analysis tools require this file to be able to efficiently search through the bam file.
 
 ### bed
 
@@ -332,7 +336,7 @@ The output may include the following folders and files:
    1. .sam (depending on whether the option for deleting sam files was selected)
    2. .bam
    3. .sorted.bam (depending on whether the option for sorting&indexing is selected); The reads are sorted which speeds up downstream processing.
-   4. .sorted.bam.bai (depending on whether the option for sorting&indexing is selected); Many downstream processing tools require this index file.
+   4. .sorted.bam.bai (depending on whether the option for sorting&indexing is selected);
    5. _flagstatreport.txt; Stores some basic information about the alignment.
    6. .bed
    7. .wig
@@ -347,6 +351,15 @@ The output may include the following folders and files:
    2. zipped folder; contains the data for creating the figures in the .html file.
 
 - **How to use**
+
+The workflow satay.sh only runs in Linux and is designed to be used as a commandline tool (see [How to use the Linux desktop](#how-to-use-the-linux-desktop)).
+
+In the commandline, navigate to the software folder (`cd /home/laanlab/Documents/satay/software/`).
+The workflow can be started either using commandline arguments or by using a graphical user interface (GUI).
+Using the GUI is the most userfriendly approach.
+Access the help text using `bash satay.sh --help` or `bash satay.sh -h` and check the current version with `bash satay.sh -v`.
+The help text explains the different commandline arguments that can be set.
+These are the same options that are set when using the GUI, so here only the GUI is explained.
 
 What to input, how to run and arguments and settings, what to expect from output, how to change things, what to do in case of error. set adapters file path
 
@@ -365,9 +378,44 @@ This creates a quality report in the `fastqc` folder and will take a few minutes
 After this first quality report the script will pause and ask the user to continue (enter `y` or `n`).
 If the program is stopped, the quality report can be checked after which the program can be restarted (again with the command `bash satay.sh`).
 All the previous settings will be remembered and do not have to be entered again.
-But some options (e.g. trimming and alignment) can be altered if this is prefered by the user after checking the quality report.
-Next the trimming is started (either with BBDuk or Trimmomatic).
-If the option for paired-end data is selected, automatically these options are also selected for the trimming (e.g. `interleaved=t` for BBDuk or `PE` for Trimmomatic).
+But some options (e.g. trimming and alignment) can be altered if this is prefered by the user after checking the quality report.  
+Next the trimming is started (either with [BBMap](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/) or [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)).
+If the option for paired-end data is selected, automatically these options are also selected for the trimming (e.g. `interleaved=t` for BBDuk or `PE` for Trimmomatic). Thus this should not be set manually by the user.
+This step also reads the adapter sequences file to search for unwanted sequences in the reads.
+The trimming can take more than half an hour to an hour (potentially even more for large datasets) and the results are stored in the `trimm_out` folder.
+After the trimming, another quality report is created for the trimmed data which stored in the `fastqc` folder.  
+Next up is the alignment by [BWA MEM](http://bio-bwa.sourceforge.net/bwa.shtml).
+Just like with the trimming, arguments for indicating whether paired-end data is used (`-p`) is automatically set and therefore the user should not set these parameters manually.
+The alignment can require more than one hour to complete and the results are stored in the `align_out` folder.  
+After the alignment a quality report is created using [SAMTools](http://www.htslib.org/) which checks how many reads were aligned and if there are any things to be aware of (e.g. read pairs that were not mapped as proper pairs).
+The results are stored as `_flagstatreport.txt` in the `align_out` folder.
+The sam file is then converted to a bam file and it is checked whether the general format and structure of the bam file is correct.
+Both tasks are done using SAMTools.
+Next the bam file is sorted and an index file is created using [Sambamba](https://lomereiter.github.io/sambamba/).
+All the steps so far after the the alignment should not take more than a few minutes and all the results are stored in the `align_out` folder.  
+As a final step the python script [transposonmapping_satay.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/transposonmapping_satay.py) is started (see below for more details).
+This creates all the files that store the information about the insertions and reads in the `align_out` folder (i.e. bed, wig, pergene.txt, peressential.txt, pergene_insertions.txt and peressential_insertions.txt).
+This python script can take well over an hour to complete.  
+After the transposon mapping the sam file is deleted and a log file is created that stores information about which file(s) has been processed, a time stamp and all the options and adapter sequences set by the user.
+This log file is stored together with the input fastq file.
+
+The python script transposonmapping.py consist of a single python function called `transposonmapper`.
+This takes a sorted bam file (which should have a bam index file present in the same folder) and potentially some additional information files.
+It starts with checking if all input files are present.
+Next if reads the bam file using the `pysam` function and gets some basic information about the chromosomes like the names and lengths and some statistics about the mapped reads in the bam file.  
+Then a for-loop is started over all chromosomes and for each chromosome a for-loop is started over all reads.
+For each read the samflag and the CIGAR string is taken to determine how the read was mapped (e.g. the orientation of the read).
+By default the leftmost position is taken as insertion site, but if the read is reversely mapped, the length of the mapped part of the read needs to be added to the insertion position as the actual insertion happened at the rightmost position of the read.
+After this correction the start position and the flags of each read are stored in arrays which are used later for creating the output files.  
+Lists are created for all genes and all essential genes including their start and end positions in the genome.  
+Next the chromosomes are all concatenated in one large array, so that each chromosome does not start anymore with basepair position 1, but rather continues counting from the previous chromosome (e.g. chrI starts at basepair 1 and ends at basepair 230218, then chrII starts at basepair 230219 instead of basepair 1).
+This makes the next a bit easier where for each gene the insertions and reads are found that are mapped within the genes.
+The last part of code consists of creating the different output files.
+First the bed file is generated where the reads are saved using the equation (read_count*20)+100.
+Then the pergene and peressential text files are created where the number of insertions and read count are stored together with the standard names of the genes.
+The same is done for the pergene_insertions and peressential_insertions text files where all individual insertions and corresponding reads are stored which can be used later for determining the distribution of insertions within genes.
+Finally the wiggle file is created where first the insertions that were mapped to the same location but with a different orientation are taken as a single insertion rather than two unique insertions.
+The corresponding reads are added up and this information is stored as a wig file.
 
 - **Notes**
 
@@ -534,6 +582,8 @@ Log in codes
 sftp for drives and disabling after 10 minutes
 
 command line
+
+where to find the processing tool
 
 updating
 
