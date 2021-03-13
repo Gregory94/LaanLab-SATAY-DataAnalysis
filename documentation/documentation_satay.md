@@ -426,7 +426,7 @@ For explanation about the parameters and their default values, see the [BWA MEM 
 
 Next are check boxes that can be set to turn on or off certain parts of the workflow.
 The first two checkboxes turn on or off quality checking before and after trimming.
-When `Quality check interrupt` is checked, the program pauses after the raw quality checking (before the trimming) and asking if the user want to stop the processing (press `y` to stop and `n` to continue).
+When `Quality check interrupt` is checked, the program pauses after the raw quality checking (before the trimming) and asking if the user want to continue the processing (press `n` to stop and `y` to continue).
 Stopping the program allows the user to check the quality report of the raw data.
 After checking the quality report, the program can be restarted by typing `bash satay.sh` after which the program remembers the settings that were previously set (it will skip the file selection window).
 Changes can be made for the trimming and alignment tools and press `OK` to continue.
@@ -437,7 +437,7 @@ The next options determine if the sam file needs to be deleted after processing,
 
 #### Tutorial
 
-Note before use: When down-/uploading files to the N-drive or M-drive, the drives will disconnect automatically after 10 minutes of inactivity.
+**Note before use**: When down-/uploading files to the N-drive or M-drive on the Linux Desktop, the drives will disconnect automatically after 10 minutes of inactivity.
 Since the files are typically large the down-/uploading therefore takes more then 10 minutes to complete, you should click back and forth to some folders once every few minutes in the drives to reset the timer.
 
 - [ ] Log in to the Linux desktop (log in credentials can be found at `N:\tnw\BN\LL\Shared\LinuxMachines\LinuxDesktop_LoginCredentials.txt`).
@@ -445,14 +445,23 @@ Since the files are typically large the down-/uploading therefore takes more the
 - [ ] If your data file is on the N-drive, it should be copied to the Linux desktop for the processing to work smoothly (if you have no data set, there is a test fastq file already on the Linux desktop, so you can skip the following steps):
   - [ ] For this, go to `Files` (located in the left bar) and click `Other Locations` on the left menu in Files.
   - [ ] On the bottom at `Connect to Server` enter: `sftp://sftp.tudelft.nl/` and click `Connect`.
-  - [ ] If required, log in with your personal tudelft credentials.
+  - [ ] If requested, log in with your personal tudelft credentials.
   - [ ] Navigate to your data file (staff-bulk is the N-drive and staff-groups is the M-drive).
-  - [ ] Copy the data set to `Documents/satay/datasets/`.
+  - [ ] Copy the data set to the desktop, for example to `Documents/satay/datasets/`.
   - [ ] Close `Files`.
 - [ ] Open the `Terminal` (located in the left bar) and enter `cd ~/Documents/satay/software/`.
 - [ ] To start the workflow, enter `bash satay.sh`. This should open a window to select a fastq file.
-- [ ] At the bottom right, select the right extension to be able to find your file, navigate to the location of your data set and select your fastq file and press `OK`. (For the test fastq, navigate to `Documents/satay/datasets/singleendtestfolder/SRR062634.fastq.gz`).
-- [ ] In the next window enter the parameters and options. Click `Open adapters file` to change the sequences that need to be trimmed (if any).
+- [ ] At the bottom right, select the right extension to be able to find your file, navigate to the location of your data set and select the fastq file and press `OK`. (For the test fastq, navigate to `Documents/satay/datasets/singleendtestfolder/SRR062634.fastq.gz`).
+- [ ] In the next window (options window) enter the parameters and options. Click `Open adapters file` to change the sequences that need to be trimmed (if any) and save and close the adapters file. Press `OK` to start processing.
+- [ ] If the option `quality check interrupt` was selected:
+  - [ ] Wait for the processing to finish the quality checking of the raw data.
+  - [ ] The workflow will ask if you want to continue. Enter `y` to continue with the parameters you have set and enter `n` to stop the workflow to check the quality report of the raw data.
+  - [ ] Navigate to the folder where your data file is stored and open the .html file and the check the quality report.
+  - [ ] When finished, restart the workflow by typing `bash satay.sh` at `~/Documents/satay/software/`.
+  - [ ] The workflow should skip the file selection window and immediately start with the options window where the parameters you have previously entered are shown. Change the parameters if needed and press `OK` to continue processing.
+  - [ ] The workflow should skip over the raw quality checking and continue with the processing.
+- [ ] When processing is finished, navigate to folder where your dataset is located and check if all expected files are present (at least the `align_out` folder and a log file should be present).
+- [ ] Copy results to N-drive following the same procedure as described in step 2. (Be aware to prevent the sftp connection to automatically disconnect, see beginning of this section).
 
 #### How does it work
 
@@ -510,7 +519,8 @@ The corresponding reads are added up and this information is stored as a wig fil
 
 #### Notes
 
-[] Some extra note to be aware of.
+- [ ] Some extra note to be aware of.
+- [ ] when processing unexpectely skips over file selection -> cancel and restart satay.sh
 
 ## Software - analysis
 
