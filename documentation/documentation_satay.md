@@ -13,6 +13,7 @@
     - [Dependencies](#dependencies)
     - [Input, Output](#input-output)
     - [How to use](#how-to-use)
+    - [Tutorial](#tutorial)
     - [How does it work](#how-does-it-work)
     - [Notes](#notes)
 - [Software - analysis](#software---analysis)
@@ -433,6 +434,25 @@ This time the raw quality report will be skipped.
 The next options determine if the sam file needs to be deleted after processing, whether the bam file needs to be sorted and indexed, if the [transposon mapping](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/transposonmapping_satay.py) needs to be performed and if a flagstat report needs to be created (the quality report of the alignment).
 
 <img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satay_settingswindow.png" alt="satay.sh_settings_window" width=700>
+
+#### Tutorial
+
+Note before use: When down-/uploading files to the N-drive or M-drive, the drives will disconnect automatically after 10 minutes of inactivity.
+Since the files are typically large the down-/uploading therefore takes more then 10 minutes to complete, you should click back and forth to some folders once every few minutes in the drives to reset the timer.
+
+- [ ] Log in to the Linux desktop (log in credentials can be found at `N:\tnw\BN\LL\Shared\LinuxMachines\LinuxDesktop_LoginCredentials.txt`).
+  - [ ] When using remote access, install the free version of [Teamviewer](https://www.teamviewer.com/nl/) on your computer and connect with the computer using the credentials found in the file mentioned above.
+- [ ] If your data file is on the N-drive, it should be copied to the Linux desktop for the processing to work smoothly (if you have no data set, there is a test fastq file already on the Linux desktop, so you can skip the following steps):
+  - [ ] For this, go to `Files` (located in the left bar) and click `Other Locations` on the left menu in Files.
+  - [ ] On the bottom at `Connect to Server` enter: `sftp://sftp.tudelft.nl/` and click `Connect`.
+  - [ ] If required, log in with your personal tudelft credentials.
+  - [ ] Navigate to your data file (staff-bulk is the N-drive and staff-groups is the M-drive).
+  - [ ] Copy the data set to `Documents/satay/datasets/`.
+  - [ ] Close `Files`.
+- [ ] Open the `Terminal` (located in the left bar) and enter `cd ~/Documents/satay/software/`.
+- [ ] To start the workflow, enter `bash satay.sh`. This should open a window to select a fastq file.
+- [ ] At the bottom right, select the right extension to be able to find your file, navigate to the location of your data set and select your fastq file and press `OK`. (For the test fastq, navigate to `Documents/satay/datasets/singleendtestfolder/SRR062634.fastq.gz`).
+- [ ] In the next window enter the parameters and options. Click `Open adapters file` to change the sequences that need to be trimmed (if any).
 
 #### How does it work
 
