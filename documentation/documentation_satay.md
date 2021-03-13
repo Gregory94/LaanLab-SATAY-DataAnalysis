@@ -438,7 +438,8 @@ The next options determine if the sam file needs to be deleted after processing,
 #### Tutorial
 
 **Note before use**: When down-/uploading files to the N-drive or M-drive on the Linux Desktop, the drives will disconnect automatically after 10 minutes of inactivity.
-Since the files are typically large the down-/uploading therefore takes more then 10 minutes to complete, you should click back and forth to some folders once every few minutes in the drives to reset the timer.
+Since the files are typically large the down-/uploading can therefore take more then 10 minutes to complete.
+To prevent disconnection while down-/uploading you should click back and forth to some folders once every few minutes in the drives to reset the timer.
 
 - [ ] Log in to the Linux desktop (log in credentials can be found at `N:\tnw\BN\LL\Shared\LinuxMachines\LinuxDesktop_LoginCredentials.txt`).
   - [ ] When using remote access, install the free version of [Teamviewer](https://www.teamviewer.com/nl/) on your computer and connect with the computer using the credentials found in the file mentioned above.
@@ -452,16 +453,17 @@ Since the files are typically large the down-/uploading therefore takes more the
 - [ ] Open the `Terminal` (located in the left bar) and enter `cd ~/Documents/satay/software/`.
 - [ ] To start the workflow, enter `bash satay.sh`. This should open a window to select a fastq file.
 - [ ] At the bottom right, select the right extension to be able to find your file, navigate to the location of your data set and select the fastq file and press `OK`. (For the test fastq, navigate to `Documents/satay/datasets/singleendtestfolder/SRR062634.fastq.gz`).
-- [ ] In the next window (options window) enter the parameters and options. Click `Open adapters file` to change the sequences that need to be trimmed (if any) and save and close the adapters file. Press `OK` to start processing.
+- [ ] In the next window (options window) enter the parameters and options. Click `Open adapters file` to change the sequences that need to be trimmed (if any) (this file should always be in fasta format, see [How to use](#how-to-use) section) and save and close the adapters file. Press `OK` to start processing.
 - [ ] If the option `quality check interrupt` was selected:
   - [ ] Wait for the processing to finish the quality checking of the raw data.
   - [ ] The workflow will ask if you want to continue. Enter `y` to continue with the parameters you have set and enter `n` to stop the workflow to check the quality report of the raw data.
-  - [ ] Navigate to the folder where your data file is stored and open the .html file and the check the quality report.
+  - [ ] Navigate to the folder where your data file is stored and open the .html file (in the `fastqc_out` folder) and the check the quality report.
   - [ ] When finished, restart the workflow by typing `bash satay.sh` at `~/Documents/satay/software/`.
-  - [ ] The workflow should skip the file selection window and immediately start with the options window where the parameters you have previously entered are shown. Change the parameters if needed and press `OK` to continue processing.
+  - [ ] The workflow should skip the file selection window and immediately start with the processing options window where the parameters you have previously entered are shown. Change the parameters if needed and press `OK` to continue processing.
   - [ ] The workflow should skip over the raw quality checking and continue with the processing.
-- [ ] When processing is finished, navigate to folder where your dataset is located and check if all expected files are present (at least the `align_out` folder and a log file should be present).
+- [ ] When processing is finished, navigate to folder where your dataset is located and check if all expected files are present (depending on what options yout have set, but at least the `align_out` folder and a log file should be present).
 - [ ] Copy results to N-drive following the same procedure as described in step 2. (Be aware to prevent the sftp connection to automatically disconnect, see beginning of this section).
+- [ ] After the processing is finished, most information is stored in the [bed](#bed) and [wig](#wig) files. But there can be some artifacts present in these files which can be removed using [strip_redundant_insertions.py](#strip_redundant_insertionspy). This is only necessary for specific downstream analysis tools like the [genome browser](#genome-browser).
 
 #### How does it work
 
