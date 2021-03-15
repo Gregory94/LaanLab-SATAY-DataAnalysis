@@ -54,7 +54,7 @@ def strip_redundant_ins(filepath=None, custom_header=None):
 
         with open(filepath_splitext[0]+"_clean.bed", "w") as w:
             #write header
-            if custom_header == None:
+            if custom_header == None or custom_header == "":
                 w.write(lines[0])
             else:
                 w.write("track name=" + str(custom_header) + " useScore=1\n")
@@ -127,7 +127,7 @@ def strip_redundant_ins(filepath=None, custom_header=None):
 
 #%%
 if __name__ == '__main__':
-    custom_header = "leila_wt_techrep_ab"
-    strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig")#, custom_header=custom_header)
-    # strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.bed", custom_header=custom_header)
+    custom_header = "leila_wt_techrep_ab_stringentalign"
+    # strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.bed", custom_header=custom_header)
+    strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig", custom_header=custom_header)
 
