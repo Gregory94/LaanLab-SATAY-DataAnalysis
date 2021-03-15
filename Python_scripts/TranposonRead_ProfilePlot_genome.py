@@ -81,7 +81,7 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
     for line in lines[chrom_start_index_dict.get("I"):chrom_end_index_dict.get("XVI")+1]:
         line = line.strip('\n').split()
         chrom_name = [k for k,v in chrom_names_dict.items() if v == line[0].replace("chr",'')][0]
-        alltransposoncounts_list[summed_chr_length_dict.get(chrom_name) + int(line[1])] += 1
+        alltransposoncounts_list[summed_chr_length_dict.get(chrom_name) + int(line[1])-1] += 1
 
 
     alltransposoncounts_binnedlist = []
@@ -180,7 +180,7 @@ def read_profile(wig_file=None, bar_width=None):
     summed_chr_length = 0
     for c in chrom_list:
         summed_chr_length_dict[c] = summed_chr_length
-        summed_chr_length += chr_length_dict.get(c)    
+        summed_chr_length += chr_length_dict.get(c)
 
 
     l_genome = 0
@@ -204,7 +204,7 @@ def read_profile(wig_file=None, bar_width=None):
 
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items()]
-    genes_essential_list = list_known_essentials(essential_genes_files)
+    genes_essential_list = list_known_essentials(essential_genes_files, verbose=False)
 
 
     with open(wig_file) as f:
@@ -220,7 +220,7 @@ def read_profile(wig_file=None, bar_width=None):
         # elif not line.startswith('VariableStep'):
         else:
             line = line.strip(' \n').split()
-            allreadscounts_list[int(line[0])+summed_chr_length_dict.get(current_chr_roman)] = int(line[1]) #DEFINE CURRENT_CHR_LENGTH DEFINED IN ELIF STATEMENT
+            allreadscounts_list[int(line[0])+summed_chr_length_dict.get(current_chr_roman)-1] = int(line[1]) #DEFINE CURRENT_CHR_LENGTH DEFINED IN ELIF STATEMENT
         # elif line.startswith('VariableStep'):
         #     current_chr = line.split(' ')[1].replace('chrom=chr','')
         #     current_chr_roman = [k for k, v in chrom_names_dict.items() if v == current_chr.strip('\n')][0]
@@ -295,10 +295,5 @@ def read_profile(wig_file=None, bar_width=None):
 
 #%%
 if __name__ == '__main__':
-#    transposon_profile(bed_file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample1\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim20210127\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.bed")
-#    transposon_profile(bed_file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample2\wt1_enzo_dataset_demultiplexed_singleend_sample2_trim20210122\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.bed")
-#    transposon_profile(bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.bed")
-
-#    read_profile(wig_file=r"\\?\X:\tnw\BN\LL\Shared\Gregory\datasets\dataset_enzo\wt1_enzo_dataset_demultiplexed_interleaved_sample1\wt1_enzo_dataset_demultiplexed_singleend_sample1_trim20210127\align_out\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample1interleavedsorted_singleend_trimmed.sorted.bam.wig")
-    read_profile(wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig")
-    # read_profile(wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\testing_site\wt1_testfolder_S288C\align_out\ERR1533147_trimmed.sorted.bam.wig")
+    transposon_profile(bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.bed")
+    # read_profile(wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig")
