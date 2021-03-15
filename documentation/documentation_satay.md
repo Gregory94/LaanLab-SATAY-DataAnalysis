@@ -6,8 +6,8 @@
   - [sam, bam](#sam-bam)
   - [bed](#bed)
   - [wig](#wig)
-  - [pergene.txt & peressential.txt](#pergenetxt--peressentialtxt)
-  - [pergene_insertions.txt & peressential_insertions.txt](#pergene_insertionstxt--peressential_insertionstxt)
+  - [pergene.txt, peressential.txt](#pergenetxt-peressentialtxt)
+  - [pergene_insertions.txt, peressential_insertions.txt](#pergene_insertionstxt-peressential_insertionstxt)
 - [Software - Processing](#software---processing)
   - [satay.sh](#sataysh)
     - [Dependencies](#dependencies)
@@ -163,7 +163,7 @@ Example sam file (note that the last read was not mapped):
 
 Sam files tend to be large in size (tens of Gb is normal).
 Therefore the sam files are typically stored as compressed binary files called bam files.
-Almost all downstream analysis tools that need the alignment information accept bam files as input.
+Almost all downstream analysis tools (at least all tools discussed in this document) that need the alignment information accept bam files as input.
 Therefore the sam files are mostly deleted after the bam file is created.
 When a sam file is needed, it can always be recreated from the bam file, for example using `SAMTools` using the command `samtools view -h -o out.sam in.bam`.
 The bam file can be sorted (creating a .sorted.bam file) where the reads are typically ordered depending on their position in the genome.
@@ -213,7 +213,7 @@ After a variablestep line, every row corresponds with an insertion in two space 
 1. insertion position
 2. number of reads
 
-In the wig file, the read count represent the actual count (unlike the bed file).
+In the wig file, the read count represent the actual count (unlike the bed file where an equation is used to transform the numbers).
 
 There is one difference between the bed and the wig file.
 In the bed file the insertions at the same position but with a different orientation are stored as individual insertions.
@@ -232,7 +232,7 @@ Example wig file:
 > `100 186`  
 > `111 469`
 
-### pergene.txt & peressential.txt
+### pergene.txt, peressential.txt
 
 A pergene.txt and peressential.txt file are yet another outputs from the transposon mapping pipeline.
 Where bed and wig files store *all* insertions throughout the genome, these files only store the insertions in each gene or each essential gene, respectively.
@@ -249,6 +249,8 @@ This consists of a header and then each row contains three tab delimited columns
 3. sum of all reads of those insertions
 
 The reads are the actual read counts.
+To suppress noise, the insertion with the highest read count in a gene is removed from that gene.
+Therefore, it might occur that a gene has 1 insertion, but 0 reads.
 
 Note that when comparing files that include gene names there might be differences in the gene naming.
 Genes have multiple names, e.g. systematic names like 'YBR200W' or standard names like 'BEM1' which can have aliases such as 'SRO1'.
@@ -263,7 +265,7 @@ Example of pergene.txt file:
 > `PAU8 26 1133`  
 > `YAL067W-A 12 319`
 
-### pergene_insertions.txt & peressential_insertions.txt
+### pergene_insertions.txt, peressential_insertions.txt
 
 The final two files that are created by the transposon mapping pipeline are the pergene_insertions.txt and the peressential_insertions.txt.
 The files have a similar format as the pergene.txt file, but are more extensive in terms of the information per gene.
@@ -279,6 +281,7 @@ Both the pergene_insertions.txt and the peressential_insertions.txt files have a
 6. list of all read counts in the same order as the insertion list
 
 This file can be useful when not only the number of insertions is important, but also the distribution of the insertions within the genes.
+Similarily as the [pergene.txt and peresential.txt file](#pergenetxt-peressentialtxt), to suppress noise the insertion with the highest read count in a gene is removed from that gene.
 
 Example of pergene_insertions.txt file:
 
@@ -292,7 +295,7 @@ Example of pergene_insertions.txt file:
 
 This section discusses the main pipeline for processing satay datasets, from the raw fastq files of the sequencing output to the bed, wig and pergene text files which can be directly used for analysis.
 See the image below for a schematic overview of the pipeline with the used software tools between brackets and the file type after each processing step on the left.
-Everything that is shown in green can be automatically performed in a single workflow as will be discussed in [satay section](#sataysh) below.
+Everything that is shown in green can be automatically performed in a single workflow as will be discussed in the [satay section](#sataysh) below.
 
 <img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satayprocessingpipeline.png" alt="satay_processing_pipeline" width="500"/>
 
@@ -316,13 +319,13 @@ Note the folder structure for the python scripts and modules and the data files.
 7. [SAMTools](http://www.htslib.org/)
 8. [Sambamba](https://lomereiter.github.io/sambamba/)
 9. Python > v3.7
-    a. numpy
-    b. [pysam](https://pysam.readthedocs.io/en/latest/index.html)
-    c. timeit
-    d. python_scripts/[transposonmapping_satay.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/transposonmapping_satay.py)
-    e. python_scripts/python_modules/[chromosome_and_gene_positions.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/chromosome_and_gene_positions.py)
-    f. python_scripts/python_modules/[gene_names.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/gene_names.py)
-    g. python_scripts/python_modules/[samflag.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/samflag.py)
+   1. numpy
+   2. [pysam](https://pysam.readthedocs.io/en/latest/index.html)
+   3. timeit
+   4. python_scripts/[transposonmapping_satay.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/transposonmapping_satay.py)
+   5. python_scripts/python_modules/[chromosome_and_gene_positions.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/chromosome_and_gene_positions.py)
+   6. python_scripts/python_modules/[gene_names.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/gene_names.py)
+   7. python_scripts/python_modules/[samflag.py](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/python_modules/samflag.py)
 10. data_files/[Saccharomyces_cerevisiae.R64-1-1.99.gff3](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/data_files/Saccharomyces_cerevisiae.R64-1-1.99.gff3)
 11. data_files/[Cerevisiae_AllEssentialGenes_List.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/data_files/Cerevisiae_AllEssentialGenes_List.txt)
 12. data_files/[Yeast_Protein_Names.txt](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/data_files/Yeast_Protein_Names.txt)
@@ -542,6 +545,8 @@ The corresponding reads are added up and this information is stored as a wig fil
 - [ ] The alignment software arguments all require to start with a dash (`-`). For some reason this sometimes gives errors and to prevent this make sure there is a space before the first argument in the `Enter alignment settings` line.
 - [ ] If the workflow unexpectedly skips over the file selection window and immediately shows the options window, it might be that a previous processing run was not correctly finished. Press `cancel` and restart the workflow. It should now start with the file selection window. (This most likely has to do with a cachefile, that is created after the `quality check interrupt`, that was not deleted. This can be deleted manually as well by removing `processing_workflow_cache.txt` at the same location where the workflow is stored).
 - [ ] When using the commandline for entering the arguments, use `Paired-end` and `Single-end` with first capital letters.
+- [ ] For all software in the pipeline, whether the data is paired-end or single-end is automatically set, so do not set options like `interleaved=t` (for BBDuk), `PE` (for Trimmomatic)
+or `-p` (for BWA) in the options window of the workflow.
 
 ## Software - analysis
 
