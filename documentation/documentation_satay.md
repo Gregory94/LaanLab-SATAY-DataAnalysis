@@ -333,51 +333,51 @@ The bash script satay.sh accepts raw fastq files, either compressed (gzip) or un
 The fastq files can be either paired-end or single-end.
 
 It is assumed that each data file contains one sample, so in case multiple samples are sequenced together, it might be necessary to demultiplex the fastq files.
-This is not integrated in the pipeline and should be performed before pipeline is started.
+This is not integrated in the pipeline and should be performed before the pipeline is started.
 
-When the processing was completed successfully, a number of output folders are created at the same location where the input file is stored. Some files and folders are depending on which options are selected in satay.sh (see below for more information about the options).
+When the processing was completed successfully, a number of output folders are created at the same location where the input fastq file is stored. The creation of some files and folders are depending on which options are selected in satay.sh (see below for more information about the options).
 The output may include the following folders and files:
 
 1. `align_out/`
-   1. .sam (depending on whether the option for deleting sam files was selected)
-   2. .bam
-   3. .sorted.bam (depending on whether the option for sorting&indexing is selected); The reads are sorted which speeds up downstream processing.
-   4. .sorted.bam.bai (depending on whether the option for sorting&indexing is selected);
-   5. _flagstatreport.txt; Stores some basic information about the alignment.
-   6. .bed
-   7. .wig
-   8. pergene.txt
-   9. peressential.txt
-   10. pergene_insertions.txt
-   11. peressential_insertions.txt
+   1. **.sam** (depending on whether the option for deleting sam files was selected)
+   2. **.bam**
+   3. **.sorted.bam** (depending on whether the option for `Sort and index bam files` is selected); The reads are sorted which speeds up downstream processing.
+   4. **.sorted.bam.bai** (depending on whether the option for `Sort and index bam files` is selected);
+   5. **flagstatreport.txt** (depending on whether `Create flagstat report is selected` is selected); Stores some basic information about the alignment.
+   6. **.bed** (depending on whether `Transposon mapping` is selected)
+   7. **.wig** (depending on whether `Transposon mapping` is selected)
+   8. **pergene.txt** (depending on whether `Transposon mapping` is selected)
+   9. **peressential.txt** (depending on whether `Transposon mapping` is selected)
+   10. **pergene_insertions.txt** (depending on whether `Transposon mapping` is selected)
+   11. **peressential_insertions.txt** (depending on whether `Transposon mapping` is selected)
 2. `trimm_out/` (depending on whether the option for trimming is selected)
-   1. _trimmed.fastq
+   1. **trimmed.fastq** (depending on whether trimming is selected)
 3. `fastqc/` (depending on whether the option for quality checking is selected)
-   1. .html; contains an a number of figures showing the quality of the data. This can be created for both raw data and/or trimmed data.
-   2. zipped folder; contains the data for creating the figures in the .html file.
+   1. **.html** (depending on whether Quality checking is selected); contains an a number of figures showing the quality of the data. This can be created for both raw data and/or trimmed data.
+   2. **zipped folder** (depending on whether Quality checking is selected); contains the data for creating the figures in the .html file.
 
 #### How to use
 
 The workflow satay.sh only runs in Linux and is designed to be used as a commandline tool (see [How to use the Linux desktop](#how-to-use-the-linux-desktop)).
+For a step-by-step guide, see the [Tutorial](#tutorial).
 
 In the commandline, navigate to the software folder (`cd /home/laanlab/Documents/satay/software/`).
 The workflow can be started either using commandline arguments or by using a graphical user interface (GUI).
 Using the GUI is the most userfriendly approach.
 Access the help text using `bash satay.sh --help` or `bash satay.sh -h` and check the current version with `bash satay.sh -v`.
-The help text explains the different commandline arguments that can be set.
-These are the same options that are set when using the GUI, so here only the GUI is explained.
+The help text explains the different commandline arguments that can be set and briefly how to use the workflow.
+The commandline arguments are the same options that are set when using the GUI, so here only the GUI is explained.
 
 Start the GUI with `bash satay.sh` without any arguments.
 This opens a window where the data file(s) can be selected.
-Navigate to the folder containing the data file(s) and select one or two files (select only two files when using paired-end data that is not interleaved and select both files by holding the ctrl button and selecting the files).
-Use the drop down window on the bottom right to select the right extension.
+Navigate to the folder containing the data file(s) and select one or two files (select only two files when using paired-end data that is not interleaved by holding the ctrl button and clicking the files).
+Use the drop down window at the bottom right to select the right extension.
 
 <img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satay_fileselectionwindow.png" alt="satay.sh_file_selection_window" width=700>
 
-Press OK after which a second window opens that already has default values set.
-This shows all the settings that can be changed.
+After pressing `OK` a second window opens that shows all the settings that can be changed with some default values.
 The first two lines indicate the file(s) that were selected in the previous window (if only one file was selected, the secondary reads file is set to `none`).
-The third line is a drop-down menu to set whether to process the data single-end (default) or paired-end.
+The third line is a drop-down menu to set whether to process the data as single-end (default) or paired-end reads.
 The fourth line sets which trimming tool to use.
 There are two trimming tools installed, BBDuk and Trimmomatic, which can be selected in this drop-down menu (default is BBDuks).
 If the trimming should be skipped (and therefore the alignment is performed with the raw input data), select `donottrim` in this menu.
@@ -385,10 +385,10 @@ The fifth line sets the trimming arguments.
 When trimming is skipped, what is put in this line is ignored.
 Otherwise, use the arguments allowed by the selected trimming software.
 
-**Trimming settings**: By default some of the most common options are set for BBDuk (`ktrim=l k=15 mink=10 hdist=1 qtrim=r trimq=10 minlen=30`).
-The first four options are for trimming unwanted (adapter) sequences which in BBDuk is done using k-mers (e.g. all 3-mers for ATTGCAAT are ATT, TTG, TGC, GCA, CAA, AAT).
-Any unwanted sequences (e.g. adapter, primer and transposon sequences) can trimmed using the adapters file at the bottom of the window.
-Clicking the `Open adapters file` opens a text file in which the unwanted sequences can be placed in fasta format.
+**Trimming settings BBDuk**: For BBDuk, a typical argument line looks like this: `ktrim=l k=15 mink=10 hdist=1 qtrim=r trimq=10 minlen=30`.
+The first four options are for trimming unwanted (adapter) sequences which in BBDuk is done using k-mers (e.g. when k=3, all 3-mers for ATTGCAAT are ATT, TTG, TGC, GCA, CAA, AAT).
+Any unwanted sequences that need to be trimmed (e.g. adapter, primer and transposon sequences) should be entered in the adapters file.
+Clicking the `Open adapters file` opens a text file in which these unwanted sequences can be placed in fasta format.
 Fasta format is similar to the fastq format, but without the last two lines (i.e. the dummy line and the quality line).
 The header line of each read should start with a `>` and can contain any text (preferably no special symbols to be sure) and the next line should contain the unwanted sequence, for example:
 
@@ -399,38 +399,55 @@ The header line of each read should start with a `>` and can contain any text (p
 
 When all unwanted sequences are set, save the text file and close it.
 The value for k is set by the `k` parameter and should not be higher than the length of the shortest unwanted sequence (e.g. if the shortest sequence that needs to be trimmed has length 10, then k < 10).
-The higher this number is, the smaller the chances are that false positives are found when trimming.
+The higher this number, the smaller the chances are that false positives are found when trimming.
 This method, however, might skip over the last few basepairs of a read when the length of a read is not a multiple of k.
 To solve for this, the `mink` option can be set which allows for shorter k-mers at the end of a read.
 Therefore, `mink` < `k`.
-The `ktrim` option set to which side to trim (`r` or `l`), in this case this is set to trim everything to the left.
-The number set with `hdist` determines the number is mistakes that can be made when matching the unwanted sequences with the reads.
+The `ktrim` option set to which side to trim when encountering an unwanted sequence (right (`r`) or left (`l`)).
+The number set with `hdist` determines the number of mistakes allowed when matching the unwanted sequences with the reads.
 Next are some options for quality trimming of the reads.
-The `trimq` option sets the minimum Q-score that a basepairs are allowed to have on average.
+The `trimq` option sets the minimum Q-score that basepairs are allowed to have on average.
 When the average quality of either first few or last few basepairs is lower than this threshold, those basepairs will be removed.
 Whether the basepairs on the left or on the right have to be trimmed is determined by the `qtrim` parameter (either `r` or `l` or `rl` to trim everything in that read).
 Finally the `minlen` parameter checks for the minimum length of a read after trimming.
 When this is smaller then this threshold, the read is completely removed.
 Note that the trimming can have a serious influence on the alignment and choosing good options can be important.
-For more information about these and many other settings check the [BBDuk manual](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) or the [Trimmomatic manual](http://www.usadellab.org/cms/?page=trimmomatic).
+For more information about these and many other settings check the [BBDuk manual](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/).
 
-**Alignment settings**: The next line takes the arguments for the alignment software.
+**Trimming settings Trimmomatic**: Alternatively, instead of using BBDuk for the trimming, Trimmomatic can be used that requires different input arguments.
+A typical input for Trimmomatic can look like this (note the capital letters): `ILLUMINACLIP:1:30:10 LEADING:15 TRAILING:15 SLIDINGWINDOW:5:15 MINLEN:10`.
+The `ILLUMINACLIP` argument performs the trimming of the unwanted sequences from the adapters file.
+Use the same file as for BBDuk which can be accessed using the `Open adapters file` button at the bottom of the window and also enter the reads in the same fasta format.
+The first number of this argument indicates how many mismatches are allowed.
+The second number is mainly for paired-end reads and determines how accurate a match should be when considering a read pair (even though this is only for paired-end reads, it is required to enter this value, but it is not important for single-end reads).
+The third value sets the accuracy of a match between an unwanted sequence and the read.
+The `SLIDINGWINDOW` is a quality control and uses a sliding window approach to determine the average quality of the reads within the window (length in basepairs is given by the first value) and trim the read when the quality drops below a threshold given by the second value.
+The `LEADING` and `TRAILING` arguments check the quality of the basepairs at the beginning or end of the read, respectively.
+If the quality is below the threshold given by the value, that basepair is trimmed.
+This is repeated for all basepairs from the start of the read or at the end of the read until a basepair is found that has a quality above the threshold.
+The `MINLEN` argument sets the minimum length of the read after trimming.
+If the length is below the threshold, the entire read is removed.
+For more information about these and many other settings check the [Trimmomatic manual](http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf).
+
+**Alignment settings**: The alignment settings line takes the arguments for the alignment software.
 The default value is `-v 2` which reduces the verbose level and prevents a whole lot of text to be printed during alignment, but doesn't do anything with the way the aligner works.
-Most aligners (including BWA MEM) initially align a read to a random location after which it calculates a certain score which indicates how well the read aligns to that location.
-Then it moves the read to another location and calculates the score again.
-Based on the scores of previous positions, the aligner determines the next location based on some algorithm (e.g. BWA MEM uses the Maximal Exact Matches algorithm) which should, in the end, converge to a mapping location with the highest mapping score.
-The parameters that can be set alters the way the mapping score is influenced by matches, mismatches, insertions, deletions etc.
+The aligner determines for each read the position in the genome where it has the highest mapping score.
+The read is aligned to a location and then this score is determined by giving points for each letter in the read that match with the reference genome, but adding penalty points for evey time a letter in the read doesn't match with the genome (e.g. because of mismatches, extra letters in the read or missing letters in the read relative to the reference genome).
+This score is determined for each location where the read is aligned and the read is mapped to the location with the highest score.
+When the read cannot be unambiguously aligned (e.g. because all the mapping scores are too low or when there are mulitple locations that have the same highest score), the reads are aligned to a random location.
+The most important parameters that can be set alters the way the mapping score is influenced by matches, mismatches, insertions, deletions etc.
 Useful parameters to consider are: `-A`, `-B`, `-O`, `-E` and `-L`.
-When using paired end data it is also good to think about the parameter `-U` to change the penalty for unpaired read pairs.
+When using paired end data it is also good to think about using the parameter `-U` to change the penalty for unpaired read pairs.
 For explanation about the parameters and their default values, see the [BWA MEM manual](http://bio-bwa.sourceforge.net/bwa.shtml).
 
 Next are check boxes that can be set to turn on or off certain parts of the workflow.
 The first two checkboxes turn on or off quality checking before and after trimming.
-When `Quality check interrupt` is checked, the program pauses after the raw quality checking (before the trimming) and asking if the user want to continue the processing (press `n` to stop and `y` to continue).
+When `Quality check interrupt` is set, the program pauses after the raw quality checking (before the trimming) and asking if the user want to continue the processing (press `n` to stop and `y` to continue).
 Stopping the program allows the user to check the quality report of the raw data.
 After checking the quality report, the program can be restarted by typing `bash satay.sh` after which the program remembers the settings that were previously set (it will skip the file selection window).
 Changes can be made for the trimming and alignment tools and press `OK` to continue.
 This time the raw quality report will be skipped.
+
 The next options determine if the sam file needs to be deleted after processing, whether the bam file needs to be sorted and indexed, if the [transposon mapping](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/transposonmapping_satay.py) needs to be performed and if a flagstat report needs to be created (the quality report of the alignment).
 
 <img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satay_settingswindow.png" alt="satay.sh_settings_window" width=700>
@@ -440,6 +457,7 @@ The next options determine if the sam file needs to be deleted after processing,
 **Note before use**: When down-/uploading files to the N-drive or M-drive on the Linux Desktop, the drives will disconnect automatically after 10 minutes of inactivity.
 Since the files are typically large the down-/uploading can therefore take more then 10 minutes to complete.
 To prevent disconnection while down-/uploading you should click back and forth to some folders once every few minutes in the drives to reset the timer.
+See also [How to use the Linux desktop](#how-to-use-the-linux-desktop).
 
 - [ ] Log in to the Linux desktop (log in credentials can be found at `N:\tnw\BN\LL\Shared\LinuxMachines\LinuxDesktop_LoginCredentials.txt`).
   - [ ] When using remote access, install the free version of [Teamviewer](https://www.teamviewer.com/nl/) on your computer and connect with the computer using the credentials found in the file mentioned above.
@@ -459,10 +477,10 @@ To prevent disconnection while down-/uploading you should click back and forth t
   - [ ] The workflow will ask if you want to continue. Enter `y` to continue with the parameters you have set and enter `n` to stop the workflow to check the quality report of the raw data.
   - [ ] Navigate to the folder where your data file is stored and open the .html file (in the `fastqc_out` folder) and the check the quality report.
   - [ ] When finished, restart the workflow by typing `bash satay.sh` at `~/Documents/satay/software/`.
-  - [ ] The workflow should skip the file selection window and immediately start with the processing options window where the parameters you have previously entered are shown. Change the parameters if needed and press `OK` to continue processing.
+  - [ ] The workflow should skip the file selection window and immediately start with the processing options window where the parameters you have previously entered are set by default. Change the parameters if needed and press `OK` to continue processing.
   - [ ] The workflow should skip over the raw quality checking and continue with the processing.
-- [ ] When processing is finished, navigate to folder where your dataset is located and check if all expected files are present (depending on what options yout have set, but at least the `align_out` folder and a log file should be present).
-- [ ] Copy results to N-drive following the same procedure as described in step 2. (Be aware to prevent the sftp connection to automatically disconnect, see beginning of this section).
+- [ ] When processing is finished, navigate to folder where your dataset is located and check if all expected files are present (depending on what options yout have set, but at least the `align_out` folder and a log file should be present, see the [Input, Output](#input-output) section).
+- [ ] Copy the results to the N-drive following the same procedure as described in step 2. (Be aware to prevent the sftp connection to automatically disconnect, see the note at the beginning of this section).
 - [ ] After the processing is finished, most information is stored in the [bed](#bed) and [wig](#wig) files. But there can be some artifacts present in these files which can be removed using [strip_redundant_insertions.py](#strip_redundant_insertionspy). This is only necessary for specific downstream analysis tools like the [genome browser](#genome-browser).
 
 #### How does it work
@@ -521,12 +539,15 @@ The corresponding reads are added up and this information is stored as a wig fil
 
 #### Notes
 
-- [ ] Some extra note to be aware of.
-- [ ] when processing unexpectely skips over file selection -> cancel and restart satay.sh
+- [ ] The alignment software arguments all require to start with a dash (`-`). For some reason this sometimes gives errors and to prevent this make sure there is a space before the first argument in the `Enter alignment settings` line.
+- [ ] If the workflow unexpectedly skips over the file selection window and immediately shows the options window, it might be that a previous processing run was not correctly finished. Press `cancel` and restart the workflow. It should now start with the file selection window. (This most likely has to do with a cachefile, that is created after the `quality check interrupt`, that was not deleted. This can be deleted manually as well by removing `processing_workflow_cache.txt` at the same location where the workflow is stored).
+- [ ] When using the commandline for entering the arguments, use `Paired-end` and `Single-end` with first capital letters.
 
 ## Software - analysis
 
 ### python scripts
+
+Order to which to do the processing
 
 #### strip_redundant_insertions.py
 
