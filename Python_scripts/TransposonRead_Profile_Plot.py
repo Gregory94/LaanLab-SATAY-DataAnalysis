@@ -48,7 +48,7 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None, savefig=False):
 #    chrom_index = chromosome_romannames_list.index(chrom)
     print('Chromosome length: ',chr_length_dict.get(chrom))
     if bar_width == None:
-        bar_width = int(chr_length_dict.get(chrom)/400)
+        bar_width = int(chr_length_dict.get(chrom)/800)
     
     
 #%% GET ALL GENES IN CURRENT CHROMOSOME
@@ -416,8 +416,10 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
 
 #%%
 if __name__ == '__main__':
-    # chrom = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
-    chrom = ["XVI"]
+    chrom = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
+    # chrom = ["XVI"]
     for c in chrom:
-        read_profile(chrom=c,wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\leila_dataset_dnrp1_processing\dnrp1_merged_dnrp1-1_dnrp1-2_processing\dnrp1_merged_dnrp1-1_dnrp1-2_trimmed.sorted.bam.wig", savefig=False)
-        # transposon_profile(chrom=c, bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\a-b_pooled\WT.bed", savefig=True)
+        read_profile(chrom=c, wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig",
+                      savefig=True)
+        # transposon_profile(chrom=c, bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.bed",
+        # savefig=True)

@@ -64,7 +64,7 @@ def strip_redundant_ins(filepath=None, custom_header=None):
 
                 for line in lines[chrom_start_line_dict.get(chrom): chrom_end_line_dict.get(chrom)+1]:
                     line_list = " ".join(line.strip("\n").split()).split(" ")
-                    if int(line_list[1]) > chr_length_dict.get(chrom) or int(line_list[1]) < 0:
+                    if int(line_list[2]) > chr_length_dict.get(chrom) or int(line_list[1]) < 0:
                         print("Line removed: %s" % line)
                     else:
                         for romanname, chromname in chrom_names_dict.items():
