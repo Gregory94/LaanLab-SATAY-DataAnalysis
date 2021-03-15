@@ -704,17 +704,62 @@ Difference in VariableStep in variablestep
 
 ## How to use the Linux desktop
 
-general layout
+For those who are not familiar with Linux, here is a brief summary of how to work with the Linux desktop and the basic tools that are necessary for using the workflow in Linux.
 
-Log in codes
+When using the Linux desktop, log in with the credentials found at `N:\tnw\BN\LL\Shared\LinuxMachines\LinuxDesktop_LoginCredentials.txt`.
+For remote access, download [Teamviewer](https://www.teamviewer.com/nl/) on your computer and connect with the Linux desktop using the credentials found in the file mentioned above.
 
-sftp for drives and disabling after 10 minutes
+The workflow can be used via the commandline.
+For this, open the Terminal located on the left bar in Linux.
+This allows you to navigate through the different files and folders that are located on the desktop.
+These files and folders can also be accessed using Files (also located on the left bar) which gives a more Windows like experience with clicking on pictograms, but this is missing some useful features from the commandline.
+The Terminal by default opens in the home directory (indicated either as `~/` or `/home/laanlab/`).
+For navigating through different directories (folders) use the change directory command `cd` (e.g. `cd ~/Documents/satay/` would bring you to the folder called satay which is located within the Documents folder).
+Everything needed for the satay analysis is located in `~/Documents/satay`, which contains the following folders (among others):
 
-command line
+- `software`; containing all the software packages and the bash script `satay.sh`.
+- `datasets`; here the datasets are stored, including some test datasets.
+- `reference_sequences`; containing the reference genome sequences.
 
-where to find the processing tool
+While navigating through the folders, see what is inside a folder using `ls` (e.g. just typing `ls` shows the contents of the current directory and `ls ~/Documents/satay` would show the contents of the satay folder regardless in which folder you currently are).
+There are several extensions of this command, like `ls -a` which shows also all hidden folders (starting with `.`) and `ls -l` shows some basic information about each file and folder.
 
-updating
+To show the contents of a file use `less` or `head`.
+The `head` command shows the first 10 lines of the file (e.g. `head ~/Documents/satay/software/satay.sh` shows the first 10 lines of the satay.sh script) and `less` also shows the contents of a file, but allows you to scroll through the file using the arrow keys.
+The advantage of these commands are that they only load the lines that are being shown, so this is a perfect tool for checking large files without using a lot of memory (what would normally happen when opening a file completely).
+
+To normally open a file with the default program for that filetype, use the command `xdg-open` (e.g. `xdg-open ~/Documents/satay/software/satay.sh` opens a text editor with satay.sh).
+
+To access the webdrives, open the Files program and go to `Other Locations` (in the left menu bar in Files).
+On the bottom of the window it should say `Connect to server`.
+Enter here the following adress: `sftp://sftp.tudelft.nl/ `
+Press `Connect` and, if requested, log in with your TUDelft credentials.
+This should show a number of folders ,among of which is `staff-bulk` which is the N-drive and `staff-groups` which is the M-drive.
+Here you can up-/download any files to the desktop, but after about 10 minutes of inactivity, the connection to the drives is automatically broken.
+This means that all the up-/downloads will abort.
+To prevent this, the switch back and forth to some files within the drives every few minutes to reset the timer.
+
+As mentioned before, the workflow can be accessed by going to the following path: `~/Documents/satay/software/`
+Start the workflow by stating the tool to which to run the script with (bash) and then the name of the script (satay.sh), thus entering `bash satay.sh`.
+Any commands you want to put in come right after this statement, e.g. `bash satay.sh -h` to open the help text.
+Datafiles can be stored at the following location: `~/Documents/satay/datasets/`.
+To keep organized create a new folder for each dataset using the command `mkdir foldername` (where foldername is to be replaced with any name you want).
+Prevent spaces in namegiving, but rather use underscores.
+(When using the Files program, right mouse click and select `New Folder` at the location where the new folder has to be located).
+
+Note that this desktop has no backup system, thus make sure to always put any files directly on the drives and remove the files you do not need from the desktop to prevent filling up the memory.
+
+Once in a while, the desktop may require an update.
+Sometimes the desktop will ask for this and you can follow the instructions of the pop up window.
+To update manually enter the following commands in the commanline:
+
+- `sudo apt-get update`; This checks for the latest versions of different system tools and files. This command only update the list of things to update, but doesn't do any downloading or isntalling itself. This requires a user password (required by the `sudo` command) which is the same password for logging in. (Note that when typing a password in the commandline, it doesn't show any signs that you're typing, but just enter the password and press enter).
+  
+- `sudo apt-get upgrade`; This does the actual downloading and installation of the updates that are found by the previous command. You may ask for a confirmation before it starts the installation and may restart the desktop.
+
+For a more thorough tutorial of the linux commandline, see for example this course from [datacarpentry.org/shell-genomics](https://datacarpentry.org/shell-genomics/).
+To have commandline like tool on windows (e.g. to access large datafiles on windows using `less` and `head` commands), try [git bash](https://gitforwindows.org/).
+For Mac users, the terminal that is by default installed in MacOS works very similar as the one in Linux, so there is no real need for downloading any special tools.
 
 ## Appendices
 
