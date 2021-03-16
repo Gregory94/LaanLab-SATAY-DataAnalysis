@@ -428,7 +428,8 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
                     'Nreads':N_reads_list,
                     'Nreads_truncatedgene':N_reads_truncatedgene_list,
                     'Nreadsperinsrt':N_reads_per_ins_list,
-                    'Nreadsperinsrt_truncatedgene':N_reads_per_ins_truncatedgene_list}
+                    'Nreadsperinsrt_truncatedgene':N_reads_per_ins_truncatedgene_list,
+                    'chromosome': region}
 
 
     dna_df2 = pd.DataFrame(all_features, columns = [column_name for column_name in all_features]) #search for feature using: dna_df2.loc[dna_df2['Feature'] == 'CDC42']
@@ -605,10 +606,10 @@ if __name__ == '__main__':
     ,variable="reads", #for plotting
                      plotting=False,
                      savefigure=False,
-                     verbose=True))
+                     verbose=True))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
         
         #dna_df2.to_excel(r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\src(source-code)\Processed-data\WT-dnrp1-sequencing-analysis-plots\detailed-analysis\data_df2_'+chrom+'.xlsx')
-    data_genome=pd.concat(dna_df2, axis=0)
+    data_genome=pd.concat(dna_df2, axis=0,ignore_index=True)
 #
 #    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
 #        dna_df2 = dna_features(region = chrom,
