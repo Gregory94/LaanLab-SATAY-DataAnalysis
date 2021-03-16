@@ -564,6 +564,9 @@ These are all python scripts that are not depended on Linux and only use rather 
 
 The order in which to run the programs shouldn't matter as these scripts are all independed of each other except for genomicfeatures_dataframe.py which is sometimes called by other scripts.
 However, most of the scripts are depending on one or more [python modules](#python-modules), which are all expected to be located in a python_modules folder inside the folder where the python scripts are located (see [github](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/satay_processing/python_scripts) for an example how this is organized).
+Also many python scripts and modules are depending on [data files](#data-files) stored in a folder called data_files located in the same folder of the python_scripts folder.
+
+The input for most scripts and modules are the output files of the processing, see the [Input, Output](#input-output) section.
 
 This is a typical order which can be used:
 
@@ -575,7 +578,11 @@ This is a typical order which can be used:
 
 #### strip_redundant_insertions.py
 
+Code can be found [here](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/strip_redundant_insertions.py)
+
 - **Main tasks**
+
+
 
 - **Dependencies**
 
