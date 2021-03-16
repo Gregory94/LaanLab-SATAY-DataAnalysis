@@ -598,7 +598,7 @@ if __name__ == '__main__':
                  wig_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig",
                  pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt",
                  variable="reads", #for plotting
-                 plotting=True,
+                 plotting=False,
                  savefigure=False,
                  verbose=True)
 
