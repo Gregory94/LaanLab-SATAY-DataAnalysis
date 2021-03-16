@@ -47,7 +47,7 @@ datapath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset
 filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
 
 
-variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
+variable = 'tn_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
@@ -130,9 +130,14 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         # norm_a += sum(tnread_gene_a.tn_per_gene)
 
         #SET ZERO COUNTS TO HIGHER VALUE (AFTER NORMALIZATION) TO PREVENT WEIRD BEHAVIOR WHEN DETERMINING THE FOLD CHANGE
-        tnread_gene_a.tn_per_gene.replace(0,tn_per_gene_zeroreplace,inplace=True)
-        tnread_gene_a.read_per_gene.replace(0,read_per_gene_zeroreplace,inplace=True)
-        tnread_gene_a.Nreadsperinsrt.replace(0,(read_per_gene_zeroreplace/tn_per_gene_zeroreplace),inplace=True)
+        # tnread_gene_a.tn_per_gene.replace(0,tn_per_gene_zeroreplace,inplace=True)
+        # tnread_gene_a.read_per_gene.replace(0,read_per_gene_zeroreplace,inplace=True)
+        # tnread_gene_a.Nreadsperinsrt.replace(0,(read_per_gene_zeroreplace/tn_per_gene_zeroreplace),inplace=True)
+
+        #ADD A CONSTANT TO ALL VALUES TO PREVENT A ZERO DIVISION WHEN DETERMINING THE FOLD CHANGE.
+        tnread_gene_a.tn_per_gene = tnread_gene_a.tn_per_gene + tn_per_gene_zeroreplace
+        tnread_gene_a.read_per_gene = tnread_gene_a.read_per_gene + read_per_gene_zeroreplace
+        tnread_gene_a.Nreadsperinsrt = tnread_gene_a.Nreadsperinsrt + (read_per_gene_zeroreplace/tn_per_gene_zeroreplace)
 
         if count == 0:
             volcano_df = tnread_gene_a[['gene_names']] #initialize new dataframe with gene_names
@@ -161,9 +166,14 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         # norm_b += sum(tnread_gene_b.tn_per_gene)
 
         #SET ZERO COUNTS TO HIGHER VALUE AFTER NORMALIZATION TO PREVENT WEIRD BEHAVIOR WHEN DETERMINING THE FOLD CHANGE
-        tnread_gene_b.tn_per_gene.replace(0,tn_per_gene_zeroreplace,inplace=True)
-        tnread_gene_b.read_per_gene.replace(0,read_per_gene_zeroreplace,inplace=True)
-        tnread_gene_b.Nreadsperinsrt.replace(0,(read_per_gene_zeroreplace/tn_per_gene_zeroreplace),inplace=True)
+        # tnread_gene_b.tn_per_gene.replace(0,tn_per_gene_zeroreplace,inplace=True)
+        # tnread_gene_b.read_per_gene.replace(0,read_per_gene_zeroreplace,inplace=True)
+        # tnread_gene_b.Nreadsperinsrt.replace(0,(read_per_gene_zeroreplace/tn_per_gene_zeroreplace),inplace=True)
+
+        #ADD A CONSTANT TO ALL VALUES TO PREVENT A ZERO DIVISION WHEN DETERMINING THE FOLD CHANGE.
+        tnread_gene_b.tn_per_gene = tnread_gene_b.tn_per_gene + tn_per_gene_zeroreplace
+        tnread_gene_b.read_per_gene = tnread_gene_b.read_per_gene + read_per_gene_zeroreplace
+        tnread_gene_b.Nreadsperinsrt = tnread_gene_b.Nreadsperinsrt + (read_per_gene_zeroreplace/tn_per_gene_zeroreplace)
 
         if count == 0:
             if normalize == True:
@@ -232,7 +242,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         #     elif variable == 'read_per_gene':
         #         fc_list[count] = np.log2(np.mean(variable_b_array[count]) / 25)
         else:
-            fc_list[count] = np.log2(np.mean(variable_b_array[count]) / np.mean(variable_a_array[count]))
+            fc_list[count] = np.log2(np.mean(variable_a_array[count]) / np.mean(variable_b_array[count]))
             # fc_list[count] = np.mean(variable_b_array[count]) - np.mean(variable_a_array[count])
 
         #Take sum of number of insertions per library 
