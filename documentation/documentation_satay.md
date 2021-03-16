@@ -553,13 +553,31 @@ The corresponding reads are added up and this information is stored as a wig fil
 - [ ] When using the commandline for entering the arguments, use `Paired-end` and `Single-end` with first capital letters.
 - [ ] For all software in the pipeline, whether the data is paired-end or single-end is automatically set, so do not set options like `interleaved=t` (for BBDuk), `PE` (for Trimmomatic)
 or `-p` (for BWA) in the options window of the workflow.
+- [ ] The names of the chromosomes in the reference genome that is used during alignment are not roman numerals as what is typically used for chromosomes. There are two ways of solving this, either change the names in the reference genome (before indexing it, see the section [S288C_reference_sequence_R64-2-1_20150113.fsa](#s288c_reference_sequence_r64-2-1_20150113fsa)) or by using the function [chromosome_names_in_files.py](#chromosome_names_in_filespy) which can be used for converting the chromosome names found bed or wig files to roman numerals. To make the analysis tools as general as possible, the latter method is chosen with using the function and therefore the chromosome names in the reference genome are not changed. The reference genome mentioned in [S288C_reference_sequence_R64-2-1_20150113.fsa](#s288c_reference_sequence_r64-2-1_20150113fsa) uses the following chromosome names:
+  - I: ref|NC_001133|
+  - II: ref|NC_001134|
+  - III: ref|NC_001135|
+  - IV: ref|NC_001136|
+  - V: ref|NC_001137|
+  - VI: ref|NC_001138|
+  - VII: ref|NC_001139|
+  - VIII: ref|NC_001140|
+  - IX: ref|NC_001141|
+  - X: ref|NC_001142|
+  - XI: ref|NC_001143|
+  - XII: ref|NC_001144|
+  - XIII: ref|NC_001145|
+  - XIV: ref|NC_001146|
+  - XV: ref|NC_001147|
+  - XVI: ref|NC_001148|
+  - Mito: ref|NC_001224|
 
 ## Software analysis
 
 ### python scripts
 
 The software discussed in the [previous section](#software-processing) is solely for the processing of the data.
-The codes that are discussed here are for the analysis after the processing.
+The codes that are discussed here are for the postprocessing analysis.
 These are all python scripts that are not depended on Linux and only use rather standard python package like numpy, matplotlib, pandas, seaborn and scipy.
 
 The order in which to run the programs shouldn't matter as these scripts are all independed of each other except for genomicfeatures_dataframe.py which is sometimes called by other scripts.
@@ -576,25 +594,52 @@ This is a typical order which can be used:
 4. scatterplot_genes.py (to check the distribution for the number of insertions per gene and per essential gene).
 5. volcanoplot.py (only when comparing multiple datasets with different genetic backgrounds to see which genes have a significant change in insertion and read counts).
 
+Most of the python scripts consists of one or more functions.
+These functions are called at the end of each script.
+Here also the input for each function (if any) should be entered.
+All packages where the scripts are depending on are called at the beginning of the script.
+The scripts should also contain a help text about how to use the functions.
+
 #### strip_redundant_insertions.py
 
-Code can be found [here](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/strip_redundant_insertions.py)
+Code can be found [here](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/strip_redundant_insertions.py).
 
 - **Main tasks**
 
-
+Remove reads mapped outside chromosomes in .bed and .wig files, clean up those files and create custom header.
 
 - **Dependencies**
 
-- **How does it work**
+[chromosome_and_gene_positions.py](#chromosome_and_gene_positionspy)  
+[chromosome_names_in_files.py](#chromosome_names_in_filespy)
 
-- **How to use**
+- **How and when to use**
 
-- **Output files**
+This script consists of a single function called `strip_redundant_ins()` with the following arguments:
+
+`filepath=[path]`  
+`custom_header=[text]`
+
+Input of the function is a filepath to a bed or wig file (required).
+Optionally a string for the custom header can be added to the input that changes the header line of each file.
+By default the name in the header is the same name as the original datafile, but this can be a long and unclear name.
+Therefore, it can be useful to change this when the bed or wig files are used for other analysis tools that use the name stated in the header, for example the [genome browser](#genome-browser).
+Also the names of the chromosomes are the names that are used in the reference genome.
+In this function these names are replaced by roman numerals.
+
+Finally, sometimes insertions can be mapped outside chromosomes (i.e. the insertion position of a read is larger than the length of the chromosome is mapped to).
+The reason for this result is not clear, but it can cause issues with downstream analysis tools.
+This function removes those reads.
+
+- **Output**
+
+A new file is created at the same location as the input file with `_clean` added to the name and with the same extension as the input name (e.g. input WT.bed results in WT_clean.bed being created).
+This contains the same information as the original bed or wig file, but with roman numerals for the chromosome names and the reads outside the chromosomes removed.
+Optionally the header is changed when this was provided by the user.
 
 - **Notes**
   
-Difference in VariableStep in variablestep
+- [ ] In the wig file, each  chromosome starts with a VariableStep line. By default this is written with capital V and S, but some tools may have issues with the capital letters. Therefor this script also converts everything to lowercase letters (i.e. variablestep).
 
 #### genomicfeatures_dataframe.py
 
