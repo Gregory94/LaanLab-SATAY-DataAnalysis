@@ -37,10 +37,6 @@ from dataframe_from_pergene import dataframe_from_pergenefile
 
 
 #%% define file paths and names. Two samples called a and b.
-# datapath_a = 
-# filenames_a = []
-# datapath_b = 
-# filenames_b = []
 datapath_a = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing"
 filenames_a = ["WT-a_pergene.txt", "WT-b_pergene.txt"]
 datapath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
@@ -52,10 +48,8 @@ significance_threshold = 0.01 #set threshold above which p-values are regarded s
 normalize=True
 
 trackgene_list = ['nrp1']
-# trackgene_list = ['ymr320w','sut1','ymr242w-a','ypl135c-a','ppn1','ypl067c','yme1','mec1','nrp1','mss18','tma7','gef1']
-# trackgene_list = ['bsd2', 'mtf2', 'abd1', 'pmp3','yjr087w','rpa49','osw7','atg23','gef1','mec1','yor293c-a']
-# trackgene_list = ['cpr1','def1', 'rrt1', 'ssc1', 'rsc3','cup2']
 # trackgene_list = ['cdc42', 'bem1', 'bem2', 'bem3', 'nrp1', 'cdc24', 'cla4', 'ste20']
+# trackgene_list = ['ymr320w','sut1','ymr242w-a','ypl135c-a','ppn1','ypl067c','yme1','mec1','nrp1','mss18','tma7','gef1']
 
 #%%
 def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', significance_threshold=0.01, normalize=True, trackgene_list=[], figure_title=""):
@@ -118,21 +112,11 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
     # norm_b = 0
     for count, datafile_a in enumerate(datafiles_list_a):
         tnread_gene_a = dataframe_from_pergenefile(datafile_a, verbose=False)
-        # #SET ZERO COUNTS TO HIGHER VALUE BEFORE NORMALIZATION TO PREVENT WEIRD BEHAVIOR WHEN DETERMINING THE FOLD CHANGE
-        # tnread_gene_a.tn_per_gene.replace(0,tn_per_gene_zeroreplace,inplace=True)
-        # tnread_gene_a.read_per_gene.replace(0,read_per_gene_zeroreplace,inplace=True)
-        # tnread_gene_a.Nreadsperinsrt.replace(0,(read_per_gene_zeroreplace/tn_per_gene_zeroreplace),inplace=True)
         if normalize == True:
             if variable == 'tn_per_gene':
                 norm_a = sum(tnread_gene_a.tn_per_gene)#*10**-4
             elif variable == 'read_per_gene':
                 norm_a = sum(tnread_gene_a.read_per_gene)#*10**-7
-        # norm_a += sum(tnread_gene_a.tn_per_gene)
-
-        #SET ZERO COUNTS TO HIGHER VALUE (AFTER NORMALIZATION) TO PREVENT WEIRD BEHAVIOR WHEN DETERMINING THE FOLD CHANGE
-        # tnread_gene_a.tn_per_gene.replace(0,tn_per_gene_zeroreplace,inplace=True)
-        # tnread_gene_a.read_per_gene.replace(0,read_per_gene_zeroreplace,inplace=True)
-        # tnread_gene_a.Nreadsperinsrt.replace(0,(read_per_gene_zeroreplace/tn_per_gene_zeroreplace),inplace=True)
 
         #ADD A CONSTANT TO ALL VALUES TO PREVENT A ZERO DIVISION WHEN DETERMINING THE FOLD CHANGE.
         tnread_gene_a.tn_per_gene = tnread_gene_a.tn_per_gene + tn_per_gene_zeroreplace
@@ -154,21 +138,11 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
 
     for count, datafile_b in enumerate(datafiles_list_b):
         tnread_gene_b = dataframe_from_pergenefile(datafile_b, verbose=False)
-        # #SET ZERO COUNTS TO HIGHER VALUE BEFORE NORMALIZATION TO PREVENT WEIRD BEHAVIOR WHEN DETERMINING THE FOLD CHANGE
-        # tnread_gene_b.tn_per_gene.replace(0,tn_per_gene_zeroreplace,inplace=True)
-        # tnread_gene_b.read_per_gene.replace(0,read_per_gene_zeroreplace,inplace=True)
-        # tnread_gene_b.Nreadsperinsrt.replace(0,(read_per_gene_zeroreplace/tn_per_gene_zeroreplace),inplace=True)
         if normalize == True:
             if variable == 'tn_per_gene':
                 norm_b = sum(tnread_gene_b.tn_per_gene)#*10**-4
             elif variable == 'read_per_gene':
                 norm_b = sum(tnread_gene_b.read_per_gene)#*10**-7
-        # norm_b += sum(tnread_gene_b.tn_per_gene)
-
-        #SET ZERO COUNTS TO HIGHER VALUE AFTER NORMALIZATION TO PREVENT WEIRD BEHAVIOR WHEN DETERMINING THE FOLD CHANGE
-        # tnread_gene_b.tn_per_gene.replace(0,tn_per_gene_zeroreplace,inplace=True)
-        # tnread_gene_b.read_per_gene.replace(0,read_per_gene_zeroreplace,inplace=True)
-        # tnread_gene_b.Nreadsperinsrt.replace(0,(read_per_gene_zeroreplace/tn_per_gene_zeroreplace),inplace=True)
 
         #ADD A CONSTANT TO ALL VALUES TO PREVENT A ZERO DIVISION WHEN DETERMINING THE FOLD CHANGE.
         tnread_gene_b.tn_per_gene = tnread_gene_b.tn_per_gene + tn_per_gene_zeroreplace
@@ -185,16 +159,6 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
                 variable_b_array = np.append(variable_b_array, np.divide(tnread_gene_b[[variable]].to_numpy(), norm_b), axis=1)
             else:
                 variable_b_array = np.append(variable_b_array, tnread_gene_b[[variable]].to_numpy(), axis=1)
-
-
-    ### printing specific genes
-    # if not trackgene_list == "":
-    #     trackgene_list = trackgene_list.upper()
-    #     print('')
-    #     print("TRACKING VARIABLE %s" % trackgene_list)
-    #     trackgene_list_index = tnread_gene_a.loc[tnread_gene_a['gene_names'] == trackgene_list].index[0]
-    #     print("tnread_gene_a:", tnread_gene_a.loc[tnread_gene_a['gene_names'] == trackgene_list])
-    #     print("tnread_gene_b:", tnread_gene_b.loc[tnread_gene_b['gene_names'] == trackgene_list])
 
 
     del (datafile_a, datafile_b, count, tnread_gene_b)
@@ -219,49 +183,11 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         if ttest_pval_list[count] > -1*np.log10(significance_threshold):
             signif_thres_list[count] = True
 
-        #Determine fold change per gene between libraries
+        #DETERMINE FOLD CHANGE PER GENE
         if np.mean(variable_b_array[count]) == 0 and np.mean(variable_a_array[count]) == 0:
             fc_list[count] = 0
-        # elif np.mean(variable_b_array[count]) == 0 and np.mean(variable_a_array[count]) != 0:
-        #     fc_list[count] = np.log2(0.01 / np.mean(variable_a_array[count]))
-        # elif np.mean(variable_b_array[count]) != 0 and np.mean(variable_a_array[count]) == 0:
-        #     fc_list[count] = np.log2(np.mean(variable_b_array[count]) / 0.01)
-
-        # elif np.mean(variable_b_array[count]) == 0 or np.mean(variable_a_array[count]) == 0:
-        #     fc_list[count] = np.nan
-        #     fc_list[count] = np.log2(max(np.mean(variable_a_array[count]), np.mean(variable_b_array[count])))
-
-        # elif np.mean(variable_b_array[count]) == 0:
-        #     if variable == 'tn_per_gene':
-        #         fc_list[count] = np.log2(5 / np.mean(variable_a_array[count]))
-        #     elif variable == 'read_per_gene':
-        #         fc_list[count] = np.log2(25 / np.mean(variable_a_array[count]))
-        # elif np.mean(variable_a_array[count]) == 0:
-        #     if variable == 'tn_per_gene':
-        #         fc_list[count] = np.log2(np.mean(variable_b_array[count]) / 5)
-        #     elif variable == 'read_per_gene':
-        #         fc_list[count] = np.log2(np.mean(variable_b_array[count]) / 25)
         else:
             fc_list[count] = np.log2(np.mean(variable_a_array[count]) / np.mean(variable_b_array[count]))
-            # fc_list[count] = np.mean(variable_b_array[count]) - np.mean(variable_a_array[count])
-
-        #Take sum of number of insertions per library 
-        # if sum(variable_a_array[count]) == 0 and sum(variable_b_array[count]) == 0:
-        #     fc_list[count] = 0
-        # elif sum(variable_a_array[count]) == 0 or sum(variable_b_array[count]) == 0:
-        #     fc_list[count] = np.log2(max(sum(variable_a_array[count]) / norm_a, sum(variable_b_array[count]) / norm_b))
-        # else:
-        #     fc_list[count] = np.log2((sum(variable_a_array[count]) / norm_a) / (sum(variable_b_array[count]) / norm_b))
-
-
-        ### printing specific genes
-        # if not trackgene_list == "" and count == trackgene_list_index:
-        #     print("variable_a_array:", variable_a_array[count])
-        #     print("variable_b_index:", variable_b_array[count])
-        #     print("t-test value:", ttest_val)
-        #     print("mean a:", np.mean(variable_a_array[count]))
-        #     print("mean b:", np.mean(variable_b_array[count]))
-        #     print("fold change:", fc_list[count])
 
 
     volcano_df['fold_change'] = fc_list
@@ -279,8 +205,6 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
     grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
     ax = plt.subplot(grid[0,0])
 
-    # ax.scatter(x=volcano_df.loc[volcano_df['significance'] == False, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == False, 'p_value'], alpha=0.4, marker='.', c='k', label='p-value > {}'.format(significance_threshold))
-    # sc = ax.scatter(x=volcano_df.loc[volcano_df['significance'] == True, 'fold_change'], y=volcano_df.loc[volcano_df['significance'] == True, 'p_value'], alpha=0.4, marker='.', c='r', label='p-value < {}'.format(significance_threshold))
     colors = {False:'black', True:'red'}
     sc = ax.scatter(x=volcano_df['fold_change'], y=volcano_df['p_value'], alpha=0.4, marker='.', c=volcano_df['significance'].apply(lambda x:colors[x]))
     ax.grid(True, which='major', axis='both', alpha=0.4)
