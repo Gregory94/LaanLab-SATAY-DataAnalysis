@@ -269,6 +269,9 @@ def essentialgene_plot_frompergenefile(datafile):
 #wigfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample2_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam.wig"
 #pergeneinsertionsfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_enzo\wt1_enzo_dataset_demultiplexed_singleend_sample2_trim1\D18524C717111_BDDP200001534-1A_HJVN5DSXY_L1_sample2interleavedsorted_singleend_trimmed.sorted.bam_pergene_insertions.txt"
 
+### WILD TYPE leila
+# wigfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig"
+# pergeneinsertionsfile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt"
 #%% example inputs for data files for essentialgene_plot_frompergenefile()
 
 ### WILD TYPE leila
@@ -289,7 +292,7 @@ datafile = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_l
 
 #%%
 if __name__ == '__main__':
-#    read_gene_df = essentialgene_plot(wigfile, pergeneinsertionsfile)
+    # read_gene_df = essentialgene_plot(wigfile, pergeneinsertionsfile)
 
     read_gene_df = essentialgene_plot_frompergenefile(datafile)
 
