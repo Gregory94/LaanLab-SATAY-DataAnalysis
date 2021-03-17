@@ -31,18 +31,34 @@ __Author__: Gregory van Beek
 """
 
 #%%
-import os
+import os, sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 
 file_dirname = os.path.dirname(os.path.abspath('__file__'))
-#sys.path.insert(1,os.path.join(file_dirname,'..','python_modules'))
+sys.path.insert(1,os.path.join(file_dirname,'python_modules'))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic, gene_position
 from chromosome_names_in_files import chromosome_name_wigfile
 from gene_names import list_gene_names, gene_aliases
 from read_sgdfeatures import sgd_features
+
+
+
+#%% INPUT
+
+# for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
+#     region=chrom
+region = 3 #e.g. 1, "I", ["I", 0, 10000"], gene name (e.g. "CDC42")
+wig_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig"
+pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt"
+plotting=True
+variable="reads" #"reads" or "insertions"
+savefigure=False
+verbose=True
+
+
 
 #%%
 def dna_features(region, wig_file, pergene_insertions_file, variable="reads", plotting=True, savefigure=False, verbose=True):
@@ -70,6 +86,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
             - Standard name of the feature
             - Aliases of feature name (if any)
             - Feature type (e.g. gene, telomere, centromere, etc. If None, this region is not defined)
+            - Chromosome
             - Position of feature type in terms of bp relative to chromosome.
             - Length of region in terms of basepairs
             - Number of insertions in region
@@ -87,13 +104,13 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
         - sgd_features_file: https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/master/Data_Files/SGD_features.tab
     '''
 #%% FILES
-    essentials_file = os.path.join(file_dirname,'..','Data_Files',"Cerevisiae_AllEssentialGenes_List.txt")
+    essentials_file = os.path.join(file_dirname,'..','data_files',"Cerevisiae_AllEssentialGenes_List.txt")
 
-    gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
+    gene_information_file = os.path.join(file_dirname,'..','data_files','Yeast_Protein_Names.txt')
 
-    gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    gff_file = os.path.join(file_dirname,'..','data_files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
 
-    sgd_features_file = os.path.join(file_dirname,'..','Data_Files','SGD_features.tab')
+    sgd_features_file = os.path.join(file_dirname,'..','data_files','SGD_features.tab')
 
     variable = variable.lower()
     if plotting == True:
@@ -421,6 +438,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
                     'Feature_alias':feature_alias_list,
                     'Feature_type': feature_type_list,
                     'Essentiality': essentiality_list,
+                    'Chromosome': [chrom]*len(feature_name_list),
                     'Position': f_pos_list,
                     'Nbasepairs':N_bp_list,
                     'Ninsertions':N_insrt_list,
@@ -594,20 +612,11 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 if __name__ == '__main__':
-    dna_df2 = dna_features(region = 4,#['xiii', 0, 14790],
-                 wig_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig",
-                 pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt",
-                 variable="reads", #for plotting
-                 plotting=False,
-                 savefigure=False,
-                 verbose=True)
+    dna_df2 = dna_features(region=region,
+                 wig_file=wig_file,
+                 pergene_insertions_file=pergene_insertions_file,
+                 variable=variable,
+                 plotting=plotting,
+                 savefigure=savefigure,
+                 verbose=verbose)
 
-#
-#    for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
-#        dna_df2 = dna_features(region = chrom,
-#                     wig_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam.wig",
-#                     pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\testing_site\dDpl1_testfolder\align_out\E-MTAB-4885.Dpl1Kan.sorted.bam_pergene_insertions.txt",
-#                     variable="reads",
-#                     plotting=False,
-#                     savefigure=False,
-#                     verbose=True)
