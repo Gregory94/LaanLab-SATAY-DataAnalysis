@@ -769,7 +769,7 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 
 - **Main tasks**
 
-Creates a a volcano plot that shows the fold change per gene between two datasets and the significance of these changes.
+Creates a a volcano plot that shows the fold change per gene between two datasets and the significance of this fold change.
 
 - **Dependencies**
 
@@ -779,9 +779,56 @@ matplotlib
 
 - **How and when to use**
 
+This script consists of a single function called `volcano` which takes the following inputs:
+
+`path_a=[path]` (required)  
+`filelist_a=[list of pergene.txt filenames in path_a]` (required)  
+`path_b=[path]` (required)  
+`filelist_b=[list of pergene.txt filenames in path_b]` (required)  
+`variable="read_per_gene"||"tn_per_gene"||"Nreadsperinsrt"` (default=read_per_gene)  
+`siginificance_threshold=[int]` (default=0.01)  
+`normalize=True||False` (default=True)  
+`trackgene_list=[list of gene names]`  
+`figure_title=[str]`
+
+A volcanoplot is useful to create to compare to strains with each other that each has multiple datasets (e.g. 2 wt strains and 4 mutant strains).
+Therefore, the paths of the two datasets (`path_a` and `path_b`) are separated from the pergene.txt  filenames, which should be given in a list (`filelist_a` and `filelist_b`).
+
+It plots the fold change per gene vs the significance as determined by a independent t-test.
+The fold change can be determined for the reads per gene (`variable=reads_per_gene`), insertions per gene (`variable=tn_per_gene`) or reads per inserions per gene (`variable=Nreadsperinsrt`).
+The fold change is calculated by the log base 2 of the mean per gene for the experimental strain divided by the mean per gene for the reference strain (e.g. mean reads per gene mutant strain / mean reads per gene wt strain).
+
+Before the mean is determined, the reads or insertions can be normalized by the total number of reads or insertions in each dataset.
+This normalization can be skipped by setting `normalize=False`.
+
+When the figure is created, the genes (each represented by a single dot) are colored depending on their significance.
+The significance is determined using an independent t-test (calculated using `scipy.stats.ttest_ind()`) and it represented as the -log base 10.
+This means that genes that are high up on the y-axis and far away from the 0 on the x-axis are the genes with a large and significant fold change.
+When the significance of a gene is higher then the threshold set by `threshold`, then the genes are considered significant and are colored red, otherwise they are colored black.
+
+Optionally, a list of genes can be given which are shown with a fixed label in the graph.
+For this enter the gene names as a list in the `trackgene_list` variable and use the same names as they occur in the files.
+The other genes can be found in the graph by hovering the cursor over each datapoint and then a label will appear that show the name of the gene that datapoint is representing.
+The title of the graph can be changed using the `figure_title` by entering a string that will be printed with the figure.
+Next to the custom title, the title indicates what variable is plotted in the graph (i.e. reads per gene, insertions per gene or reads per insertion).
+
 - **Output**
 
+The main output of the script is the interactive volcano plot of fold change vs significance.
+Also it return the variable `volcano_df` that includes the information used for plotting.
+In the dataframe each row consists of a gene and the following columns are used:
+
+- gene names
+- fold change
+- t statistic
+- p value
+- significance (True or False)
+
+<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\volcanoplot_figure.png" alt="volcanoplot_figure" width=700>
+
 - **Notes**
+
+- [ ] The fold change is calculated as the ratio between the means of the datasets. But this is an issue when either of the dataset is 0. To prevent this issue, for each gene in each dataset, 5 insertions and 25 reads are added. This ensures that there is never a 0 in the division. This chosen because the processing of the Kornmann-lab also does this and by integrating the same method in this script allows for direct comparison of the figures. However, this is not completely fair as it changes the data. For example, if the initial number of insertions were 1 and 2 it yields a fold change of 0.5. By adding 5 insertions to it it becomes 6 and 7, respectively, yielding a fold change of 0.85.
 
 #### create_essentialgenes_list.py
 
