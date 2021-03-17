@@ -5,23 +5,14 @@ Created on Tue Feb 16 14:06:48 2021
 @author: gregoryvanbeek
 
 This script creates a volcanoplot to show the significance of fold change between two datasets.
-The following steps are taken:
-    - Load all datafiles from two samples, called a and b
-    - For each gene in each sample, determine the mean and the unbiased variance
-    - For each gene determine the standard deviation based on the variances in each sample.
-    - For each gene determine the t-statistic
-    - For each gene determine the negative log_10 of the p-value corresponding to the t-statistic
-    - For each gene determine the log_2 fold change between the means of number of reads per insertion of both samples: log2((mean_a-mean_b)/mean_b)
-    - plot log fold change vs negative log p value
-This is based on this website:
+It is based on this website:
     - https://towardsdatascience.com/inferential-statistics-series-t-test-using-numpy-2718f8f9bf2f
     - https://www.statisticshowto.com/independent-samples-t-test/
 
 Code for showing gene name when hovering over datapoint is based on:
     - https://stackoverflow.com/questions/7908636/possible-to-make-labels-appear-when-hovering-over-a-point-in-matplotlib
 
-T-test is measuring the number of standard
-deviations our measured mean is from the baseline mean, while taking into
+T-test is measuring the number of standard deviations our measured mean is from the baseline mean, while taking into
 account that the standard deviation of the mean can change as we get more data
 """
 
@@ -38,19 +29,22 @@ from dataframe_from_pergene import dataframe_from_pergenefile
 
 #%% INPUT
 #Define file paths and names. Two samples called a and b.
-datapath_a = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing"
-filenames_a = ["WT-a_pergene.txt", "WT-b_pergene.txt"]
-datapath_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
-filenames_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
+path_a = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing"
+filelist_a = ["WT-a_pergene.txt", "WT-b_pergene.txt"]
+path_b = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_dnpr1\dataset_leila_dnrp1_agnesprocessing"
+filelist_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
 
 
 variable = 'tn_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
-trackgene_list = ['nrp1']
+trackgene_list = []
+# trackgene_list = ['nrp1']
 # trackgene_list = ['cdc42', 'bem1', 'bem2', 'bem3', 'nrp1', 'cdc24', 'cla4', 'ste20']
 # trackgene_list = ['ymr320w','sut1','ymr242w-a','ypl135c-a','ppn1','ypl067c','yme1','mec1','nrp1','mss18','tma7','gef1']
+
+figure_title = ""
 
 #%%
 def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', significance_threshold=0.01, normalize=True, trackgene_list=[], figure_title=""):
@@ -272,13 +266,13 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
 
 #%%
 if __name__ == '__main__':
-    volcano_df = volcano(path_a=datapath_a, filelist_a=filenames_a,
-            path_b=datapath_b, filelist_b=filenames_b,
+    volcano_df = volcano(path_a=path_a, filelist_a=filelist_a,
+            path_b=path_b, filelist_b=filelist_b,
             variable=variable,
             significance_threshold=significance_threshold,
             normalize=normalize,
             trackgene_list=trackgene_list,
-            figure_title="WT vs dNrp1")
+            figure_title=figure_title)
 
 
 
