@@ -643,7 +643,7 @@ Optionally the header is changed when this was provided by the user.
 
 - **Main tasks**
 
-Create a pandas dataframe that stores the main information for a specific chromosome (or region within a chromosome) including all genomic features, positions of the genomic features and the number of insertions and reads within those features.
+Create a pandas dataframe that stores information for a specific chromosome including all genomic features, positions of the genomic features and the number of insertions and reads within those features for an entire chromosome or specific genomic region.
 Optionally it can create a barplot with the number of insertions or reads within each feature.
 
 - **Dependencies**
@@ -662,7 +662,7 @@ matplotlib
 
 - **How and when to use**
 
-[This script](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/genomicfeatures_dataframe.py) consists of a two functions, `dna_features` and `feature_position`.
+[This script](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/genomicfeatures_dataframe.py) consists of two functions, `dna_features` and `feature_position`.
 The function `dna_features` is the main function that takes user inputs and this function calls the function `feature_position` which is not intended to be used directly.
 The function `dna_features` takes the following arguments:
 
@@ -674,25 +674,26 @@ The function `dna_features` takes the following arguments:
 `savefigure=True||False`  
 `verbose=True||False`
 
-The script takes a wig file and a pergene_insertions_file and genomic region.
+The script takes a wig file and a pergene_insertions_file and a genomic region.
 This genomic region can be:
 
-- number (either roman numeral or integer between 1 and 16)  
-- a list with three arguments: first a number defining the chromosome (again eiter roman numeral or integer between 1 and 16) second an integer defining start position and third an integer defining an end position (e.g. ["I", 10000, 20000] to get the region between basepair 10000 and 20000 on chromosome 1)  
-- a gene name (e.g. "CDC42") which will automatically get the corresponding chromosome and position
+- chromosome number (either roman numeral or integer between 1 and 16)  
+- a list with three arguments: first a number defining the chromosome (again eiter roman numeral or integer between 1 and 16) second an integer defining start basepair and third an integer defining an end basepair (e.g. ["I", 10000, 20000] to get the region between basepair 10000 and 20000 on chromosome 1)  
+- a gene name (e.g. "CDC42") which will automatically get the corresponding chromosome and basepair position
 
 The `plotting` argument (True or False) defines whether to create a barplot.
 The `variable` argument determines what to plot, either reads or insertions and the `savefigure` whether to automatically save the figure at the same location as where this script is stored.
 Finally the `verbose` determines if any printing output should be given (this is mostly useful for when calling this script from other python scripts).
 
 This scripts does not only look at genes, but also at other genomic regions like telomere, centromeres, rna genes etc.
-All these features are stored in one dataframe called `dna_df2` that includes positional information about features and the insertion and read counts (see output).
-The dataframe will always be created for one entire chromosome (regardless if a basepair position or gene name was entered in the `region` argument).
-When the plotting is set to the True, it will also create a barplot for the same chromosome within the region that is defined in the `region`.
-The plot distinguishes between nonessential genes, esential genes, other genomic features and noncoding dna.
+All these features are stored in one dataframe called `dna_df2` that includes naming and positional information about the features and the insertion and read counts (see output).
+The dataframe will always be created for one entire chromosome (regardless if a basepair region or gene name was entered in the `region` argument).
+When the plotting is set to the True, it will also create a barplot for the same chromosome within the region that is defined in the `region` variable.
+The plot distinguishes between nonessential genes, essential genes, other genomic features (e.g. telomeres, centromeres etc.) and noncoding dna.
 The width of the bars is determined by the length of the genomic feature and the height represents either the number of reads or insertions (depending what is defined in `variable`).
 
-This function can be used by other python functions as well when information is required about the positions, insertions ans read counts of various genomic features.
+This function can be useful for other python functions as well when information is required about the positions, insertions and read counts of various genomic features.
+The full list of genomic features that is regarded in the dataframe is mentioned in [read_sgdfeatures.py](#read_sgdfeaturespy).
 
 - **Output**
 
@@ -726,6 +727,7 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 - **Notes**
 
 - [ ] The definition for a truncated gene is currently that the first and last 100bp are ignored. This is not completely fair as this is much more stringent for short genes compared with long genes. Alternatively this can be changed to a percentage, for example ignoring the first and last 5 percent of a gene, but this can create large regions in large genes. There is option to set this in the script, but if this needs to be changed, search the script for the following line: `#TRUNCATED GENE DEFINITION`. This should give the `N10percent` variable that controls the definition of a truncated gene.
+- [ ] The barplot currently only takes reads or insertions, but it might be useful to include  reads per insertions as well.
 
 #### transposonread_profileplot.py
 
@@ -733,11 +735,9 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 
 - **Dependencies**
 
-- **How does it work**
+- **How and when to use**
 
-- **How to use**
-
-- **Output files**
+- **Output**
 
 - **Notes**
 
@@ -747,11 +747,9 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 
 - **Dependencies**
 
-- **How does it work**
+- **How and when to use**
 
-- **How to use**
-
-- **Output files**
+- **Output**
 
 - **Notes**
 
@@ -761,11 +759,9 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 
 - **Dependencies**
 
-- **How does it work**
+- **How and when to use**
 
-- **How to use**
-
-- **Output files**
+- **Output**
 
 - **Notes**
 
@@ -773,13 +769,17 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 
 - **Main tasks**
 
+Creates a a volcano plot that shows the fold change per gene between two datasets and the significance of these changes.
+
 - **Dependencies**
 
-- **How does it work**
+scipy  
+matplotlib  
+[dataframe_from_pergene.py](#dataframe_from_pergenepy)
 
-- **How to use**
+- **How and when to use**
 
-- **Output files**
+- **Output**
 
 - **Notes**
 
@@ -789,11 +789,9 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 
 - **Dependencies**
 
-- **How does it work**
+- **How and when to use**
 
-- **How to use**
-
-- **Output files**
+- **Output**
 
 - **Notes**
 
@@ -803,11 +801,9 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 
 - **Dependencies**
 
-- **How does it work**
+- **How and when to use**
 
-- **How to use**
-
-- **Output files**
+- **Output**
 
 - **Notes**
 
@@ -832,6 +828,42 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 #### mapped_reads.py
 
 #### read_sgdfeatures.py
+
+This [python module](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/python_modules/read_sgdfeatures.py) reads the [SGD_features.tab](#sgd_featurestab) file and creates dictionaries for type of genomic feature with all general information about these features.
+The following features are considered:
+
+- ORF (genes)
+- ARS
+- Telomere
+- long terminal repeat
+- Centromere
+- X element
+- Intron
+- ncRNA gene
+- Noncoding exon
+- tRNA gene
+- snoRNA gene
+- transposable element gene
+- five prime UTR intron
+- matrix attachment site
+- snRNA gene
+- rRNA gene
+- external transcribed spacer region
+- internal transcribed spacer region
+- origin of replication
+- telomerase RNA gene
+
+The function returns 20 dictionaries, one for each feature type, and it creates a list with the names of all feature types (called `genomicregions_list`).
+In each dictionary the keys are the names of the features and the values consists of a single list with the following elements:
+
+- feature type
+- feature qualifier (`Verified` or `Dubious`)
+- standard name
+- aliases (separated by `|`)
+- parent feature name (typically 'chromosome ...')
+- chromosome
+- start coordinate (starting at 0 for each chromosome)
+- end coordinate (starting at 0 for each chromosome)
 
 #### statistics_perchromosome.py
 
