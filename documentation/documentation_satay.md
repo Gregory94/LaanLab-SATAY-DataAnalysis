@@ -289,6 +289,15 @@ Both the pergene_insertions.txt and the peressential_insertions.txt files have a
 This file can be useful when not only the number of insertions is important, but also the distribution of the insertions within the genes.
 Similarily as the [pergene.txt and peresential.txt file](#pergenetxt-peressentialtxt), to suppress noise the insertion with the highest read count in a gene is removed from that gene.
 
+This file is uniquely created in the processing workflow described below.
+To create this file from a dataset processed in another workflow, store the bam file and the corresponding .bam.bai index file on the Linux desktop (see [How to use the Linux desktop](#how-to-use-the-linux-desktop)).
+Go to the python folder with the following command: `cd /home/laanlab/satay/Documents/software/python_codes/`.
+Run the transposonmapping_satay.py script with the bam file using the command `python3 transposonmapping_satay.py [path]/[filename.bam]` (see [How does it work](#how-does-it-work) for more explanation about the python script).
+If the index file .bam.bai is not present, create this before running the python script.
+The index file can be created using the command `sambamba-0.7.1.-linux-static sort -m 1GB [path]/[filename.bam]`.
+This creates a sorted.bam file and a sorted.bam.bai index file.
+Run the sorted.bam file in the python script using the command `python3 transposonmapping_satay.py [path]/[filename.sorted.bam]`.
+
 Example of pergene_insertions.txt file:
 
 > `Essential gene name chromosome Start location End location Insertion locations Reads per insertion location`  
@@ -303,7 +312,7 @@ This section discusses the main pipeline for processing satay datasets, from the
 See the image below for a schematic overview of the pipeline with the used software tools between brackets and the file type after each processing step on the left.
 Everything that is shown in green can be automatically performed in a single workflow as will be discussed in the [satay section](#sataysh) below.
 
-<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satayprocessingpipeline.png" alt="satay_processing_pipeline" width="500"/>
+<img src="media\satayprocessingpipeline.png" alt="satay_processing_pipeline" width="500"/>
 
 ### satay.sh
 
@@ -382,7 +391,7 @@ This opens a window where the data file(s) can be selected.
 Navigate to the folder containing the data file(s) and select one or two files (select only two files when using paired-end data that is not interleaved by holding the ctrl button and clicking the files).
 Use the drop down window at the bottom right to select the right extension.
 
-<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satay_fileselectionwindow.png" alt="satay.sh_file_selection_window" width=700>
+<img src="media\satay_fileselectionwindow.png" alt="satay.sh_file_selection_window" width=700>
 
 After pressing `OK` a second window opens that shows all the settings that can be changed with some default values.
 The first two lines indicate the file(s) that were selected in the previous window (if only one file was selected, the secondary reads file is set to `none`).
@@ -459,7 +468,7 @@ This time the raw quality report will be skipped.
 
 The next options determine if the sam file needs to be deleted after processing, whether the bam file needs to be sorted and indexed, if the [transposon mapping](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_transposonmapping/transposonmapping_satay.py) needs to be performed and if a flagstat report needs to be created (the quality report of the alignment).
 
-<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\satay_settingswindow.png" alt="satay.sh_settings_window" width=700>
+<img src="media\satay_settingswindow.png" alt="satay.sh_settings_window" width=700>
 
 #### Tutorial
 
@@ -528,7 +537,7 @@ This python script can take well over an hour to complete.
 After the transposon mapping the sam file is deleted and a log file is created that stores information about which file(s) has been processed, a time stamp and all the options and adapter sequences set by the user.
 This log file is stored together with the input fastq file.
 
-The python script transposonmapping.py consist of a single python function called `transposonmapper`.
+The python script transposonmapping_satay.py consist of a single python function called `transposonmapper`.
 This takes a sorted bam file (which should have a bam index file present in the same folder) and potentially some additional information files.
 It starts with checking if all input files are present.
 Next if reads the bam file using the `pysam` function and gets some basic information about the chromosomes like the names and lengths and some statistics about the mapped reads in the bam file.  
@@ -716,13 +725,13 @@ The main output is the `dna_df2` dataframe in which each row represents a genomi
 The truncated feature columns ignores basepairs at the beginning and end of a gene.
 This can be useful as sometimes it mentioned that insertions located at the beginning or end of a gene results in a protein that is still functional (although truncated) (e.g. see Michel et.al. 2017) (see Notes for a furhter discussion about how this is defined).
 
-<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\genomicfeatures_dataframe_dnadf2.png" alt="genomicfeature_dataframe_dnadf2" width=700>
+<img src="media\genomicfeatures_dataframe_dnadf2.png" alt="genomicfeature_dataframe_dnadf2" width=700>
 
 When plotting is set to True, a barplot is created where the width of the bars correspond to the width of the feature the bar is representing.
 This can be automatically saved at the location where the python script is stored.
 The plot is created for an entire chromosome, or it can be created for a specific region, for example when a list is provided in the `region` argument or when a gene name is given.
 
-<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\genomicfeatures_dataframe_barplot.png" alt="genomicfeature_dataframe_dnadf2" width=700>
+<img src="C:media\genomicfeatures_dataframe_barplot.png" alt="genomicfeature_dataframe_dnadf2" width=700>
 
 - **Notes**
 
@@ -757,13 +766,41 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 
 - **Main tasks**
 
+Create a sorted scatterplot that shows the number of reads per insertion per gene for both annotated essential and non-essential genes.
+This is plotted together with a histogram showing the distribution of the reads per insertion per gene to indicate potential differences in the distribution between essential and non-essential genes.
+
 - **Dependencies**
+
+numpy  
+matplotlib  
+seaborn  
+pandas  
+[essential_genes_names.py](#essential_genes_namespy)
+
+[Cerevisiae_EssentialGenes_List_1.txt and Cerevisiae_EssentialGenes_List_2.txt](#cerevisiae_allessentialgenes_listtxt)
 
 - **How and when to use**
 
+[This code](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/scatterplot_genes.py) consists of a single function called `scatterplot` that takes a single argument for the path of the pergene.txt file.
+From this file it takes, for each gene, the number of insertions and the number of reads and with this it determines the number of reads per insertion.
+This is stored in a dataframe together with the essentiality (True or False) for each gene which is returned as output.
+
+The genes are sorted based on their reads per insertion value and therefore the scatterplot is turned into a hockeystick plot where the genes with the lowest reads per insertion are at the left of the graph and the genes with the highest values are always on the right of the graph.
+The genes are colorcoded based on their essentiality.
+
+Next to the sorted scatterplot a histogram is shown for the y-axis of the scatterplot that shows the distribution of the reads per insertion for the essential genes and the non-essential genes in two overlapping histograms.
+
 - **Output**
 
+The main output is a sorted scatterplot (hockeystickplot) together with a histogram showing the distribution of the reads per insertion for essential and non-essential genes.
+
+Next to the plots it returns a dataframe with data from the pergene.txt file together with the essentiality of each gene.
+
+<img src="media\scatterplot_genes_plot.png" alt="genomicfeature_dataframe_dnadf2" width=700>
+
 - **Notes**
+
+- [ ] This code is relatively bare bones and could be extended with statistics to more thoroughly compare the essential and the non-essential gene distributions.
 
 #### volcanoplot.py
 
@@ -824,7 +861,7 @@ In the dataframe each row consists of a gene and the following columns are used:
 - p value
 - significance (True or False)
 
-<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\volcanoplot_figure.png" alt="volcanoplot_figure" width=700>
+<img src="media\volcanoplot_figure.png" alt="volcanoplot_figure" width=700>
 
 - **Notes**
 
