@@ -20,9 +20,9 @@
   - [python scripts](#python-scripts)
     - [strip_redundant_insertions.py](#strip_redundant_insertionspy)
     - [genomicfeatures_dataframe.py](#genomicfeatures_dataframepy)
-    - [scatterplot_genes.py](#scatterplot_genespy)
     - [transposonread_profileplot.py](#transposonread_profileplotpy)
     - [transposonread_profileplot_genome.py](#transposonread_profileplot_genomepy)
+    - [scatterplot_genes.py](#scatterplot_genespy)
     - [volcanoplot.py](#volcanoplotpy)
     - [create_essentialgenes_list.py](#create_essentialgenes_listpy)
     - [split_wigfiles.py](#split_wigfilespy)
@@ -553,7 +553,7 @@ The corresponding reads are added up and this information is stored as a wig fil
 - [ ] When using the commandline for entering the arguments, use `Paired-end` and `Single-end` with first capital letters.
 - [ ] For all software in the pipeline, whether the data is paired-end or single-end is automatically set, so do not set options like `interleaved=t` (for BBDuk), `PE` (for Trimmomatic)
 or `-p` (for BWA) in the options window of the workflow.
-- [ ] The names of the chromosomes in the reference genome that is used during alignment are not roman numerals as what is typically used for chromosomes. There are two ways of solving this, either change the names in the reference genome (before indexing it, see the section [S288C_reference_sequence_R64-2-1_20150113.fsa](#s288c_reference_sequence_r64-2-1_20150113fsa)) or by using the function [chromosome_names_in_files.py](#chromosome_names_in_filespy) which can be used for converting the chromosome names found bed or wig files to roman numerals. To make the analysis tools as general as possible, the latter method is chosen with using the function and therefore the chromosome names in the reference genome are not changed. The reference genome mentioned in [S288C_reference_sequence_R64-2-1_20150113.fsa](#s288c_reference_sequence_r64-2-1_20150113fsa) uses the following chromosome names:
+- [ ] The names of the chromosomes in the reference genome that is used during alignment are not roman numerals as what is typically used for chromosomes. The output files (e.g. bed and wig files) get the chromosome names from this reference genome and since these are not roman numerals as what is generally expected, it might confuse some downstream analysis tools. There are two ways of solving this, either change the names in the reference genome (before indexing it, see the section [S288C_reference_sequence_R64-2-1_20150113.fsa](#s288c_reference_sequence_r64-2-1_20150113fsa)) or by using the function [chromosome_names_in_files.py](#chromosome_names_in_filespy) which can be used for converting the chromosome names found bed or wig files to roman numerals. To make the analysis tools as general as possible, the latter method is chosen with using the function and therefore the chromosome names in the reference genome are not changed. The reference genome mentioned in [S288C_reference_sequence_R64-2-1_20150113.fsa](#s288c_reference_sequence_r64-2-1_20150113fsa) uses the following chromosome names:
   - I: ref|NC_001133|
   - II: ref|NC_001134|
   - III: ref|NC_001135|
@@ -581,12 +581,11 @@ The codes that are discussed here are for the postprocessing analysis.
 These are all python scripts that are not depended on Linux and only use rather standard python package like numpy, matplotlib, pandas, seaborn and scipy.
 
 The order in which to run the programs shouldn't matter as these scripts are all independed of each other except for genomicfeatures_dataframe.py which is sometimes called by other scripts.
-However, most of the scripts are depending on one or more [python modules](#python-modules), which are all expected to be located in a python_modules folder inside the folder where the python scripts are located (see [github](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/satay_processing/python_scripts) for an example how this is organized).
+However, most scripts are depending on one or more [python modules](#python-modules), which are all expected to be located in a python_modules folder inside the folder where the python scripts are located (see [github](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/tree/satay_processing/python_scripts) for an example how this is organized).
 Also many python scripts and modules are depending on [data files](#data-files) stored in a folder called data_files located in the same folder of the python_scripts folder.
-
 The input for most scripts and modules are the output files of the processing, see the [Input, Output](#input-output) section.
 
-This is a typical order which can be used:
+This is a typical order which can be used of the scripts described below:
 
 1. strip_redundant_insertions.py (to clean the bed and wig files).
 2. transposonread_profileplot_genome.py (to check the insertion and read distribution throughout the genome).
@@ -595,14 +594,11 @@ This is a typical order which can be used:
 5. volcanoplot.py (only when comparing multiple datasets with different genetic backgrounds to see which genes have a significant change in insertion and read counts).
 
 Most of the python scripts consists of one or more functions.
-These functions are called at the end of each script.
-Here also the input for each function (if any) should be entered.
+These functions are called at the end of each script after the line `if __name__ == '__main__':`.
 All packages where the scripts are depending on are called at the beginning of the script.
 The scripts should also contain a help text about how to use the functions.
 
 #### strip_redundant_insertions.py
-
-Code can be found [here](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/strip_redundant_insertions.py).
 
 - **Main tasks**
 
@@ -615,21 +611,23 @@ Remove reads mapped outside chromosomes in .bed and .wig files, clean up those f
 
 - **How and when to use**
 
-This script consists of a single function called `strip_redundant_ins()` with the following arguments:
+[This script](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/strip_redundant_insertions.py) consists of a single function called `strip_redundant_ins()` with the following arguments:
 
-`filepath=[path]`  
+`filepath=[path]` (required)  
 `custom_header=[text]`
 
 Input of the function is a filepath to a bed or wig file (required).
 Optionally a string for the custom header can be added to the input that changes the header line of each file.
 By default the name in the header is the same name as the original datafile, but this can be a long and unclear name.
 Therefore, it can be useful to change this when the bed or wig files are used for other analysis tools that use the name stated in the header, for example the [genome browser](#genome-browser).
-Also the names of the chromosomes are the names that are used in the reference genome.
-In this function these names are replaced by roman numerals.
+Also the names of the chromosomes are the names that are used in the reference genome (see [here](#notes) for more explanation).
+In this function these names are replaced by roman numerals what is more commonly used.
 
 Finally, sometimes insertions can be mapped outside chromosomes (i.e. the insertion position of a read is larger than the length of the chromosome is mapped to).
-The reason for this result is not clear, but it can cause issues with downstream analysis tools.
-This function removes those reads.
+The reason for this result is not clear, but is likely to be the result of either the alignment or transposon mapping in the processing workflow.
+It can cause issues with downstream analysis tools and therefore this function remove those reads.
+The removed reads are shown in the terminal where the python script runs.
+The number of removed reads should be little.
 
 - **Output**
 
@@ -639,35 +637,95 @@ Optionally the header is changed when this was provided by the user.
 
 - **Notes**
   
-- [ ] In the wig file, each  chromosome starts with a VariableStep line. By default this is written with capital V and S, but some tools may have issues with the capital letters. Therefor this script also converts everything to lowercase letters (i.e. variablestep).
+- [ ] In the wig file, each  chromosome starts with a VariableStep line. By default this is written with capital V and S, but some tools may have issues with the capital letters. Therefore this script also converts everything to lowercase letters (i.e. variablestep).
 
 #### genomicfeatures_dataframe.py
 
 - **Main tasks**
 
-- **Dependencies**
-
-- **How does it work**
-
-- **How to use**
-
-- **Output files**
-
-- **Notes**
-
-#### scatterplot_genes.py
-
-- **Main tasks**
+Create a pandas dataframe that stores the main information for a specific chromosome (or region within a chromosome) including all genomic features, positions of the genomic features and the number of insertions and reads within those features.
+Optionally it can create a barplot with the number of insertions or reads within each feature.
 
 - **Dependencies**
 
-- **How does it work**
+pandas  
+matplotlib  
+[chromosome_and_gene_positions.py](#chromosome_and_gene_positionspy)  
+[chromosome_names_in_files.py](#chromosome_names_in_filespy)  
+[gene_names.py](#gene_namespy)  
+[read_sgdfeatures.py](#read_sgdfeaturespy)
 
-- **How to use**
+[Cerevisiae_AllEssentialGenes_List.txt](#cerevisiae_allessentialgenes_listtxt)  
+[SGD_features.tab](#sgd_featurestab)  
+[Saccharomyces_cerevisiae.R64-1-1.99.gff3](#saccharomyces_cerevisiaer64-1-199gff3)  
+[Yeast_Protein_Names.txt](#yeast_protein_namestxt)
 
-- **Output files**
+- **How and when to use**
+
+[This script](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/genomicfeatures_dataframe.py) consists of a two functions, `dna_features` and `feature_position`.
+The function `dna_features` is the main function that takes user inputs and this function calls the function `feature_position` which is not intended to be used directly.
+The function `dna_features` takes the following arguments:
+
+`region=[int]||[string]||[list]` (required)  
+`wig_file=[path]` (required)  
+`pergene_insertions_file=[path]` (required)  
+`plotting=True||False`  
+`variable="reads"||"insertions"`  
+`savefigure=True||False`  
+`verbose=True||False`
+
+The script takes a wig file and a pergene_insertions_file and genomic region.
+This genomic region can be:
+
+- number (either roman numeral or integer between 1 and 16)  
+- a list with three arguments: first a number defining the chromosome (again eiter roman numeral or integer between 1 and 16) second an integer defining start position and third an integer defining an end position (e.g. ["I", 10000, 20000] to get the region between basepair 10000 and 20000 on chromosome 1)  
+- a gene name (e.g. "CDC42") which will automatically get the corresponding chromosome and position
+
+The `plotting` argument (True or False) defines whether to create a barplot.
+The `variable` argument determines what to plot, either reads or insertions and the `savefigure` whether to automatically save the figure at the same location as where this script is stored.
+Finally the `verbose` determines if any printing output should be given (this is mostly useful for when calling this script from other python scripts).
+
+This scripts does not only look at genes, but also at other genomic regions like telomere, centromeres, rna genes etc.
+All these features are stored in one dataframe called `dna_df2` that includes positional information about features and the insertion and read counts (see output).
+The dataframe will always be created for one entire chromosome (regardless if a basepair position or gene name was entered in the `region` argument).
+When the plotting is set to the True, it will also create a barplot for the same chromosome within the region that is defined in the `region`.
+The plot distinguishes between nonessential genes, esential genes, other genomic features and noncoding dna.
+The width of the bars is determined by the length of the genomic feature and the height represents either the number of reads or insertions (depending what is defined in `variable`).
+
+This function can be used by other python functions as well when information is required about the positions, insertions ans read counts of various genomic features.
+
+- **Output**
+
+The main output is the `dna_df2` dataframe in which each row represents a genomic feature and has the following columns:
+
+- Feature name
+- Feature standard name
+- Feature aliases (different names for the same feature, mainly for genes)
+- Essentialilty (only for genes)
+- Chromosome where feature is located
+- Position in terms in basepairs
+- Length of feature in terms of basepairs
+- Number of insertions in feature
+- Number of insertions in truncated feature (only for genes where the insertions in the first and last 100bp are ignored)
+- Sum of reads in feature
+- Sum of reads in truncated feature (only for genes where the reads in the first and last 100bp are ignored)
+- Number of reads per insertion
+- Number of reads per insertions (only for genes where the insertions and reads in the first and last 100bp are ignored)
+
+The truncated feature columns ignores basepairs at the beginning and end of a gene.
+This can be useful as sometimes it mentioned that insertions located at the beginning or end of a gene results in a protein that is still functional (although truncated) (e.g. see Michel et.al. 2017) (see Notes for a furhter discussion about how this is defined).
+
+<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\genomicfeatures_dataframe_dnadf2.png" alt="genomicfeature_dataframe_dnadf2" width=700>
+
+When plotting is set to True, a barplot is created where the width of the bars correspond to the width of the feature the bar is representing.
+This can be automatically saved at the location where the python script is stored.
+The plot is created for an entire chromosome, or it can be created for a specific region, for example when a list is provided in the `region` argument or when a gene name is given.
+
+<img src="C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\documentation\media\genomicfeatures_dataframe_barplot.png" alt="genomicfeature_dataframe_dnadf2" width=700>
 
 - **Notes**
+
+- [ ] The definition for a truncated gene is currently that the first and last 100bp are ignored. This is not completely fair as this is much more stringent for short genes compared with long genes. Alternatively this can be changed to a percentage, for example ignoring the first and last 5 percent of a gene, but this can create large regions in large genes. There is option to set this in the script, but if this needs to be changed, search the script for the following line: `#TRUNCATED GENE DEFINITION`. This should give the `N10percent` variable that controls the definition of a truncated gene.
 
 #### transposonread_profileplot.py
 
@@ -684,6 +742,20 @@ Optionally the header is changed when this was provided by the user.
 - **Notes**
 
 #### transposonread_profileplot_genome.py
+
+- **Main tasks**
+
+- **Dependencies**
+
+- **How does it work**
+
+- **How to use**
+
+- **Output files**
+
+- **Notes**
+
+#### scatterplot_genes.py
 
 - **Main tasks**
 
@@ -860,7 +932,7 @@ Prevent spaces in namegiving, but rather use underscores.
 
 Note that this desktop has no backup system, thus make sure to always put any files directly on the drives and remove the files you do not need from the desktop to prevent filling up the memory.
 Removing files can be done using the command `rm` (e.g. `rm [pathtofile]/[filename]`).
-Note that this command does not have an undo and also are not moved to a trash folder.
+Note that this command does not have an undo and also the removed files are not moved to a trash folder.
 This command works immediately and is permanent, so use with caution and double check before you enter it.
 To remove folders including the contents, use `rm -r`.
 Alternatively, you can use the Files program to delete files, which does first move the files to a trash folder where you then can remove them permanently.
