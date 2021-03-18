@@ -595,14 +595,21 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 
+wig_file_WT_greg1=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig',
+per_gene_WT_gerg1=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt'
 
+wig_file_WT_agnes=r'N:\tnw\BN\LL\Shared\Leila\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\FASTQ_Generation_2021-02-10_19_53_12Z-376766391_2\a-b pooled\a-b pooled_transposonmapping_satay\WT.bam_clean.wig'
+per_gene_WT_agnes=r'N:\tnw\BN\LL\Shared\Leila\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\FASTQ_Generation_2021-02-10_19_53_12Z-376766391_2\a-b pooled\a-b pooled_transposonmapping_satay\WT.bam_pergene_insertions.txt'
+
+wig_file_WT_greg2=r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig'
+per_gene_WT_greg2=r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt'
 if __name__ == '__main__':
     chrom=['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']
     dna_df2=[]
     for chrom in chrom:
         dna_df2.append(dna_features(region = chrom,#['xiii', 0, 14790],
-                               wig_file=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig',
-                               pergene_insertions_file =r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt'
+                               wig_file=wig_file_WT_agnes,    
+                               pergene_insertions_file =per_gene_WT_agnes
     ,variable="reads", #for plotting
                      plotting=False,
                      savefigure=False,

@@ -129,9 +129,11 @@ def strip_redundant_ins(filepath=None, custom_header=None):
 if __name__ == '__main__':
     nrp1_dataset=r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_dnrp1\leila_dataset_dnrp1_processing\dnrp1_merged_dnrp1-1_dnrp1-2_processing\align_out\dnrp1_merged_dnrp1-1_dnrp1-2_trimmed.sorted.bam.bed'
     wt_dataset=r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.bed'
+    wig_file_WT_agnes=r'N:\tnw\BN\LL\Shared\Leila\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\FASTQ_Generation_2021-02-10_19_53_12Z-376766391_2\a-b pooled\a-b pooled_transposonmapping_satay\WT.bam.wig'
+    wig_file_WT_greg2=r'N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig'
     #strip_redundant_ins(filepath = nrp1_dataset)
     # strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dnrp1.bed")
-    custom_header = "leila_wt_techrep_ab"
+    custom_header = "leila_wt_agnes_analysis"
     # strip_redundant_ins(filepath = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig", custom_header=custom_header)
-    strip_redundant_ins(filepath = wt_dataset, custom_header=custom_header)
+    strip_redundant_ins(filepath = wig_file_WT_agnes, custom_header=custom_header)
 
