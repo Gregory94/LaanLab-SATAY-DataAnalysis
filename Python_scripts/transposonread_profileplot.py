@@ -19,10 +19,10 @@ from chromosome_names_in_files import chromosome_name_bedfile
 #%% INPUT
 
 bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.bed"
-variable="reads" #"reads" "transposons"
+variable="read" #"reads" "transposons"
 chrom="III"
-bar_width=100
-savefig=True
+bar_width=None
+savefig=False
 
 #%%
 def profile_plot(bed_file, variable="transposons", chrom='I', bar_width=None, savefig=False):
@@ -40,9 +40,9 @@ def profile_plot(bed_file, variable="transposons", chrom='I', bar_width=None, sa
     For this a list for essential genes is needed (used in 'list_known_essentials' function) and a .gff file is required (for the functions in 'chromosome_and_gene_positions.py') and a list for gene aliases (used in the function 'gene_aliases')
     '''
 #%% USED FILES
-    gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    essential_genes_files = [os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_1.txt'),
-                            os.path.join(file_dirname,'Data_Files','Cerevisiae_EssentialGenes_List_2.txt')]
+    gff_file = os.path.join(file_dirname,'..','data_files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    essential_genes_files = [os.path.join(file_dirname,'..','data_files','Cerevisiae_EssentialGenes_List_1.txt'),
+                            os.path.join(file_dirname,'..','data_files','Cerevisiae_EssentialGenes_List_2.txt')]
 
 #%% GET CHROMOSOME LENGTHS AND POSITIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
@@ -80,7 +80,7 @@ def profile_plot(bed_file, variable="transposons", chrom='I', bar_width=None, sa
 
     else:
         print("ERROR: No valid variable argument given. Use transposons or reads")
-        exit(1)
+        sys.exit(1)
                 
 
 
