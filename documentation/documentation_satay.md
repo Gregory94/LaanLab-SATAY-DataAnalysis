@@ -48,8 +48,8 @@
   - [Other tools](#other-tools)
     - [IGV](#igv)
     - [genome browser](#genome-browser)
-- [Outlook](#outlook)
 - [How to use the Linux desktop](#how-to-use-the-linux-desktop)
+- [Outlook](#outlook)
 - [Appendices](#appendices)
   - [PHRED table (base33)](#phred-table-base33)
   - [PHRED table (base64)](#phred-table-base64)
@@ -1060,8 +1060,6 @@ From this file, the files [S_Cerevisiae_protein_designation_name_full_genome.txt
 
 #### genome browser
 
-## Outlook
-
 ## How to use the Linux desktop
 
 For those who are not familiar with Linux, here is a brief summary of how to work with the Linux desktop and the basic tools that are necessary for using the workflow.
@@ -1127,6 +1125,8 @@ To update manually enter the following commands in the commandline:
 For a more thorough tutorial of the linux commandline and many other useful commands, see for example this course from [datacarpentry.org/shell-genomics](https://datacarpentry.org/shell-genomics/).
 To have commandline like tool on windows (e.g. to access large datafiles on windows as well using the `less` and `head` commands), try [git bash](https://gitforwindows.org/).
 For Mac users, the terminal that is by default installed in MacOS works very similar as the one in Linux, so there is no real need for downloading any special tools.
+
+## Outlook
 
 ## Appendices
 
