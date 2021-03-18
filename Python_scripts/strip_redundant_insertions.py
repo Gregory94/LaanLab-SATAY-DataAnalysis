@@ -16,7 +16,7 @@ from chromosome_names_in_files import chromosome_name_bedfile, chromosome_name_w
 
 #%% INPUT -> FILEPATH TAKES PATHS TO .BED OR .WIG FILES
 custom_header = ""
-filepath = r""
+filepath = r"N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig"
 
 #%%
 
@@ -97,7 +97,7 @@ def strip_redundant_ins(filepath=None, custom_header=None):
 
         with open(filepath_splitext[0]+"_clean.wig", "w") as w:
             #write header
-            if custom_header == None:
+            if custom_header == None or custom_header == "":
                 w.write(lines[0].replace(',',''))
             else:
                 w.write("track type=wiggle_0 maxheightPixels=60 name=" + str(custom_header) + "\n")
