@@ -756,9 +756,32 @@ matplotlib
 
 - **How and when to use**
 
+[This code](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/transposonread_profileplot.py) consists of a single function `profile_plot` which takes the following arguments:
+
+`bed_file=[path]` (required)  
+`variable="transposons"||"reads"`  
+`chrom=[roman numeral]`  
+`bar_width=[int]`  
+`savefig=True||False`
+
+The `variable` arguments determines whether to plot the number of transposons or the number of reads for a chromosome defined in `chrom`.
+The `bar_width` argument defines the width of the bars (in basepairs).
+All insertions or reads within a bar are added up.
+Wider bars makes the script significantly faster, but this might regions with low abundance less visible where the smaller bars provide more detailed information.
+By default the width of the bars are chosen as the length of the chromosome divided by 800.
+
+Optionally, the figure can be automatically saved at the same location where the bed file is stored with the `savefig` argument.
+The name given to the figure is the name of the bed file with the extension _[variable]plot_chrom[chrom].png (where the names between the brackets are replaced with their respective names from the input).
+
 - **Output**
 
+A barplot is created which shows the transposon or read count throughout the genome together with a strip that is colorcoded at the location of genes based on their essentiality to compare the insertion or read abundance relative to the location of the genes.
+
+<img src="media\transposonread_profileplot_readprofile.png" alt="transposonread_profileplot_readprofile" width=700>
+
 - **Notes**
+
+- [ ]
 
 #### transposonread_profileplot_genome.py
 
