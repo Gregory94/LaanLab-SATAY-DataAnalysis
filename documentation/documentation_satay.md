@@ -787,13 +787,43 @@ A barplot is created which shows the transposon or read count throughout the gen
 
 - **Main tasks**
 
+Create a barplot to show the read or insertion count for the whole genome and indicate the location of the genes which are colorcoded based on their essentiality.
+
 - **Dependencies**
+
+numpy  
+matplotlib  
+[chromosome_and_gene_positions.py](#chromosome_and_gene_positionspy)  
+[chromosome_names_in_files.py](#chromosome_names_in_filespy)  
+[essential_genes_names.py](#essential_genes_namespy)
 
 - **How and when to use**
 
+[This code]() consists of a single function `profile_genome` which takes the following arguments:
+
+`bed_file=[path]` (required)  
+`variable="transposons"||"reads"`  
+`bar_width=[int]`  
+`savefig=True||False`
+
+This code is very similar to [transposonread_profileplot.py](#transposonread_profileplotpy), instead this code creates a barplot for the entire genome.
+The `variable` arguments defines whether the transposon or read count is plotted and the `bar_width` sets the number of basepairs that is considered in each bin.
+All the reads or insertions are summed within each bin.
+A lower value allows for more details to be visible, but can take more time to plot.
+Higher values may obscure areas of low abundance.
+Default setting is length of the genome divided by 1000 (i.e. aprroximately 1200bp per bin).
+
+Optionally the figures might be automatically saved by setting `savefig` to True where the figure is saved at the same location and name as the bed file with the extension [variable]plot_genome.png (where [variable] is replaced with whatever is set in the `variable` argument).
+
 - **Output**
 
+A barplot is created that shows the tranposon or read abundance for the genome together with the location of the genes that are colorcoded based on their essentiality.
+
+<img src="media\transposonread_genomeplot_transposonprofile.png" alt="transposonread_genomeplot_transposonprofile" width=700>
+
 - **Notes**
+
+- [ ]
 
 #### scatterplot_genes.py
 
