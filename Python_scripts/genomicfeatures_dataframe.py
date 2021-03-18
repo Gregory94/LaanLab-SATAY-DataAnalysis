@@ -46,17 +46,17 @@ from read_sgdfeatures import sgd_features
 
 
 
-#%% INPUT
+# #%% INPUT
 
-# for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
-#     region=chrom
-region = 5 #e.g. 1, "I", ["I", 0, 10000"], gene name (e.g. "CDC42")
-wig_file = r"N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig"
-pergene_insertions_file = r"N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_peressential_insertions.txt"
-plotting=False
-variable="reads" #"reads" or "insertions"
-savefigure=False
-verbose=True
+# # for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
+# #     region=chrom
+# region = 5 #e.g. 1, "I", ["I", 0, 10000"], gene name (e.g. "CDC42")
+# wig_file = r"N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig"
+# pergene_insertions_file = r"N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_peressential_insertions.txt"
+# plotting=False
+# variable="reads" #"reads" or "insertions"
+# savefigure=False
+# verbose=True
 
 
 
@@ -626,8 +626,8 @@ if __name__ == '__main__':
     dna_df2=[]
     for chrom in chrom:
         dna_df2.append(dna_features(region = chrom,#['xiii', 0, 14790],
-                               wig_file=wig_file_WT_agnes,    
-                               pergene_insertions_file =per_gene_WT_agnes
+                               wig_file=wig_file_WT_greg2,    
+                               pergene_insertions_file =per_gene_WT_greg2
     ,variable="reads", #for plotting
                      plotting=False,
                      savefigure=False,
