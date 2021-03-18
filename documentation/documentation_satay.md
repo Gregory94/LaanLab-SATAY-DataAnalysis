@@ -291,7 +291,7 @@ Similarily as the [pergene.txt and peresential.txt file](#pergenetxt-peressentia
 
 This file is uniquely created in the processing workflow described below.
 To create this file from a dataset processed in another workflow, store the bam file and the corresponding .bam.bai index file on the Linux desktop (see [How to use the Linux desktop](#how-to-use-the-linux-desktop)).
-Go to the python folder with the following command: `cd /home/laanlab/satay/Documents/software/python_codes/`.
+Go to the python folder in the Terminal with the following command: `cd /home/laanlab/satay/Documents/software/python_codes/`.
 Run the transposonmapping_satay.py script with the bam file using the command `python3 transposonmapping_satay.py [path]/[filename.bam]` (see [How does it work](#how-does-it-work) for more explanation about the python script).
 If the index file .bam.bai is not present, create this before running the python script.
 The index file can be created using the command `sambamba-0.7.1.-linux-static sort -m 1GB [path]/[filename.bam]`.
@@ -604,8 +604,9 @@ This is a typical order which can be used of the scripts described below:
 
 Most of the python scripts consists of one or more functions.
 These functions are called at the end of each script after the line `if __name__ == '__main__':`.
+The user input for these functions are stated at the beginning of the script in the `#INPUT` section.
 All packages where the scripts are depending on are called at the beginning of the script.
-The scripts should also contain a help text about how to use the functions.
+The scripts also contain a help text about how to use the functions.
 
 #### strip_redundant_insertions.py
 
@@ -625,18 +626,18 @@ Remove reads mapped outside chromosomes in .bed and .wig files, clean up those f
 `filepath=[path]` (required)  
 `custom_header=[text]`
 
-Input of the function is a filepath to a bed or wig file (required).
+Input of the function is a path to a bed or wig file (required).
 Optionally a string for the custom header can be added to the input that changes the header line of each file.
-By default the name in the header is the same name as the original datafile, but this can be a long and unclear name.
+By default the name in the header is the same name as the original datafile (fastq file), but this can be a long and unclear name.
 Therefore, it can be useful to change this when the bed or wig files are used for other analysis tools that use the name stated in the header, for example the [genome browser](#genome-browser).
-Also the names of the chromosomes are the names that are used in the reference genome (see [here](#notes) for more explanation).
+Also the names of the chromosomes are the names that are used in the reference genome (see [satay.sh notes](#notes) for more explanation).
 In this function these names are replaced by roman numerals what is more commonly used.
 
-Finally, sometimes insertions can be mapped outside chromosomes (i.e. the insertion position of a read is larger than the length of the chromosome is mapped to).
+Finally, sometimes insertions can be mapped outside chromosomes (i.e. the insertion position of a read is larger than the length of the chromosome it is mapped to).
 The reason for this result is not clear, but is likely to be the result of either the alignment or transposon mapping in the processing workflow.
 It can cause issues with downstream analysis tools and therefore this function remove those reads.
 The removed reads are shown in the terminal where the python script runs.
-The number of removed reads should be little.
+Check that only few reads are removed.
 
 - **Output**
 
@@ -716,14 +717,14 @@ The main output is the `dna_df2` dataframe in which each row represents a genomi
 - Position in terms in basepairs
 - Length of feature in terms of basepairs
 - Number of insertions in feature
-- Number of insertions in truncated feature (only for genes where the insertions in the first and last 100bp are ignored)
+- Number of insertions in truncated feature (only for genes, the insertions in the first and last 100bp are ignored, see below)
 - Sum of reads in feature
-- Sum of reads in truncated feature (only for genes where the reads in the first and last 100bp are ignored)
+- Sum of reads in truncated feature (only for genes, where the reads in the first and last 100bp are ignored)
 - Number of reads per insertion
-- Number of reads per insertions (only for genes where the insertions and reads in the first and last 100bp are ignored)
+- Number of reads per insertions (only for genes, where the insertions and reads in the first and last 100bp are ignored)
 
 The truncated feature columns ignores basepairs at the beginning and end of a gene.
-This can be useful as sometimes it mentioned that insertions located at the beginning or end of a gene results in a protein that is still functional (although truncated) (e.g. see Michel et.al. 2017) (see Notes for a furhter discussion about how this is defined).
+This can be useful as sometimes it mentioned that insertions located at the beginning or end of a gene results in a protein that is still functional (although truncated) (e.g. see Michel et.al. 2017) (see Notes for a further discussion about how this is defined).
 
 <img src="media\genomicfeatures_dataframe_dnadf2.png" alt="genomicfeature_dataframe_dnadf2" width=700>
 
@@ -731,18 +732,27 @@ When plotting is set to True, a barplot is created where the width of the bars c
 This can be automatically saved at the location where the python script is stored.
 The plot is created for an entire chromosome, or it can be created for a specific region, for example when a list is provided in the `region` argument or when a gene name is given.
 
-<img src="C:media\genomicfeatures_dataframe_barplot.png" alt="genomicfeature_dataframe_dnadf2" width=700>
+<img src="media\genomicfeatures_dataframe_barplot.png" alt="genomicfeature_dataframe_dnadf2" width=700>
 
 - **Notes**
 
-- [ ] The definition for a truncated gene is currently that the first and last 100bp are ignored. This is not completely fair as this is much more stringent for short genes compared with long genes. Alternatively this can be changed to a percentage, for example ignoring the first and last 5 percent of a gene, but this can create large regions in large genes. There is option to set this in the script, but if this needs to be changed, search the script for the following line: `#TRUNCATED GENE DEFINITION`. This should give the `N10percent` variable that controls the definition of a truncated gene.
+- [ ] The definition for a truncated gene is currently that the first and last 100bp are ignored. This is not completely fair as this is much more stringent for short genes compared to long genes. Alternatively this can be changed to a percentage, for example ignoring the first and last 5 percent of a gene, but this can create large regions in long genes. There is no option to set this directly in the script, but if this needs to be changed, search the script for the following line: `#TRUNCATED GENE DEFINITION`. This should give the `N10percent` variable that controls the definition of a truncated gene.
 - [ ] The barplot currently only takes reads or insertions, but it might be useful to include  reads per insertions as well.
+- [ ] Sometimes it can happen that two genomic regions can overlap. When this happens, the dataframe shows a feature, in the next row another feature and then the next row from that it continues with the first feature (e.g. row1; geneA, row2; overlapping feature, row3; geneA). This issue is not automatically solved yet, but best is to, whenever you find a feature, to search if that feature also exists a couple of rows further on. If yes, sum all rows between the first and last occurance of your gene (e.g. in the example above for geneA, sum the values from row1, row2 and row3).
 
 #### transposonread_profileplot.py
 
 - **Main tasks**
 
+Create a barplot to show the read or insertion count for one chromosome and indicate the location of the genes which are colorcoded based on their essentiality.
+
 - **Dependencies**
+
+numpy  
+matplotlib  
+[chromosome_and_gene_positions.py](#chromosome_and_gene_positionspy)  
+[chromosome_names_in_files.py](#chromosome_names_in_filespy)  
+[essential_genes_names.py](#essential_genes_namespy)
 
 - **How and when to use**
 
@@ -767,7 +777,7 @@ The plot is created for an entire chromosome, or it can be created for a specifi
 - **Main tasks**
 
 Create a sorted scatterplot that shows the number of reads per insertion per gene for both annotated essential and non-essential genes.
-This is plotted together with a histogram showing the distribution of the reads per insertion per gene to indicate potential differences in the distribution between essential and non-essential genes.
+This is plotted together with a histogram of the reads per insertion per gene to indicate potential differences in the distribution between essential and non-essential genes.
 
 - **Dependencies**
 
@@ -782,17 +792,17 @@ pandas
 - **How and when to use**
 
 [This code](https://github.com/Gregory94/LaanLab-SATAY-DataAnalysis/blob/satay_processing/python_scripts/scatterplot_genes.py) consists of a single function called `scatterplot` that takes a single argument for the path of the pergene.txt file.
-From this file it takes, for each gene, the number of insertions and the number of reads and with this it determines the number of reads per insertion.
+From this file it takes, for each gene, the number of insertions and the number of reads and with this it calculates the number of reads per insertion.
 This is stored in a dataframe together with the essentiality (True or False) for each gene which is returned as output.
 
-The genes are sorted based on their reads per insertion value and therefore the scatterplot is turned into a hockeystick plot where the genes with the lowest reads per insertion are at the left of the graph and the genes with the highest values are always on the right of the graph.
+The genes are sorted based on their reads per insertion value and therefore the genes with the lowest reads per insertion are on the left of the graph and the genes with the highest values are always on the right of the graph.
 The genes are colorcoded based on their essentiality.
 
 Next to the sorted scatterplot a histogram is shown for the y-axis of the scatterplot that shows the distribution of the reads per insertion for the essential genes and the non-essential genes in two overlapping histograms.
 
 - **Output**
 
-The main output is a sorted scatterplot (hockeystickplot) together with a histogram showing the distribution of the reads per insertion for essential and non-essential genes.
+The main output is a sorted scatterplot (i.e. a hockeystickplot) together with a histogram showing the distribution of the reads per insertion for essential and non-essential genes.
 
 Next to the plots it returns a dataframe with data from the pergene.txt file together with the essentiality of each gene.
 
