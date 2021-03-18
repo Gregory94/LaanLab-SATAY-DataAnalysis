@@ -17,8 +17,27 @@ from essential_genes_names import list_known_essentials
 # from gene_names import gene_aliases
 from chromosome_names_in_files import chromosome_name_bedfile, chromosome_name_wigfile
 
-#%%
 
+
+#%% INPUT
+
+chrom="I"
+#for chrom in ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
+bar_width=None
+savefig=False
+
+
+#which function to run
+function="read_profile" #"read_profile" "transposon_profile"
+
+#input file for read_profile
+wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.wig"
+#input file for transposon_profile
+# bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.bed"
+
+
+
+#%%
 def transposon_profile(chrom='I',bar_width=None,bed_file = None, savefig=False):
     '''This function creates a bar plot along a specified chromosome for the number of transposons.
     The height of each bar represents the number of transposons at the genomic position indicated on the x-axis.
@@ -101,9 +120,8 @@ def transposon_profile(chrom='I',bar_width=None,bed_file = None, savefig=False):
     for line in lines[chrom_start_index_dict.get(chrom):chrom_end_index_dict.get(chrom)+1]:
         line = line.strip('\n').split()
         alltransposoncounts_list[int(line[1]) - 1] += 1
-    
-    
-    
+
+
 #%% BINNING OF THE READS
     #THE LIST WITH ALL THE TRANPOSONS FOR THE CURRENT CHROMOSOME IS TYPICALLY REALLY LARGE.
     #TO COMPRESS THIS LIST, THE BASEPAIR POSITIONS ARE GROUPED IN GROUPS WITH SIZE DEFINED BY 'BAR_WIDTH'
@@ -370,6 +388,7 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
     ax.set_axisbelow(True)
     ax.grid(True)
     ax.set_xlim(0,chr_length_dict.get(chrom))
+    ax.set_ylim(0,13000)
 #    ax.set_yscale('log')
     ax.tick_params(axis='x', which='major', pad=30)
     ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
@@ -416,10 +435,9 @@ def read_profile(chrom='I',bar_width=None,wig_file = None, savefig=False):
 
 #%%
 if __name__ == '__main__':
-    chrom = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI']
-    # chrom = ["XVI"]
-    for c in chrom:
-        read_profile(chrom=c, wig_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig",
-                      savefig=True)
-        # transposon_profile(chrom=c, bed_file=r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.bed",
-        # savefig=True)
+    if function == "read_profile":
+        read_profile(chrom=chrom, wig_file=wig_file, bar_width=bar_width, savefig=savefig)
+    elif function == "transposon_profile":
+        transposon_profile(chrom=chrom, bed_file=bed_file, bar_width=bar_width, savefig=savefig)
+
+
