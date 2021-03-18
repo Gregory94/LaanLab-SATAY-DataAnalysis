@@ -81,7 +81,7 @@ def transposon_profile(chrom=None, bar_width=None, bed_file=None):
     for line in lines[chrom_start_index_dict.get("I"):chrom_end_index_dict.get("XVI")+1]:
         line = line.strip('\n').split()
         chrom_name = [k for k,v in chrom_names_dict.items() if v == line[0].replace("chr",'')][0]
-        alltransposoncounts_list[summed_chr_length_dict.get(chrom_name) + int(line[1])] += 1
+        alltransposoncounts_list[summed_chr_length_dict.get(chrom_name) + int(line[1])-1] += 1
 
 
     alltransposoncounts_binnedlist = []
@@ -180,7 +180,7 @@ def read_profile(wig_file=None, bar_width=None):
     summed_chr_length = 0
     for c in chrom_list:
         summed_chr_length_dict[c] = summed_chr_length
-        summed_chr_length += chr_length_dict.get(c)    
+        summed_chr_length += chr_length_dict.get(c)
 
 
     l_genome = 0
@@ -204,7 +204,7 @@ def read_profile(wig_file=None, bar_width=None):
 
     gene_pos_dict = gene_position(gff_file)
     genes_currentchrom_pos_list = [k for k, v in gene_pos_dict.items()]
-    genes_essential_list = list_known_essentials(essential_genes_files)
+    genes_essential_list = list_known_essentials(essential_genes_files, verbose=False)
 
 
     with open(wig_file) as f:
@@ -220,7 +220,7 @@ def read_profile(wig_file=None, bar_width=None):
         # elif not line.startswith('VariableStep'):
         else:
             line = line.strip(' \n').split()
-            allreadscounts_list[int(line[0])+summed_chr_length_dict.get(current_chr_roman)] = int(line[1]) #DEFINE CURRENT_CHR_LENGTH DEFINED IN ELIF STATEMENT
+            allreadscounts_list[int(line[0])+summed_chr_length_dict.get(current_chr_roman)-1] = int(line[1]) #DEFINE CURRENT_CHR_LENGTH DEFINED IN ELIF STATEMENT
         # elif line.startswith('VariableStep'):
         #     current_chr = line.split(' ')[1].replace('chrom=chr','')
         #     current_chr_roman = [k for k, v in chrom_names_dict.items() if v == current_chr.strip('\n')][0]

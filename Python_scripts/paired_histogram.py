@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Mar 18 09:40:43 2021
-
-@author: linigodelacruz
-"""
-# -*- coding: utf-8 -*-
-"""
 Created on Wed Mar 17 19:26:59 2021
+
 @author: gregoryvanbeek
 """
 
@@ -52,7 +47,7 @@ def hist_compare(datafile):
     del (line, l, line_counter, datafile)
 
 
-### determine number of reads per insertion per gene
+#%% determine number of reads per insertion per gene
     readperinspergene_list = [None]*len(lines)
     for i in range(len(tnpergene_list)):
         if not tnpergene_list[i] == 0:
