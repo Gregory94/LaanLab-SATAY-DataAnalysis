@@ -50,9 +50,9 @@ from read_sgdfeatures import sgd_features
 
 # for chrom in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI']:
 #     region=chrom
-region = 3 #e.g. 1, "I", ["I", 0, 10000"], gene name (e.g. "CDC42")
-wig_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig"
-pergene_insertions_file = r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt"
+region = 5 #e.g. 1, "I", ["I", 0, 10000"], gene name (e.g. "CDC42")
+wig_file = r"N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig"
+pergene_insertions_file = r"N:\tnw\BN\LL\Shared\Gregory\datasets\dataset_leila\leila_dataset\leila_dataset_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing2\align_out\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_peressential_insertions.txt"
 plotting=False
 variable="reads" #"reads" or "insertions"
 savefigure=False
@@ -318,7 +318,7 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
     reads_loc_list = [0] * len(dna_dict) # CONTAINS ALL READS JUST LIKE READS_IN_CHROM_LIST, BUT THIS LIST HAS THE SAME LENGTH AS THE NUMBER OF BP IN THE CHROMOSOME WHERE THE LOCATIONS WITH NO READS ARE FILLED WITH ZEROS
     i = 0
     for ins in insrt_in_chrom_list:
-        reads_loc_list[ins] = reads_in_chrom_list[i]
+        reads_loc_list[ins-1] = reads_in_chrom_list[i]
         i += 1
 
 
