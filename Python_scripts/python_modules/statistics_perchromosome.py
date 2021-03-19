@@ -16,6 +16,15 @@ sys.path.insert(1,os.path.join(file_dirname))
 from chromosome_and_gene_positions import chromosome_position, chromosomename_roman_to_arabic
 from chromosome_names_in_files import chromosome_name_bedfile
 
+
+#%%INPUT
+
+chromosome="I"
+bed_file=r"C:\Users\gregoryvanbeek\Desktop\matlab_python_compare\Python\WT.bam_clean.bed"
+printing=True
+
+
+
 #%%
 def chromosome_insertion_periodicity(chromosome=None,bed_file=None,gff_file=None,printing=False):
     '''Determines statistical values for the transposon insertion per chromosome.
@@ -26,12 +35,7 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,gff_file=None
 
 #%% USED FILES
     if gff_file is None:
-        import os
-        file_dirname = os.path.dirname(os.path.abspath('__file__'))
-        if os.path.isfile(os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')):
-            gff_file = os.path.join(file_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-        else:
-            gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+        gff_file = os.path.join(file_dirname,'..','..','data_files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
 #%% GET CHROMOSOME START AND END POSTIONS
     chr_length_dict, chr_start_pos_dict, chr_end_pos_dict = chromosome_position(gff_file)
 
@@ -75,7 +79,7 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,gff_file=None
 #                
 #        line_counter += 1
 
-    chrom_names_dict,chrom_start_index_dict, chrom_end_index_dict= chromosome_name_bedfile(lines)
+    chrom_names_dict,chrom_start_index_dict, chrom_end_index_dict= chromosome_name_bedfile(bed_file)
 
 
 #%% DETERMINE STATISTICS FOR INDIVIDUAL CHROMOSOMES AND PUT THE RESULTS IN A DICT
@@ -186,4 +190,4 @@ def chromosome_insertion_periodicity(chromosome=None,bed_file=None,gff_file=None
 
 #%%
 if __name__ == '__main__':
-    chromosome_insertion_periodicity(chromosome='xvi',bed_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed",printing=True)
+    chromosome_insertion_periodicity(chromosome=chromosome,bed_file=bed_file,printing=printing)
