@@ -26,8 +26,8 @@ def hit_free_region(gene_name='None',region=None,bed_file=None):
 #%% USED FILES
     datafile_dirname = os.path.join(file_dirname,'..')
     
-    gff_file = os.path.join(datafile_dirname,'Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
-    gene_information_file = os.path.join(datafile_dirname,'Data_Files','Yeast_Protein_Names.txt')
+    gff_file = os.path.join(datafile_dirname,'..','data_files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    gene_information_file = os.path.join(datafile_dirname,'..','data_files','Yeast_Protein_Names.txt')
 
 #%% GET START AND END POSITION OF GENE
     if gene_name.upper() == 'HOLOCUS' or gene_name == 'HO-LOCUS':
@@ -74,7 +74,7 @@ def hit_free_region(gene_name='None',region=None,bed_file=None):
 
 #%% GET POSITION FOR THE CHROMOSOMES IN THE BED FILE
 
-    chrom_start_line_dict, chrom_end_line_dict= chromosome_name_bedfile(lines)[1:3]
+    chrom_start_line_dict, chrom_end_line_dict= chromosome_name_bedfile(bed_file)[1:3]
 
 #%% GET ALL READS WITHIN THE GENE
     insertion_list = []
@@ -163,5 +163,4 @@ def hit_free_region(gene_name='None',region=None,bed_file=None):
 
 #%%
 if __name__ == '__main__':
-#    hit_free_region(region=['XI',1000,2000],bed_file=r"C:\Users\gregoryvanbeek\Documents\GitHub\LaanLab-SATAY-DataAnalysis\satay_analysis_testdata\Output_Processing\Cerevisiae_WT2_Michel2017_trimmed1.bam.bed")
-    hit_free_region(gene_name='bem1',bed_file=r"C:\Users\gregoryvanbeek\Documents\testing_site\wt1_testfolder\align_out\ERR1533148_trimmed.sorted.bam.bed")
+    insertion_list, read_list, max_empty_region, bp_between_tn_insertions = hit_free_region(gene_name='bem1',bed_file=r"C:\Users\gregoryvanbeek\Desktop\matlab_python_compare\Python\WT.bam_clean.bed")
