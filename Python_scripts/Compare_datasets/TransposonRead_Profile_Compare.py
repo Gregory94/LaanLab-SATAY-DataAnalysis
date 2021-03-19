@@ -352,17 +352,17 @@ def read_profile(wig_files = None, chrom_user_set='I',bar_width_user_set=None, s
 
 #%%
 if __name__ == '__main__':
-    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam.bed",
-                                  r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\a-b_pooled\WT.bed"],
-                        chrom_user_set='VII',
+    transposon_profile(bed_files=[r"C:\Users\gregoryvanbeek\Desktop\matlab_python_compare\Matlab\WT.bam.bed",
+                                  r"C:\Users\gregoryvanbeek\Desktop\matlab_python_compare\Python\WT.bam.bed"],
+                        chrom_user_set=['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI'],
                         bar_width_user_set=None,
                         savefigure_path=None,
                         savefigure_name=None)
 
-    # read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\leila_dataset_wt_processing\WT_merged-techrep-a_techrep-b_processing\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig",
-                                  # r"C:\Users\gregoryvanbeek\Documents\Data_Sets\dataset_leila\dataset_leila_wt\dataset_leila_wt_agnesprocessing\a-b_pooled\WT.wig"],
-                            # chrom_user_set="VII",
-                            # bar_width_user_set=None,
-                        # savefigure_path=None,
-                        # savefigure_name=None)
+    # read_profile(wig_files=[r"C:\Users\gregoryvanbeek\Desktop\matlab_python_compare\Matlab\WT.bam.wig",
+    #                         r"C:\Users\gregoryvanbeek\Desktop\matlab_python_compare\Python\WT.bam.wig"],
+    #                  chrom_user_set="I",
+    #                  bar_width_user_set=None,
+    #                  savefigure_path=None,
+    #                  savefigure_name=None)
 
