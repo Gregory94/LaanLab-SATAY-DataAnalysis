@@ -84,10 +84,10 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
 
 
 
-#%% Extract information from datasets
+### Extract information from datasets
     print('Plotting: %s' % variable)
-    tn_per_gene_zeroreplace = 5
-    read_per_gene_zeroreplace = 25
+    tn_per_gene_zeroreplace = 5 #Add 5 insertions to every gene
+    read_per_gene_zeroreplace = 25 #Add 25 reads  to every gene
     # norm_a = 0
     # norm_b = 0
     for count, datafile_a in enumerate(datafiles_list_a):
@@ -97,6 +97,8 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
                 norm_a = sum(tnread_gene_a.tn_per_gene)#*10**-4
             elif variable == 'read_per_gene':
                 norm_a = sum(tnread_gene_a.read_per_gene)#*10**-7
+            elif variable == 'Nreadsperinsrt':
+                norm_a = sum(tnread_gene_a.Nreadsperinsrt)
 
         #ADD A CONSTANT TO ALL VALUES TO PREVENT A ZERO DIVISION WHEN DETERMINING THE FOLD CHANGE.
         tnread_gene_a.tn_per_gene = tnread_gene_a.tn_per_gene + tn_per_gene_zeroreplace
@@ -123,6 +125,8 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
                 norm_b = sum(tnread_gene_b.tn_per_gene)#*10**-4
             elif variable == 'read_per_gene':
                 norm_b = sum(tnread_gene_b.read_per_gene)#*10**-7
+            elif variable == 'Nreadsperinsrt':
+                norm_b = sum(tnread_gene_b.Nreadsperinsrt)
 
         #ADD A CONSTANT TO ALL VALUES TO PREVENT A ZERO DIVISION WHEN DETERMINING THE FOLD CHANGE.
         tnread_gene_b.tn_per_gene = tnread_gene_b.tn_per_gene + tn_per_gene_zeroreplace
@@ -146,7 +150,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         del tnread_gene_a
 
 
-#%% APPLY stats.ttest_ind(A,B)
+##% APPLY stats.ttest_ind(A,B)
     fc_list = [np.nan]*len(variable_a_array) #initialize list for storing fold changes
     ttest_tval_list = [np.nan]*len(variable_a_array) #initialize list for storing t statistics
     ttest_pval_list = [np.nan]*len(variable_a_array) #initialize list for storing p-values
@@ -180,7 +184,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
         del (norm_a, norm_b)
 
 
-#%% Volcanoplot
+### Volcanoplot
     fig = plt.figure(figsize=(19.0,9.0))#(27.0,3))
     grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
     ax = plt.subplot(grid[0,0])
@@ -255,7 +259,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
-#%% return function
+### return function
     return(volcano_df)
 
 
@@ -266,7 +270,7 @@ path_b = path_a
 filelist_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
 
 
-variable = 'read_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
+variable = 'Nreadsperinsrt' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
