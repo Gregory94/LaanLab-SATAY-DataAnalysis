@@ -2,6 +2,7 @@
 # LaanLab-SATAY-DataAnalysis
 
 This repository contains codes, data and workflows for data analysis regarding SATAY experiments.
+This branch is the old master branch of this repository.
 
 ## License
 
