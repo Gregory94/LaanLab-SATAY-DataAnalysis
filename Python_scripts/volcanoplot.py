@@ -185,17 +185,17 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
 
 
 ### Volcanoplot
-    fig = plt.figure(figsize=(19.0,9.0))#(27.0,3))
+    fig = plt.figure(figsize=(15,10))#(27.0,3))
     grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
     ax = plt.subplot(grid[0,0])
 
     colors = {False:'black', True:'red'}
-    sc = ax.scatter(x=volcano_df['fold_change'], y=volcano_df['p_value'], alpha=0.4, marker='.', c=volcano_df['significance'].apply(lambda x:colors[x]))
+    sc = ax.scatter(x=volcano_df['fold_change'], y=volcano_df['p_value'], alpha=0.4, marker='o', c=volcano_df['significance'].apply(lambda x:colors[x]))
     ax.grid(True, which='major', axis='both', alpha=0.4)
     ax.set_xlabel('Log2 FC')
-    ax.set_ylabel('-1*Log10 p-value')
+    ax.set_ylabel('-*Log10 p-value')
     if not figure_title == "":
-        ax.set_title(variable + " - " + figure_title)
+        ax.set_title(figure_title)
     else:
         ax.set_title(variable)
     ax.scatter(x=[],y=[],marker='.',color='black', label='p-value > {}'.format(significance_threshold)) #set empty scatterplot for legend
@@ -260,6 +260,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
 
 
 ### return function
+    fig.savefig('volcanoplot_on_'+variable+'.png',dpi=300,format='png')
     return(volcano_df)
 
 
@@ -274,12 +275,12 @@ variable = 'Nreadsperinsrt' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
-#trackgene_list = []
+trackgene_list = []
 # trackgene_list = ['nrp1']
-trackgene_list = ['cdc42', 'bem1', 'bem2', 'bem3', 'nrp1', 'cdc24', 'cla4', 'ste20','osw7','mas2']
+#trackgene_list = [ 'bem1', 'bem2', 'bem3', 'cla4']
 # trackgene_list = ['ymr320w','sut1','ymr242w-a','ypl135c-a','ppn1','ypl067c','yme1','mec1','nrp1','mss18','tma7','gef1']
 
-figure_title = ""
+figure_title = "Reads per transposon"
 if __name__ == '__main__':
     volcano_df = volcano(path_a=path_a, filelist_a=filelist_a,
             path_b=path_b, filelist_b=filelist_b,
