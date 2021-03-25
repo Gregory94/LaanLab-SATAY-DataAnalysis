@@ -1,5 +1,5 @@
 # LaanLab-SATAY-DataAnalysis (dev_gregory)
-test
+
 This repository contains codes, data and workflows for data analysis regarding SATAY experiments, created by Gregory van Beek.
 
 For an example test dataset, see the Data Files folder in the master-branch.
@@ -16,8 +16,8 @@ This code is originally created by [the Kornmann-lab](https://sites.google.com/s
 Currently the following Matlab codes and data files are present:
 
 1. tn_and_reads_per_gene.m: This inputs a .bam file and outputs the number of transposons and reads per gene.
-2. names.mat: Matlab data file with all genes names. This file is required for running the matlab code 1.
-3. yeastGFF.mat: Matlab data file with information about the genes. This file is required for running the matlab code 1.
+2. names.mat: Matlab data file with all genes names. This file is required for running the matlab code one.
+3. yeastGFF.mat: Matlab data file with information about the genes. This file is required for running the matlab code one.
 
 ## Python_TransposonMapping
 
