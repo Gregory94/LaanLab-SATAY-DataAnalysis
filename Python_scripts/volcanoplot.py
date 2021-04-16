@@ -205,11 +205,15 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
     for i in np.arange(0,len(volcano_df)):
         x=volcano_df['fold_change'][i]
         y=volcano_df['p_value'][i]
-        if np.abs(x)>2 and y>3: 
+        if x<-0.8 and y>3: 
             
             #ax.text(x*(1-0.02) ,y*(1+0.02) , volcano_df['gene_names'][i] , fontsize=5)
             ax.annotate(volcano_df['gene_names'][i],(x*(1-0.02) ,y*(1+0.02)),size=10, c='green', bbox=dict(boxstyle="round", fc="w"))
         
+        elif x>1 and y>3: 
+            
+            #ax.text(x*(1-0.02) ,y*(1+0.02) , volcano_df['gene_names'][i] , fontsize=5)
+            ax.annotate(volcano_df['gene_names'][i],(x*(1-0.02) ,y*(1+0.02)),size=10, c='green', bbox=dict(boxstyle="round", fc="w"))
         
     if not trackgene_list == []:
         genenames_array = volcano_df['gene_names'].to_numpy()
@@ -266,21 +270,29 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
 
 #%%
 path_a = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\Calculations\Bioinformatic-Project\datasets\Leila_10Feb21_PerGeneFiles"
+#path_a=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-unpooled\annotated-essentials-in-WT'
+#path_a=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-unpooled'
+
 filelist_a = ["WT-a_pergene.txt", "WT-b_pergene.txt"]
+## wt annotated essentials
+#filelist_a = ["WT_merged-DpnII-NlaIII-a_trimmed.sorted.bam_peressential.txt","WT_merged-DpnII-NlaIII-b_trimmed.sorted.bam_peressential.txt"]
+#filelist_a = ["WT_merged-DpnII-NlaIII-b_trimmed.sorted.bam_pergene.txt","WT_merged-DpnII-NlaIII-b_trimmed.sorted.bam_pergene.txt"]
 path_b = path_a
 filelist_b = ["dnrp1-1-a_pergene.txt", "dnrp1-1-b_pergene.txt", "dnrp1-2-a_pergene.txt", "dnrp1-2-b_pergene.txt"]
+## wt annotated essentials in dnrp1 background
+#filelist_b=['dnrp1-1_merged-DpnII-NlaIII-a_trimmed.sorted.bam_peressential.txt','dnrp1-1_merged-DpnII-NlaIII-b_trimmed.sorted.bam_peressential.txt','dnrp1-2_merged-DpnII-NlaIII-a_trimmed.sorted.bam_peressential.txt','dnrp1-2_merged-DpnII-NlaIII-b_trimmed.sorted.bam_peressential.txt']
 
-
-variable = 'Nreadsperinsrt' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
+#filelist_b=['dnrp1-1_merged-DpnII-NlaIII-b_trimmed.sorted.bam_pergene.txt','dnrp1-1_merged-DpnII-NlaIII-b_trimmed.sorted.bam_pergene.txt','dnrp1-2_merged-DpnII-NlaIII-a_trimmed.sorted.bam_pergene.txt','dnrp1-2_merged-DpnII-NlaIII-b_trimmed.sorted.bam_pergene.txt']
+variable = 'tn_per_gene' #'read_per_gene' 'tn_per_gene', 'Nreadsperinsrt'
 significance_threshold = 0.01 #set threshold above which p-values are regarded significant
 normalize=True
 
 trackgene_list = []
-# trackgene_list = ['nrp1']
+#trackgene_list = ['mec1','rpa49']
 #trackgene_list = [ 'bem1', 'bem2', 'bem3', 'cla4']
 # trackgene_list = ['ymr320w','sut1','ymr242w-a','ypl135c-a','ppn1','ypl067c','yme1','mec1','nrp1','mss18','tma7','gef1']
 
-figure_title = "Reads per transposon"
+figure_title = "Transposons"
 if __name__ == '__main__':
     volcano_df = volcano(path_a=path_a, filelist_a=filelist_a,
             path_b=path_b, filelist_b=filelist_b,
