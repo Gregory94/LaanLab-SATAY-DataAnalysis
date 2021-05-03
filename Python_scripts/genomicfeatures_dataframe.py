@@ -106,11 +106,11 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
 ## FILES
     essentials_file = os.path.join(file_dirname,'..','Data_Files',"Cerevisiae_AllEssentialGenes_List.txt")
 
-    gene_information_file = os.path.join(file_dirname,'..','data_files','Yeast_Protein_Names.txt')
+    gene_information_file = os.path.join(file_dirname,'..','Data_Files','Yeast_Protein_Names.txt')
 
-    gff_file = os.path.join(file_dirname,'..','data_files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
+    gff_file = os.path.join(file_dirname,'..','Data_Files','Saccharomyces_cerevisiae.R64-1-1.99.gff3')
 
-    sgd_features_file = os.path.join(file_dirname,'..','data_files','SGD_features.tab')
+    sgd_features_file = os.path.join(file_dirname,'..','Data_Files','SGD_features.tab')
 
     variable = variable.lower()
     if plotting == True:
@@ -375,11 +375,11 @@ def dna_features(region, wig_file, pergene_insertions_file, variable="reads", pl
             N_reads_per_ins_list.append(0)
             N_reads_per_ins_truncatedgene_list.append(0)
         elif N_insrt_truncatedgene_list[i] == 0:
-            N_reads_per_ins_list.append(N_reads_list[i]/N_insrt_list[i])
+            N_reads_per_ins_list.append(N_reads_list[i]/N_insrt_list[i]-1)
             N_reads_per_ins_truncatedgene_list.append(0)
         else:
-            N_reads_per_ins_list.append(N_reads_list[i]/N_insrt_list[i])
-            N_reads_per_ins_truncatedgene_list.append(N_reads_truncatedgene_list[i]/N_insrt_truncatedgene_list[i])
+            N_reads_per_ins_list.append(N_reads_list[i]/N_insrt_list[i]-1)
+            N_reads_per_ins_truncatedgene_list.append(N_reads_truncatedgene_list[i]/N_insrt_truncatedgene_list[i]-1)
 
 
     #############get all essential genes together with their aliases##############
@@ -613,8 +613,13 @@ def feature_position(feature_dict, chrom, start_chr, dna_dict, feature_type=None
 
 #%%
 
-wig_file_WT_greg1=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig',
-per_gene_WT_gerg1=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-pooled\WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt'
+wig_file_WT_greg1=r'/data/localhome/linigodelacruz/Documents/PhD_2018/Documentation/SATAY/data/15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford/a-b-pooled/WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_clean.wig'
+per_gene_WT_greg1=r'/data/localhome/linigodelacruz/Documents/PhD_2018/Documentation/SATAY/data/15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford/a-b-pooled/WT_merged-techrep-a_techrep-b_trimmed.sorted.bam_pergene_insertions.txt'
+
+wig_file_dnrp1_greg1=r'/data/localhome/linigodelacruz/Documents/PhD_2018/Documentation/SATAY/data/15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford/a-b-pooled/dnrp1_merged_dnrp1-1_dnrp1-2_trimmed.sorted.bam_clean.wig'
+per_gene_dnrp1_greg1=r'/data/localhome/linigodelacruz/Documents/PhD_2018/Documentation/SATAY/data/15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford/a-b-pooled/dnrp1_merged_dnrp1-1_dnrp1-2_trimmed.sorted.bam_pergene_insertions.txt'
+
+
 
 wig_file_WT_agnes=r'N:\tnw\BN\LL\Shared\Leila\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\FASTQ_Generation_2021-02-10_19_53_12Z-376766391_2\a-b pooled\a-b pooled_transposonmapping_satay\WT.bam_clean.wig'
 per_gene_WT_agnes=r'N:\tnw\BN\LL\Shared\Leila\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\FASTQ_Generation_2021-02-10_19_53_12Z-376766391_2\a-b pooled\a-b pooled_transposonmapping_satay\WT.bam_pergene_insertions.txt'
@@ -626,8 +631,8 @@ if __name__ == '__main__':
     dna_df2=[]
     for chrom in chrom:
         dna_df2.append(dna_features(region = chrom,#['xiii', 0, 14790],
-                               wig_file=wig_file_WT_greg2,    
-                               pergene_insertions_file =per_gene_WT_greg2
+                               wig_file=wig_file_dnrp1_greg1,    
+                               pergene_insertions_file =per_gene_dnrp1_greg1
     ,variable="reads", #for plotting
                      plotting=False,
                      savefigure=False,
