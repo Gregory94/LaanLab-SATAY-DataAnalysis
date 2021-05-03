@@ -269,7 +269,7 @@ def volcano(path_a, filelist_a, path_b, filelist_b, variable='read_per_gene', si
 
 
 #%%
-path_a = r"C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\Calculations\Bioinformatic-Project\datasets\Leila_10Feb21_PerGeneFiles"
+path_a = r"/data/localhome/linigodelacruz/Documents/PhD_2018/Documentation/Calculations/Bioinformatic-Project/datasets/Leila_10Feb21_PerGeneFiles"
 #path_a=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-unpooled\annotated-essentials-in-WT'
 #path_a=r'C:\Users\linigodelacruz\Documents\PhD_2018\Documentation\SATAY\data\15022021-sequencing-data-WT-dnrp1-SATAY-from-Oxford\a-b-unpooled'
 
